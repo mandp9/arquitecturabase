@@ -1,0 +1,19 @@
+{
+  "name": "arquitecturabase",
+  "version": "1.0.0",
+  "description": "procesos sprint 1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mandp9/arquitecturabase.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mandp9/arquitecturabase/issues"
+  },
+  "homepage": "https://github.com/mandp9/arquitecturabase#readme"
+}
