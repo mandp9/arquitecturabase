@@ -8,11 +8,9 @@ const PORT = process.env.PORT || 3000; //puerto que utilizara para escuchar
 app.use(express.static(__dirname + "/")); //carga middleware
 let sistema = new modelo.Sistema();
 
-app.get("/", function(request, response){
-    response.statusCode = 200;
-    response.setHeader('Content-Type', 'text/plain');
-    response.end('Hola Mundo!');
-});
+var contenido=fs.readFileSync(__dirname+"/cliente/index.html");
+response.setHeader("Content-type","text/html");
+response.send(contenido);
 
 app.listen(PORT, () => {
     console.log(`App está escuchando en el puerto ${PORT}`);
