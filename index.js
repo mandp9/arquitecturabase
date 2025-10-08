@@ -1,11 +1,12 @@
 const fs = require("fs");
 const express = require('express');
 const app = express(); //para librerias
-//const modelo = require("./servidor/modelo.js");
+const modelo = require("./servidor/modelo.js");
 
 const PORT = process.env.PORT || 3000; //puerto que utilizara para escuchar
 
 app.use(express.static(__dirname + "/")); //carga middleware
+let sistema = new modelo.Sistema();
 
 app.get("/", function(request, response){
     response.statusCode = 200;
