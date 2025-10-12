@@ -4,6 +4,7 @@
   "description": "procesos sprint 1",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "testW": "node_modules\\.bin\\jasmine-node servidor",
     "test": "./node_modules/.bin/jasmine-node servidor"
   },
