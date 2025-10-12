@@ -7,7 +7,6 @@
     "testW": "node_modules\\.bin\\jasmine-node servidor",
     "test": "./node_modules/.bin/jasmine-node servidor"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mandp9/arquitecturabase.git"
@@ -20,5 +19,8 @@
   "homepage": "https://github.com/mandp9/arquitecturabase#readme",
   "dependencies": {
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "jasmine-node": "^3.0.0"
   }
 }
