@@ -4,7 +4,7 @@ describe('El sistema', function() {
   let sistema;
 
   beforeEach(function() {
-    sistema = new Sistema();
+    sistema = new modelo.Sistema();
   });
 
   it('inicialmente no hay usuarios', function() {
@@ -14,14 +14,14 @@ describe('El sistema', function() {
    it('agregar usuario', function() {
     sistema.agregarUsuario('Maria');
     expect(sistema.numeroUsuarios()).toEqual(1);
-    expect(sistema.usuarioActivo('Maria')).toBeTrue();
+    expect(sistema.usuarioActivo('Maria')).toBe(true);
   });
 
     it('eliminar usuario', function(){
       sistema.agregarUsuario('Maria');
       const eliminado = sistema.eliminarUsuario('Maria');
-      expect(eliminado).toBeTrue();
-      expect(sistema.usuarioActivo('Maria')).toBeFalse();
+      expect(eliminado).toBe(true);
+      expect(sistema.usuarioActivo('Maria')).toBe(false);
       expect(sistema.numeroUsuarios()).toEqual(0);
   });
 
@@ -35,7 +35,9 @@ describe('El sistema', function() {
   
     it('usuario activo', function(){
       sistema.agregarUsuario('Maria');
-      expect(sistema.usuarioActivo('Maria')).toBeTrue();
-      expect(sistema.usuarioActivo('Pedro')).toBeFalse();
+      expect(sistema.usuarioActivo('Maria')).toBe(true);
+      expect(sistema.usuarioActivo('Pedro')).toBe(false);
     });
 });
+
+//npm run testW
