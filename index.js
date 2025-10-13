@@ -14,11 +14,36 @@ app.get('/', (request, response) => {
     response.send(contenido);
 });
 app.get("/agregarUsuario/:nick",function(request,response){
-let nick=request.params.nick;
-let res=sistema.agregarUsuario(nick);
-response.send(res);
+    let nick=request.params.nick;
+    let res=sistema.agregarUsuario(nick);
+    response.json(res);
 });
 
+app.get('/obtenerUsuarios', function (req, res) {
+  var dic = sistema.obtenerUsuarios();
+  var lista = Object.keys(dic).map(n => dic[n]);
+  res.json(lista);
+});
+
+
+app.get('/usuarioActivo/:nick', function (req, res) {
+  var nick = req.params.nick;
+  var activo = sistema.usuarioActivo(nick);
+  res.json({ activo: activo }); // {activo:true/false}
+});
+
+
+app.get('/numeroUsuarios', function (req, res) {
+  var num = sistema.numeroUsuarios();
+  res.json({ num: num }); // {num:N}
+});
+
+
+app.get('/eliminarUsuario/:nick', function (req, res) {
+  var nick = req.params.nick;
+  var ok = sistema.eliminarUsuario(nick);
+  res.json({ ok: ok }); // {ok:true/false}
+});
 app.listen(PORT, () => {
     console.log(`App está escuchando en el puerto ${PORT}`);
     console.log('Ctrl+C para salir');
