@@ -48,3 +48,5 @@ app.listen(PORT, () => {
     console.log(`App está escuchando en el puerto ${PORT}`);
     console.log('Ctrl+C para salir');
 });
+
+//node index.js
