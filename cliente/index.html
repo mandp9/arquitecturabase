@@ -17,12 +17,9 @@
   <!-- NAVBAR -->
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <a class="navbar-brand" href="#">Sistema</a>
-    <ul class="navbar-nav">
-      <li class="nav-item"><a class="nav-link" href="#au">Link 1</a></li>
-      <li class="nav-item"><a class="nav-link" href="#au">Link 2</a></li>
-      <li class="nav-item"><a class="nav-link" href="#au">Link 3</a></li>
-    </ul>
+    <ul class="navbar-nav ml-auto" id="menu"></ul>
   </nav>
+
 
   <!-- Contenido principal -->
   <div class="container py-4">
@@ -56,9 +53,9 @@
     }
 
     // instancias y render
-    window.rest = new ClienteRest();
-    window.cw   = new ControlWeb();
-    $(function(){ cw.mostrarAgregarUsuario(); });
+    cw=new ControlWeb(); 
+    rest=new ClienteRest(); 
+    cw.comprobarSesion();
   </script>
 </body>
 </html>

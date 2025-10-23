@@ -1,14 +1,17 @@
 function ClienteRest(){
-this.agregarUsuario=function(nick){
-var cli=this;
-$.getJSON("/agregarUsuario/"+nick,function(data){
-if (data.nick!=-1){
-console.log("Usuario "+nick+" ha sido registrado")
-}
-else{
-console.log("El nick ya está ocupado");
-}
-})
+this.agregarUsuario = function(nick){
+  $.getJSON("/agregarUsuario/"+nick, function(data){
+    let msg = "El nick "+nick+" está ocupado";
+    if (data.nick != -1){
+      console.log("Usuario "+nick+" ha sido registrado");
+      msg = "Bienvenido al sistema, "+nick;
+      localStorage.setItem("nick", nick);
+    } else {
+      console.log("El nick ya está ocupado");
+    }
+    cw.mostrarMensaje(msg);
+    cw.pintarMenu(localStorage.getItem("nick"));
+  });
 };
 this.agregarUsuario2 = function (nick) {
     $.ajax({
