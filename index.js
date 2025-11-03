@@ -1,6 +1,8 @@
 const fs = require("fs");
 const express = require('express');
 const app = express(); //para librerias
+const passport=require("passport");
+const cookieSession=require("cookie-session");
 const modelo = require("./servidor/modelo.js");
 
 const PORT = process.env.PORT || 3000; //puerto que utilizara para escuchar
