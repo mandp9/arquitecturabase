@@ -1,18 +1,24 @@
 function ClienteRest(){
-this.agregarUsuario = function(nick){
-  $.getJSON("/agregarUsuario/"+nick, function(data){
-    let msg = "El nick "+nick+" está ocupado";
-    if (data.nick != -1){
-      console.log("Usuario "+nick+" ha sido registrado");
-      msg = "Bienvenido al sistema, "+nick;
-      $.setItem("nick", nick);
+this.agregarUsuario = function(nick) {
+  $.getJSON("/agregarUsuario/" + nick, function(data) {
+    if (data.nick != -1) {
+      console.log("Usuario " + nick + " ha sido registrado");
+      const msg = "Bienvenido al sistema, " + nick;
+      $.cookie("nick", nick, { path: '/' });
+      cw.mostrarMensaje(msg);
+      cw.pintarMenu($.cookie('nick'));
     } else {
       console.log("El nick ya está ocupado");
+      $.removeCookie("nick");
+      cw.mostrarMensaje("El nick " + nick + " está ocupado. Elige otro nombre.");
+      setTimeout(() => cw.mostrarAgregarUsuario(), 1500);
     }
-    cw.mostrarMensaje(msg);
-    cw.pintarMenu($.cookie('nick'));
+  }).fail(function(xhr, status, err) {
+    console.error("Error en agregarUsuario:", status, err);
+    alert("Error al conectar con el servidor");
   });
 };
+
 this.agregarUsuario2 = function (nick) {
     $.ajax({
       type: 'GET',
