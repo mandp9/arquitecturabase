@@ -3,12 +3,23 @@ const express = require('express');
 const app = express(); //para librerias
 const passport=require("passport");
 const cookieSession=require("cookie-session");
+require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
 
 const PORT = process.env.PORT || 3000; //puerto que utilizara para escuchar
 
 app.use(express.static(__dirname + "/")); //carga middleware
 let sistema = new modelo.Sistema();
+
+app.use(cookieSession({
+ name: 'Sistema',
+ keys: ['key1', 'key2']
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/auth/google",passport.authenticate('google', { scope: ['profile','email'] }));
 
 app.get('/', (request, response) => {
   var contenido=fs.readFileSync(__dirname+"/cliente/index.html");
