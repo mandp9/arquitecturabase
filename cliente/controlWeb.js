@@ -35,7 +35,7 @@ function ControlWeb() {
     });
   };
   this.comprobarSesion=function(){
-    let nick=localStorage.getItem("nick");
+    const nick = $.cookie('nick');
     this.pintarMenu(nick);
     if (nick){
       this.mostrarMensaje("Bienvenido al sistema, "+nick);
@@ -55,10 +55,16 @@ function ControlWeb() {
     this.salir(); 
   });
   };
-  this.salir=function(){
-    const nick = localStorage.getItem('nick');
-    localStorage.removeItem("nick");
+  this.salir = function () {
+    const nick = $.cookie('nick') || localStorage.getItem('nick'); // fallback opcional
+
+    // borrar sesión
+    $.removeCookie('nick', { path: '/' });
+
+    // actualizar UI + despedida y recarga
     this.pintarMenu(null);
     this.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
-    setTimeout(() => location.reload(), 1200); };
+    setTimeout(() => location.reload(), 1200);
+};
+
 }

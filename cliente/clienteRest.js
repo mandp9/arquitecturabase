@@ -5,12 +5,12 @@ this.agregarUsuario = function(nick){
     if (data.nick != -1){
       console.log("Usuario "+nick+" ha sido registrado");
       msg = "Bienvenido al sistema, "+nick;
-      localStorage.setItem("nick", nick);
+      $.setItem("nick", nick);
     } else {
       console.log("El nick ya está ocupado");
     }
     cw.mostrarMensaje(msg);
-    cw.pintarMenu(localStorage.getItem("nick"));
+    cw.pintarMenu($.cookie('nick'));
   });
 };
 this.agregarUsuario2 = function (nick) {
@@ -77,4 +77,5 @@ this.agregarUsuario2 = function (nick) {
       console.log('Eliminado:', data);
     });
   };
+  
 }
