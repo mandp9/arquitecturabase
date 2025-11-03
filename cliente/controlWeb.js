@@ -16,24 +16,30 @@ function ControlWeb() {
       `);
     }
   };
-  this.mostrarAgregarUsuario = function () {
-    var html = '';
-    html += '<div id="mAU">';
-    html += '  <div class="form-group">';
-    html += '    <label for="nick">Nick:</label>';
-    html += '    <input type="text" class="form-control" id="nick" placeholder="introduce un nick">';
-    html += '  </div>';
-    html += '  <button id="btnAU" class="btn btn-primary">Submit</button>';
-    html += '</div>';
+  this.mostrarAgregarUsuario = function(){
+    $('#bnv').remove();
+    $('#mAU').remove();
+    let cadena = '<div id="mAU">';
+    cadena = cadena + '<div class="card"><div class="card-body">';
+    cadena = cadena + '<div class="form-group">';
+    cadena = cadena + '<label for="nick">Nick:</label>';
+    cadena = cadena + '<p><input type="text" class="form-control" id="nick" placeholder="introduce un nick"></p>';
+    cadena = cadena + '<button id="btnAU" type="submit" class="btn btn-primary">Submit</button>';
+    // Botón “Acceso con Google” igual que en el guion
+    cadena = cadena + '<div><a href="/auth/google"><img src="./cliente/img/btn_google_signin_light_focus_web@2x.png" style="height:40px;"></a></div>';
+    cadena = cadena + '</div>';
+    cadena = cadena + '</div></div></div>';
 
-    $('#au').empty().append(html);
+    // Inyectamos en el contenedor
+    $('#au').empty().append(cadena);
 
-    $('#btnAU').on('click', function () {
+    $('#btnAU').on('click', function(){
       var nick = $('#nick').val().trim();
-      if (!nick) { alert('Escribe un nick'); return; }
-      rest.agregarUsuario(nick);               // llama a tu endpoint
-    });
-  };
+      if (!nick){ alert('Escribe un nick'); return; }
+      rest.agregarUsuario(nick);
+  });
+};
+
   this.comprobarSesion=function(){
     const nick = $.cookie('nick');
     this.pintarMenu(nick);
@@ -44,17 +50,15 @@ function ControlWeb() {
       this.mostrarAgregarUsuario();
     }
   };
-  this.mostrarMensaje = function (msg) {
-  const html = `
-    <div class="alert alert-info" role="alert">
-      ${msg}
-    </div>
-  `;
-  $('#au').html(html);
-   $('#btnSalir').on('click', () => {
-    this.salir(); 
-  });
+   this.mostrarMensaje = function (msg) {
+    const html = `
+      <div class="alert alert-info" role="alert">
+        ${msg}
+      </div>
+    `;
+    $('#au').html(html);
   };
+
   this.salir = function () {
     const nick = $.cookie('nick') || localStorage.getItem('nick'); // fallback opcional
 
