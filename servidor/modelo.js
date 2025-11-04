@@ -1,5 +1,12 @@
+const datos=require("./cad.js");
+
 function Sistema(test){
   this.usuarios = {};
+  this.cad=new datos.CAD();
+  this.cad.conectar(function(db){
+        console.log("Conectado a Mongo Atlas");
+    });
+    
   this.agregarUsuario = function(nick){
     let res={"nick":-1};
     if (!this.usuarios[nick]){
@@ -32,11 +39,11 @@ function Sistema(test){
 
 function Usuario(nick){
   this.nick = nick;
-if(!test.test){
-  this.cad.conectar(function(db){
-    console.log("Conectado a Mango Atlas");});
-    //Aqui puedes realizar operaciones con la base de datos
-}
+  if(!test.test){
+    this.cad.conectar(function(db){
+      console.log("Conectado a Mango Atlas");});
+      //Aqui puedes realizar operaciones con la base de datos
+  }
 }
 
 
