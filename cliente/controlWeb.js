@@ -26,7 +26,7 @@ function ControlWeb() {
     cadena = cadena + '<p><input type="text" class="form-control" id="nick" placeholder="introduce un nick"></p>';
     cadena = cadena + '<button id="btnAU" type="submit" class="btn btn-primary">Submit</button>';
     // Botón “Acceso con Google” igual que en el guion
-    cadena = cadena + '<div><a href="/auth/google"><img src="./cliente/img/btn_google_signin_light_focus_web@2x.png" style="height:40px;"></a></div>';
+    cadena = cadena + '<div><a href="/auth/google"><img src="/cliente/img/web_light_rd_SI@1x.png" style="height:40px;"></a></div>';
     cadena = cadena + '</div>';
     cadena = cadena + '</div></div></div>';
 
