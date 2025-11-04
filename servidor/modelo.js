@@ -1,4 +1,4 @@
-function Sistema(){
+function Sistema(test){
   this.usuarios = {};
   this.agregarUsuario = function(nick){
     let res={"nick":-1};
@@ -32,6 +32,12 @@ function Sistema(){
 
 function Usuario(nick){
   this.nick = nick;
+if(!test.test){
+  this.cad.conectar(function(db){
+    console.log("Conectado a Mango Atlas");});
+    //Aqui puedes realizar operaciones con la base de datos
 }
+}
+
 
 module.exports.Sistema = Sistema;
