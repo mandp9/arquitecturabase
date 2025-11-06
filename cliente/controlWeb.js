@@ -47,7 +47,7 @@ function ControlWeb() {
       let email=$("#email").val();
       let pwd=$("#pwd").val();
       if (email && pwd){
-      //rest.registrarUsuario(nick);
+      rest.registrarUsuario(email,pwd);
       console.log(email+" "+pwd);
       }
       });
@@ -84,6 +84,10 @@ function ControlWeb() {
     this.pintarMenu(null);
     this.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
     setTimeout(() => location.reload(), 1200);
-};
-
+  };
+  this.limpiar = function() {
+    $('#au').empty(); // Contenedor de "agregar usuario" / mensajes
+    $('#registro').empty(); // Contenedor del formulario de registro
+    $('#msg').empty(); // Contenedor de mensajes (si lo usas para feedback)
+  };
 }
