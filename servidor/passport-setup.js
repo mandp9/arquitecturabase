@@ -30,7 +30,6 @@ passport.use(
       //clientSecret: "xxxx", //local
       clientSecret: options.clientSecret, 
       verifyCsrfToken: false, // whether to validate the csrf token or
-      not
    },
    function (profile, done) {
       return done(null, profile);
