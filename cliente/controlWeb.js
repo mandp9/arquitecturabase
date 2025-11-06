@@ -39,15 +39,30 @@ function ControlWeb() {
       rest.agregarUsuario(nick);
   });
 };
+  this.mostrarRegistro=function(){
+  $("#fmRegistro").remove();
+  $("#registro").load("./cliente/registro.html",function(){
+    $("#btnRegistro").on("click",function(e){
+      e.preventDefault();
+      let email=$("#email").val();
+      let pwd=$("#pwd").val();
+      if (email && pwd){
+      //rest.registrarUsuario(nick);
+      console.log(email+" "+pwd);
+      }
+      });
+    });
+  },
 
   this.comprobarSesion=function(){
     const nick = $.cookie('nick');
     this.pintarMenu(nick);
+    $('#au').empty();
     if (nick){
       this.mostrarMensaje("Bienvenido al sistema, "+nick);
     }
     else{
-      this.mostrarAgregarUsuario();
+      this.mostrarRegistro();
     }
   };
    this.mostrarMensaje = function (msg) {

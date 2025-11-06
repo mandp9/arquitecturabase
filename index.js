@@ -94,4 +94,11 @@ app.post('/oneTap/callback',
     }
 );
 
+app.post("/registrarUsuario",function(request,response){
+  sistema.registrarUsuario(request.body,function(res){
+  response.send({"nick":res.email});
+  });
+});
+
+
 //node index.js
