@@ -5,6 +5,7 @@ const passport=require("passport");
 const cookieSession=require("cookie-session");
 require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
+const bodyParser=require("body-parser");
 
 const PORT = process.env.PORT || 3000; //puerto que utilizara para escuchar
 
@@ -12,6 +13,9 @@ app.use(cookieSession({
  name: 'Sistema',
  keys: ['key1', 'key2']
 }));
+
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -82,5 +86,12 @@ app.listen(PORT, () => {
     console.log(`App está escuchando en el puerto ${PORT}`);
     console.log('Ctrl+C para salir');
 });
+
+app.post('/oneTap/callback',
+    passport.authenticate('google-one-tap', { failureRedirect: '/fallo' }),
+    function(req, res) {
+        res.redirect('/good');
+    }
+);
 
 //node index.js

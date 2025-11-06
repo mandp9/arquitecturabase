@@ -24,7 +24,8 @@
     "express": "^5.1.0",
     "mongodb": "^4.17.2",
     "passport": "^0.5.3",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "passport-google-one-tap": "^1.0.1"
   },
   "devDependencies": {
     "jasmine-node": "^3.0.0"

@@ -1,6 +1,7 @@
 const passport=require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 require("dotenv").config();
+const GoogleOneTapStrategy = require("passport-google-one-tap").GoogleOneTapStrategy;
 
 let options = {};
 options.clientID = process.env.GOOGLE_CLIENT_ID;
@@ -22,3 +23,17 @@ passport.use(new GoogleStrategy({
     return done(null, profile);
  }
 ));
+passport.use(
+   new GoogleOneTapStrategy(
+   {
+      client_id: options.clientID, //prod-oneTap
+      //clientSecret: "xxxx", //local
+      clientSecret: options.clientSecret, 
+      verifyCsrfToken: false, // whether to validate the csrf token or
+      not
+   },
+   function (profile, done) {
+      return done(null, profile);
+   }
+   )
+);
