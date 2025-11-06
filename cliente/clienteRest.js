@@ -91,7 +91,7 @@ this.agregarUsuario2 = function (nick) {
       success:function(data){
       if (data.nick!=-1){
       console.log("Usuario "+data.nick+" ha sido registrado");
-      $.cookie("nick",data.nick);
+      $.cookie("nick",data.nick,{ path: '/' });
       cw.limpiar();
       cw.mostrarMensaje("Bienvenido al sistema, "+data.nick);
       //cw.mostrarLogin();
