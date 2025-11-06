@@ -27,14 +27,13 @@ app.get('/google/callback',
 });
 
 app.get("/good", function(request,response){
- let nick=request.user.emails[0].value;
- if (nick){
- sistema.agregarUsuario(nick);
- }
- //console.log(request.user.emails[0].value);
- response.cookie('nick',nick);
- response.redirect('/');
+ let email=request.user.emails[0].value;
+  sistema.usuarioGoogle({"email":email},function(obj){
+  response.cookie('nick',obj.email);
+  response.redirect('/');
+  });
 });
+
 
 app.get("/fallo",function(request,response){
  response.send({nick:"nook"})
