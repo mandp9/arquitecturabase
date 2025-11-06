@@ -21,6 +21,7 @@ function CAD(){
     this.insertarUsuario=function(usuario,callback){
         insertar(this.usuarios,usuario,callback);
     }
+}
 
     function buscarOCrear(coleccion,criterio,callback)
     {
@@ -56,5 +57,5 @@ function CAD(){
         });
     }
 
-}
+
 module.exports.CAD=CAD;
