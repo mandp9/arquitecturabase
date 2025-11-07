@@ -106,7 +106,16 @@ this.agregarUsuario2 = function (nick) {
       },
       contentType:'application/json'
       });
-  }
+  };
+  this.cerrarSesion = function(){
+    $.getJSON("/cerrarSesion", function(){
+        // Opcional: El servidor debería manejar el logout de Passport y la redirección
+        // En este callback podemos confirmar que el proceso terminó
+        console.log("Sesión de servidor notificada."); 
+    }).fail(function(xhr, status, err) {
+        console.error("Error al notificar cierre de sesión:", status, err);
+    });
+};
 
   
 }

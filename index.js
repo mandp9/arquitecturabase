@@ -79,6 +79,19 @@ app.get('/eliminarUsuario/:nick', function (req, res) {
   var ok = sistema.eliminarUsuario(nick);
   res.json({ ok: ok }); // {ok:true/false}
 });
+app.get("/cerrarSesion", function (request, response, next) {
+    let nick = request.user ? request.user.nick : undefined; 
+    
+    request.logout(function(err) {
+        if (err) { return next(err); }
+        
+        if (nick) {
+            sistema.eliminarUsuario(nick); 
+        }
+        
+        response.redirect("/"); 
+    });
+});
 
 app.use(express.static(__dirname + "/"));
 

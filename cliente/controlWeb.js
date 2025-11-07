@@ -81,8 +81,7 @@ function ControlWeb() {
     $.removeCookie("nick");
     rest.cerrarSesion();
     // actualizar UI + despedida y recarga
-    this.pintarMenu(null);
-    this.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
+    cw.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
     setTimeout(() => location.reload(), 1200);
   };
   this.limpiar = function() {
