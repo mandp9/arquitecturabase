@@ -75,11 +75,11 @@ function ControlWeb() {
   };
 
   this.salir = function () {
-    const nick = $.cookie('nick') || localStorage.getItem('nick'); // fallback opcional
+    //const nick = $.cookie('nick') || localStorage.getItem('nick'); // fallback opcional
 
     // borrar sesión
-    $.removeCookie('nick', { path: '/' });
-
+    $.removeCookie("nick");
+    rest.cerrarSesion();
     // actualizar UI + despedida y recarga
     this.pintarMenu(null);
     this.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
