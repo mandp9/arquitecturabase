@@ -67,7 +67,11 @@
 
     // instancias y render
     cw=new ControlWeb(); 
-    rest=new ClienteRest(); 
+    rest=new ClienteRest(cw); 
+    $("#menu").on("click", "#lnkSalir", function(e) {
+        e.preventDefault();
+        cw.salir(); // Llama a la función de cierre de sesión
+    });
     cw.comprobarSesion();
   </script>
 </body>

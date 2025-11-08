@@ -5,8 +5,7 @@ this.agregarUsuario = function(nick) {
       console.log("Usuario " + nick + " ha sido registrado");
       const msg = "Bienvenido al sistema, " + nick;
       $.cookie("nick", nick, { path: '/' });
-      cw.mostrarMensaje(msg);
-      cw.pintarMenu($.cookie('nick'));
+      cw.comprobarSesion();
     } else {
       console.log("El nick ya está ocupado");
       $.removeCookie("nick");
@@ -93,8 +92,7 @@ this.agregarUsuario2 = function (nick) {
       console.log("Usuario "+data.nick+" ha sido registrado");
       $.cookie("nick",data.nick,{ path: '/' });
       cw.limpiar();
-      cw.mostrarMensaje("Bienvenido al sistema, "+data.nick);
-      //cw.mostrarLogin();
+      cw.comprobarSesion();
       }
       else{
       console.log("El nick está ocupado");

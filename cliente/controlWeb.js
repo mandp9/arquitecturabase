@@ -7,7 +7,6 @@ function ControlWeb() {
         <li class="nav-item"><a class="nav-link" href="#link2">Link 2</a></li>
         <li class="nav-item"><a id="lnkSalir" class="nav-link" href="#">Salir</a></li>
       `);
-      $("#lnkSalir").on("click", (e) => { e.preventDefault(); this.salir(); });
     } else {
       $menu.html(`
         <li class="nav-item"><a class="nav-link" href="#login">Inicio sesión</a></li>
@@ -76,7 +75,7 @@ function ControlWeb() {
 
   this.salir = function () {
     //const nick = $.cookie('nick') || localStorage.getItem('nick'); // fallback opcional
-
+    const nick = $.cookie('nick');
     // borrar sesión
     $.removeCookie("nick");
     rest.cerrarSesion();
