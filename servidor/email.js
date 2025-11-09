@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
-const url = "http://localhost:3000/";
-//const url="tu-url-de-despliegue";
+const url = process.env.BASE_URL || "http://localhost:3000/";
+
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
