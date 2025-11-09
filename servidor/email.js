@@ -5,14 +5,14 @@ const url = "http://localhost:3000/";
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'tu-cuenta@gmail.com', 
-    pass: 'tu-clave-generada-en-Gmail' 
+    user: 'pirma.ba@gmail.com', 
+    pass: 'rmsn fwjw rqsg ylfv' 
   }
 });
 
 module.exports.enviarEmail = async function(direccion, key, men) {
   const result = await transporter.sendMail({
-    from: 'tu-cuenta@gmail.com', 
+    from: 'pirma.ba@gmail.com', 
     to: direccion, 
     subject: men, 
     text: 'Pulsa aquí para confirmar cuenta', 
