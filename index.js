@@ -22,7 +22,7 @@ const haIniciado=function(request,response,next){
 
 app.use(cookieSession({
  name: 'Sistema',
- keys: ['key1', 'key2']
+ keys: [process.env.KEY1, process.env.KEY2]
 }));
 
 app.use(bodyParser.urlencoded({extended:true}));
