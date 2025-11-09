@@ -90,21 +90,54 @@ this.agregarUsuario2 = function (nick) {
       success:function(data){
       if (data.nick!=-1){
       console.log("Usuario "+data.nick+" ha sido registrado");
-      $.cookie("nick",data.nick,{ path: '/' });
-      cw.limpiar();
-      cw.comprobarSesion();
+      cw.mostrarMensaje("Usuario " + data.nick + " registrado. Por favor, inicia sesión.");
+      cw.mostrarLogin();
       }
       else{
-      console.log("El nick está ocupado");
+      console.log("El email ya está ocupado");
+      cw.mostrarMensaje("El email " + email + " ya está registrado. Prueba con otro.");
+      $("#btnRegistro").prop("disabled", false).text("Registrar");
       }
       },
       error:function(xhr, textStatus, errorThrown){
       console.log("Status: " + textStatus);
       console.log("Error: " + errorThrown);
+      cw.mostrarMensaje("Error de conexión al registrar. Inténtalo de nuevo.");
+      $("#btnRegistro").prop("disabled", false).text("Registrar");
       },
       contentType:'application/json'
       });
   };
+  this.loginUsuario = function(email, password) {
+    $.ajax({
+      type: 'POST',
+      url: '/loginUsuario', 
+      data: JSON.stringify({ "email": email, "password": password }),
+      success: function(data) {
+        if (data.nick != -1) {
+          console.log("Usuario " + data.nick + " ha iniciado sesión");
+          $.cookie("nick", data.nick);
+          cw.limpiar();
+          // Llamamos a comprobarSesion para que pinte el menú y el saludo
+          cw.comprobarSesion(); 
+        } else {
+          console.log("No se pudo iniciar sesión");
+          cw.mostrarMensaje("Error: Email o contraseña incorrectos.");
+          // Reactivamos el botón
+          $("#btnLogin").prop("disabled", false).text("Iniciar sesión");
+        }
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        // TAREA CUMPLIDA: Mensaje en caso de error
+        console.log("Status: " + textStatus);
+        cw.mostrarMensaje("Error de conexión al iniciar sesión.");
+        // Reactivamos el botón
+        $("#btnLogin").prop("disabled", false).text("Iniciar sesión");
+      },
+      contentType: 'application/json'
+    });
+  };
+
   this.cerrarSesion = function(){
     $.getJSON("/cerrarSesion", function(){
         // Opcional: El servidor debería manejar el logout de Passport y la redirección

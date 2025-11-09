@@ -40,37 +40,72 @@ function ControlWeb() {
 };
   this.mostrarRegistro=function(){
   $("#fmRegistro").remove();
+  $("#fmLogin").remove();
   $("#registro").load("./cliente/registro.html",function(){
     $("#btnRegistro").on("click",function(e){
       e.preventDefault();
       let email=$("#email").val();
       let pwd=$("#pwd").val();
       if (email && pwd){
-      rest.registrarUsuario(email,pwd);
-      console.log(email+" "+pwd);
+        $(this).prop("disabled", true).text("Registrando...");
+        rest.registrarUsuario(email,pwd);
+        console.log(email+" "+pwd);
       }
       });
+    $("#registro").append('<p>¿Ya tienes cuenta? <a href="#" id="linkLogin">Inicia sesión</a></p>');
+      $("#linkLogin").on("click", function(e){
+        e.preventDefault();
+        cw.mostrarLogin();
+      });
     });
-  },
+  };
+
+  this.mostrarLogin = function() {
+    $("#fmLogin").remove();
+    // Limpiamos el div de registro si estuviera
+    $("#fmRegistro").remove(); 
+    
+    $("#registro").load("./cliente/login.html", function() {
+      // Deshabilitar botón al enviar
+      $("#btnLogin").off("click").on("click", function(e) {
+        e.preventDefault();
+        let email = $("#email").val();
+        let pwd = $("#pwd").val();
+        if (email && pwd) {
+          // Deshabilitamos botón
+          $(this).prop("disabled", true).text("Iniciando sesión...");
+          rest.loginUsuario(email, pwd);
+        }
+      });
+      $("#registro").append('<p>¿No tienes cuenta? <a href="#" id="linkRegistro">Regístrate aquí</a></p>');
+      $("#linkRegistro").on("click", function(e){
+        e.preventDefault();
+        cw.mostrarRegistro();
+      });
+    });
+  };
 
   this.comprobarSesion=function(){
     const nick = $.cookie('nick');
     this.pintarMenu(nick);
     $('#au').empty();
     if (nick){
-      this.mostrarMensaje("Bienvenido al sistema, "+nick);
+      this.mostrarMensaje("Bienvenido al sistema, "+ nick);
     }
     else{
-      this.mostrarRegistro();
+      this.mostrarLogin();
     }
   };
+
    this.mostrarMensaje = function (msg) {
+    $('#msg').empty();
     const html = `
       <div class="alert alert-info" role="alert">
         ${msg}
       </div>
     `;
-    $('#au').html(html);
+    $('#msg').html(html);
+    setTimeout(() => $('#msg').empty(), 3000);
   };
 
   this.salir = function () {
@@ -86,6 +121,5 @@ function ControlWeb() {
   this.limpiar = function() {
     $('#au').empty(); // Contenedor de "agregar usuario" / mensajes
     $('#registro').empty(); // Contenedor del formulario de registro
-    $('#msg').empty(); // Contenedor de mensajes (si lo usas para feedback)
   };
 }

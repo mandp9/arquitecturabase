@@ -3,6 +3,7 @@ const express = require('express');
 const app = express(); //para librerias
 const passport=require("passport");
 const cookieSession=require("cookie-session");
+const LocalStrategy = require('passport-local').Strategy;
 require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
 const bodyParser=require("body-parser");
@@ -19,6 +20,21 @@ app.use(bodyParser.json());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(new LocalStrategy({
+    usernameField: "email",
+    passwordField: "password"
+  },
+  function(email, password, done) {
+    sistema.loginUsuario({ "email": email, "password": password }, function(user) {
+      if (user) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: 'Email o contraseña incorrectos.' });
+      }
+    });
+  }
+));
 
 let sistema = new modelo.Sistema({test:false});
 
@@ -79,6 +95,23 @@ app.get('/eliminarUsuario/:nick', function (req, res) {
   var ok = sistema.eliminarUsuario(nick);
   res.json({ ok: ok }); // {ok:true/false}
 });
+
+app.post('/loginUsuario',
+  passport.authenticate("local", {
+    failureRedirect: "/fallo" // Redirige a /fallo si la autenticación falla
+  }),
+  function(req, res) {
+    // Si la autenticación es exitosa, redirige a /ok
+    res.redirect("/ok");
+  }
+);
+
+app.get("/ok", function(request, response) {
+  // Passport guarda el usuario en request.user
+  // Enviamos el email como 'nick' al cliente
+  response.send({ nick: request.user.email }); 
+});
+
 app.get("/cerrarSesion", function (request, response, next) {
     let nick = request.user ? request.user.nick : undefined; 
     

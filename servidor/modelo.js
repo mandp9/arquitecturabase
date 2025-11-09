@@ -1,4 +1,6 @@
 const datos=require("./cad.js");
+const correo = require("./email.js");
+const bcrypt = require('bcrypt');
 
 function Sistema(test){
   this.usuarios = {};
@@ -48,11 +50,14 @@ function Sistema(test){
     if (!obj.nick){
      obj.nick=obj.email;
     }
-    this.cad.buscarUsuario(obj,function(usr){
+    this.cad.buscarUsuario({ "email": obj.email }, async function(usr){
     if (!usr){
-      modelo.cad.insertarUsuario(obj,function(res){
-      callback(res);
-    });
+      obj.key = Date.now().toString();
+      obj.confirmada = false;
+      obj.password = await bcrypt.hash(obj.password, 10); 
+      modelo.cad.insertarUsuario(obj, function(res) {
+          callback(res);
+      });
     }
     else
     {
@@ -61,6 +66,25 @@ function Sistema(test){
     });
 };
 
+this.loginUsuario = function(obj, callback) {
+    let modelo = this;
+    this.cad.buscarUsuario({ "email": obj.email /*, "confirmada": true*/ }, function(usr) {
+      if (!usr) {
+        // Usuario no encontrado
+        callback(undefined); 
+        return -1;
+      }
+      bcrypt.compare(obj.password, usr.password, function(err, result) { 
+        if (result) {
+          // Contraseña correcta
+          callback(usr);
+        } else {
+          // Contraseña incorrecta
+          callback(undefined);
+        }
+      });
+    });
+  };
 }
 
 function Usuario(nick){
