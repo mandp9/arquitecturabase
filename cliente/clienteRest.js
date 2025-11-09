@@ -114,14 +114,14 @@ this.agregarUsuario2 = function (nick) {
       url: '/loginUsuario', 
       data: JSON.stringify({ "email": email, "password": password }),
       success: function(data) {
-        if (data.nick != -1) {
+        if (data.nick != "nook") {
           console.log("Usuario " + data.nick + " ha iniciado sesión");
           $.cookie("nick", data.nick);
           cw.limpiar();
           // Llamamos a comprobarSesion para que pinte el menú y el saludo
           cw.comprobarSesion(); 
         } else {
-          console.log("No se pudo iniciar sesión");
+          console.log("Datos incorrectos. No se pudo iniciar sesión");
           cw.mostrarMensaje("Error: Email o contraseña incorrectos.");
           // Reactivamos el botón
           $("#btnLogin").prop("disabled", false).text("Iniciar sesión");

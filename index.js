@@ -96,6 +96,7 @@ app.get('/eliminarUsuario/:nick', function (req, res) {
   res.json({ ok: ok }); // {ok:true/false}
 });
 
+
 app.post('/loginUsuario',
   passport.authenticate("local", {
     failureRedirect: "/fallo" // Redirige a /fallo si la autenticación falla
@@ -110,6 +111,21 @@ app.get("/ok", function(request, response) {
   // Passport guarda el usuario en request.user
   // Enviamos el email como 'nick' al cliente
   response.send({ nick: request.user.email }); 
+});
+app.get("/confirmarUsuario/:email/:key", function(request, response) {
+    let email = request.params.email;
+    let key = request.params.key;
+    
+    sistema.confirmarUsuario({ "email": email, "key": key }, function(usr) {
+        if (usr.email != -1) {
+            // Si la confirmación es exitosa, creamos la cookie e iniciamos sesión
+            response.cookie('nick', usr.email); // [cite: 759]
+            response.redirect('/'); // [cite: 760]
+        } else {
+            // Aquí podrías redirigir a una página de error
+            response.redirect('/fallo');
+        }
+    });
 });
 
 app.get("/cerrarSesion", function (request, response, next) {
