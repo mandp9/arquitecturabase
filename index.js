@@ -10,6 +10,16 @@ const bodyParser=require("body-parser");
 
 const PORT = process.env.PORT || 3000; //puerto que utilizara para escuchar
 
+const haIniciado=function(request,response,next){
+  if (request.user){
+    next();
+  }
+  else{
+    response.redirect("/")
+  }
+}
+
+
 app.use(cookieSession({
  name: 'Sistema',
  keys: ['key1', 'key2']
@@ -70,10 +80,9 @@ app.get("/agregarUsuario/:nick",function(request,response){
     response.json(res);
 });
 
-app.get('/obtenerUsuarios', function (req, res) {
-  var dic = sistema.obtenerUsuarios();
-  var lista = Object.keys(dic).map(n => dic[n]);
-  res.json(lista);
+app.get("/obtenerUsuarios",haIniciado,function(request,response){
+  let lista=sistema.obtenerUsuarios();
+  response.send(lista);
 });
 
 
@@ -119,8 +128,8 @@ app.get("/confirmarUsuario/:email/:key", function(request, response) {
     sistema.confirmarUsuario({ "email": email, "key": key }, function(usr) {
         if (usr.email != -1) {
             // Si la confirmación es exitosa, creamos la cookie e iniciamos sesión
-            response.cookie('nick', usr.email); // [cite: 759]
-            response.redirect('/'); // [cite: 760]
+            response.cookie('nick', usr.email); 
+            response.redirect('/');
         } else {
             // Aquí podrías redirigir a una página de error
             response.redirect('/fallo');
@@ -128,7 +137,7 @@ app.get("/confirmarUsuario/:email/:key", function(request, response) {
     });
 });
 
-app.get("/cerrarSesion", function (request, response, next) {
+app.get("/cerrarSesion", haIniciado, function (request, response, next) {
     let nick = request.user ? request.user.nick : undefined; 
     
     request.logout(function(err) {

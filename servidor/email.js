@@ -5,8 +5,8 @@ const url = "http://localhost:3000/";
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'pirma.ba@gmail.com', 
-    pass: 'rmsn fwjw rqsg ylfv' 
+    user: process.env.GMAIL_USER, // Lee desde .env
+    pass: process.env.GMAIL_PASS  // Lee desde .env
   }
 });
 

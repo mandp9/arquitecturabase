@@ -140,9 +140,8 @@ this.agregarUsuario2 = function (nick) {
 
   this.cerrarSesion = function(){
     $.getJSON("/cerrarSesion", function(){
-        // Opcional: El servidor debería manejar el logout de Passport y la redirección
-        // En este callback podemos confirmar que el proceso terminó
-        console.log("Sesión de servidor notificada."); 
+        console.log("Sesion cerrada."); 
+        $.removeCookie("nick");
     }).fail(function(xhr, status, err) {
         console.error("Error al notificar cierre de sesión:", status, err);
     });
