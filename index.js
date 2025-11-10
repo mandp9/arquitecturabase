@@ -70,10 +70,19 @@ app.get("/fallo",function(request,response){
 });
 
 app.get('/', (request, response) => {
-  var contenido=fs.readFileSync(__dirname+"/cliente/index.html");
-    response.setHeader("Content-type","text/html");
-    response.send(contenido);
+  var contenido = fs.readFileSync(__dirname + "/cliente/index.html", 'utf8');
+  contenido = contenido.replace(
+    '%%GOOGLE_CLIENT_ID%%', 
+    process.env.GOOGLE_CLIENT_ID
+  );
+  contenido = contenido.replace(
+    '%%GOOGLE_ONETAP_CALLBACK%%', 
+    process.env.BASE_URL + '/oneTap/callback'
+  );
+  response.setHeader("Content-type", "text/html");
+  response.send(contenido);
 });
+
 app.get("/agregarUsuario/:nick",function(request,response){
     let nick=request.params.nick;
     let res=sistema.agregarUsuario(nick);
