@@ -4,37 +4,26 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sistema</title>
-  <style>
-  /* Oculta el recuadro de salida mientras no tenga contenido */
-  pre#salida:empty { display: none; }
-  </style>
 
-  <!-- Bootstrap 4 CSS -->
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" />
-</head>
+  </head>
 <body>
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <a class="navbar-brand" href="#">Sistema</a>
     <ul class="navbar-nav ml-auto" id="menu"></ul>
   </nav>
 
-
-  <!-- Contenido principal -->
   <div class="container py-4">
     <div class="row">
-      <!-- margen a la izquierda como en la figura -->
       <div class="col-12 col-lg-8 offset-lg-1">
         <h1 class="mb-4">Sistema</h1>
 
-        <!-- aquí inyecta ControlWeb -->
         <div id="au"></div>
         <div id="registro"></div>
         <div id="msg"></div>
 
-        <pre id="salida" class="mt-4 p-3 bg-light border rounded small"></pre>
-      </div>
+        </div>
     </div>
   </div>
 
@@ -46,24 +35,18 @@
   ></div>
   
   
-  <!-- JS: jQuery → Popper → Bootstrap -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
   
-  <!-- Tus scripts -->
   <script src="./cliente/controlWeb.js"></script>
   <script src="./cliente/clienteRest.js"></script>
   
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-  <!-- helper opcional para ver JSON -->
+  
   <script>
-    function logSalida(t, d) {
-      const el = document.getElementById('salida');
-      if (el) el.textContent = '[' + t + ']\n' + JSON.stringify(d, null, 2);
-    }
+    // La función logSalida() se ha eliminado
 
     // instancias y render
     cw=new ControlWeb(); 
