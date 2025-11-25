@@ -136,10 +136,20 @@ this.unirAPartida = function(email, codigo) {
     if (this.partidas[codigo]) {
         let partida = this.partidas[codigo];
         
-        if (partida.estado === "abierta" && partida.propietario === email) {
-            delete this.partidas[codigo];
-            return { codigo: codigo, eliminado: true };
+        let index = partida.jugadores.indexOf(email);
+        if (index > -1) {
+            partida.jugadores.splice(index, 1);
         }
+
+        if (partida.jugadores.length === 0) {
+            delete this.partidas[codigo];
+            return { codigo: codigo, eliminado: true, propietario: partida.propietario };
+        }
+        
+        partida.estado = "abierta";
+        partida.propietario = partida.jugadores[0];
+        
+        return { codigo: codigo, eliminado: false, propietario: partida.propietario };
     }
     return { codigo: -1 };
 };

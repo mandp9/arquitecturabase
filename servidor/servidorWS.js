@@ -32,18 +32,23 @@ function WSServer() {
                 }
             });
 
-        socket.on("abandonarPartida", function(datos) {
-            let res = sistema.abandonarPartida(datos.email, datos.codigo);
-            
-            if (res.eliminado) {
-                socket.leave(datos.codigo);
+            socket.on("abandonarPartida", function(datos) {
+                let res = sistema.abandonarPartida(datos.email, datos.codigo);
                 
-                let lista = sistema.obtenerPartidasDisponibles();
-                srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
-                
-                srv.enviarAlRemitente(socket, "partidaAbandonada", res);
-            }
-        });
+                if (res.codigo != -1) {
+                    socket.leave(datos.codigo);
+                    
+                    let lista = sistema.obtenerPartidasDisponibles();
+                    srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
+                    
+                    if (!res.eliminado) {
+                        io.to(datos.codigo).emit("jugadorAbandona", {
+                            mensaje: "El rival ha abandonado. Esperando nuevo jugador...",
+                            propietario: res.propietario
+                        });
+                    }
+                }
+            });
         });
     }
     this.enviarAlRemitente = function(socket, mensaje, datos) {
