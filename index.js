@@ -1,28 +1,32 @@
 const fs = require("fs");
 const express = require('express');
-const app = express(); //para librerias
-const passport=require("passport");
-const cookieSession=require("cookie-session");
+const app = express(); 
+const passport = require("passport");
+const cookieSession = require("cookie-session");
 const LocalStrategy = require('passport-local').Strategy;
+const bodyParser = require("body-parser");
+
+// 1. Importar HTTP y Socket.IO
+const httpServer = require('http').Server(app);
+const { Server } = require("socket.io");
+const moduloWS = require("./servidor/servidorWS.js");
+
 require("./servidor/passport-setup.js");
 const modelo = require("./servidor/modelo.js");
-const bodyParser=require("body-parser");
 
-const PORT = process.env.PORT || 3000; //puerto que utilizara para escuchar
+const PORT = process.env.PORT || 3000; 
 
-const haIniciado=function(request,response,next){
-  if (request.user){
-    next();
-  }
-  else{
-    response.redirect("/")
-  }
-}
+let sistema = new modelo.Sistema({test:false});
 
+// 2. Crear instancias de WS
+let ws = new moduloWS.WSServer();
+let io = new Server(httpServer);
+
+// --- MIDDLEWARE DE EXPRESS (Configuración) ---
 
 app.use(cookieSession({
- name: 'Sistema',
- keys: [process.env.KEY1, process.env.KEY2]
+  name: 'Sistema',
+  keys: [process.env.KEY1, process.env.KEY2]
 }));
 
 app.use(bodyParser.urlencoded({extended:true}));
@@ -31,6 +35,9 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(express.static(__dirname + "/"));
+
+// --- ESTRATEGIA LOCAL ---
 passport.use(new LocalStrategy({
     usernameField: "email",
     passwordField: "password"
@@ -46,101 +53,94 @@ passport.use(new LocalStrategy({
   }
 ));
 
-let sistema = new modelo.Sistema({test:false});
+// --- FUNCIONES AUXILIARES ---
+const haIniciado = function(request, response, next){
+  if (request.user){
+    next();
+  }
+  else{
+    response.redirect("/")
+  }
+}
 
-app.get("/auth/google",passport.authenticate('google', { scope: ['profile','email'] }));
+// --- RUTAS (Endpoints) ---
+
+app.get("/auth/google", passport.authenticate('google', { scope: ['profile','email'] }));
 
 app.get('/google/callback',
- passport.authenticate('google', { failureRedirect: '/fallo' }),
- function(req, res) {
- res.redirect('/good');
+  passport.authenticate('google', { failureRedirect: '/fallo' }),
+  function(req, res) {
+    res.redirect('/good');
 });
 
 app.get("/good", function(request,response){
- let email=request.user.emails[0].value;
+  let email=request.user.emails[0].value;
   sistema.usuarioGoogle({"email":email},function(obj){
-  response.cookie('nick',obj.email);
-  response.redirect('/');
+    response.cookie('nick',obj.email);
+    response.redirect('/');
   });
 });
 
-
-app.get("/fallo",function(request,response){
- response.send({nick:"nook"})
+app.get("/fallo", function(request,response){
+  response.send({nick:"nook"})
 });
 
 app.get('/', (request, response) => {
-  var contenido = fs.readFileSync(__dirname + "/cliente/index.html", 'utf8');
-  contenido = contenido.replace(
-    '%%GOOGLE_CLIENT_ID%%', 
-    process.env.GOOGLE_CLIENT_ID
-  );
-  contenido = contenido.replace(
-    '%%GOOGLE_ONETAP_CALLBACK%%', 
-    process.env.BASE_URL + '/oneTap/callback'
-  );
-  response.setHeader("Content-type", "text/html");
-  response.send(contenido);
+  var contenido = fs.readFileSync(__dirname + "/cliente/index.html", 'utf8');
+  contenido = contenido.replace('%%GOOGLE_CLIENT_ID%%', process.env.GOOGLE_CLIENT_ID);
+  contenido = contenido.replace('%%GOOGLE_ONETAP_CALLBACK%%', process.env.BASE_URL + '/oneTap/callback');
+  response.setHeader("Content-type", "text/html");
+  response.send(contenido);
 });
 
+// ... (Resto de tus rutas API: agregarUsuario, obtenerUsuarios, etc.) ...
 app.get("/agregarUsuario/:nick",function(request,response){
     let nick=request.params.nick;
     let res=sistema.agregarUsuario(nick);
     response.json(res);
 });
 
-app.get("/obtenerUsuarios",haIniciado,function(request,response){
+app.get("/obtenerUsuarios", haIniciado, function(request,response){
   let lista=sistema.obtenerUsuarios();
   response.send(lista);
 });
 
-
 app.get('/usuarioActivo/:nick', function (req, res) {
   var nick = req.params.nick;
   var activo = sistema.usuarioActivo(nick);
-  res.json({ activo: activo }); // {activo:true/false}
+  res.json({ activo: activo }); 
 });
-
 
 app.get('/numeroUsuarios', function (req, res) {
   var num = sistema.numeroUsuarios();
-  res.json({ num: num }); // {num:N}
+  res.json({ num: num }); 
 });
-
 
 app.get('/eliminarUsuario/:nick', function (req, res) {
   var nick = req.params.nick;
   var ok = sistema.eliminarUsuario(nick);
-  res.json({ ok: ok }); // {ok:true/false}
+  res.json({ ok: ok }); 
 });
 
-
 app.post('/loginUsuario',
-  passport.authenticate("local", {
-    failureRedirect: "/fallo" // Redirige a /fallo si la autenticación falla
-  }),
+  passport.authenticate("local", { failureRedirect: "/fallo" }),
   function(req, res) {
-    // Si la autenticación es exitosa, redirige a /ok
     res.redirect("/ok");
   }
 );
 
 app.get("/ok", function(request, response) {
-  // Passport guarda el usuario en request.user
-  // Enviamos el email como 'nick' al cliente
   response.send({ nick: request.user.email }); 
 });
+
 app.get("/confirmarUsuario/:email/:key", function(request, response) {
     let email = request.params.email;
     let key = request.params.key;
-    
     sistema.confirmarUsuario({ "email": email, "key": key }, function(usr) {
         if (usr.email != -1) {
-            // Si la confirmación es exitosa, creamos la cookie e iniciamos sesión
             response.cookie('nick', usr.email); 
             response.redirect('/');
         } else {
-            // Aquí podrías redirigir a una página de error
             response.redirect('/fallo');
         }
     });
@@ -148,23 +148,13 @@ app.get("/confirmarUsuario/:email/:key", function(request, response) {
 
 app.get("/cerrarSesion", haIniciado, function (request, response, next) {
     let nick = request.user ? request.user.nick : undefined; 
-    
     request.logout(function(err) {
         if (err) { return next(err); }
-        
         if (nick) {
             sistema.eliminarUsuario(nick); 
         }
-        
         response.redirect("/"); 
     });
-});
-
-app.use(express.static(__dirname + "/"));
-
-app.listen(PORT, () => {
-    console.log(`App está escuchando en el puerto ${PORT}`);
-    console.log('Ctrl+C para salir');
 });
 
 app.post('/oneTap/callback',
@@ -176,10 +166,20 @@ app.post('/oneTap/callback',
 
 app.post("/registrarUsuario",function(request,response){
   sistema.registrarUsuario(request.body,function(res){
-  response.send({"nick":res.email});
+    response.send({"nick":res.email});
   });
 });
 
+// --- LANZAMIENTO DEL SERVIDOR ---
+
+// 3. Lanzar WebSockets pasando 'sistema'
+ws.lanzarServidor(io, sistema); 
+
+// 4. Arrancar el servidor HTTP (Una sola vez al final)
+httpServer.listen(PORT, () => {
+    console.log(`App está escuchando en el puerto ${PORT}`);
+    console.log('Ctrl+C para salir');
+});
 
 //node index.js
 //probando

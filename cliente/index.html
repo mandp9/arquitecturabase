@@ -57,15 +57,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
   
   <script src="./cliente/controlWeb.js"></script>
   <script src="./cliente/clienteRest.js"></script>
-  
+  <script src="./cliente/clienteWS.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   
   <script>
     cw = new ControlWeb(); 
     rest = new ClienteRest(cw); 
+    ws = new ClienteWS();
+    
     $("#menu").on("click", "#lnkSalir", function(e) {
         e.preventDefault();
         cw.salir(); 

@@ -114,7 +114,6 @@ this.agregarUsuario2 = function (nick) {
           console.log("Usuario " + data.nick + " ha iniciado sesión");
           $.cookie("nick", data.nick);
           cw.limpiar();
-          // Llamamos a comprobarSesion para que pinte el menú y el saludo
           cw.comprobarSesion(); 
         } else {
           console.log("Datos incorrectos. No se pudo iniciar sesión");
@@ -123,10 +122,8 @@ this.agregarUsuario2 = function (nick) {
         }
       },
       error: function(xhr, textStatus, errorThrown) {
-        // TAREA CUMPLIDA: Mensaje en caso de error
         console.log("Status: " + textStatus);
         cw.mostrarMensaje("Error de conexión al iniciar sesión.");
-        // Reactivamos el botón
         $("#btnLogin").prop("disabled", false).text("Iniciar sesión");
       },
       contentType: 'application/json'
