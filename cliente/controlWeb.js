@@ -90,14 +90,15 @@ function ControlWeb() {
     this.pintarMenu(nick);
     $('#au').empty();
     if (nick){
-      this.mostrarMensaje("Bienvenido al sistema, "+ nick);
+      this.mostrarMensaje("Bienvenido al sistema, " + nick, true);
+      this.mostrarHome();
     }
     else{
       this.mostrarLogin();
     }
   };
 
-   this.mostrarMensaje = function (msg) {
+   this.mostrarMensaje = function (msg, noOcultar) {
     $('#msg').empty();
     const html = `
       <div class="alert alert-info" role="alert">
@@ -105,7 +106,9 @@ function ControlWeb() {
       </div>
     `;
     $('#msg').html(html);
-    setTimeout(() => $('#msg').empty(), 3000);
+    if (!noOcultar) {
+        setTimeout(() => $('#msg').empty(), 3000);
+    }
   };
 
   this.salir = function () {
@@ -118,6 +121,7 @@ function ControlWeb() {
   this.limpiar = function() {
     $('#au').empty(); // Contenedor de "agregar usuario" / mensajes
     $('#registro').empty(); // Contenedor del formulario de registro
+    $('#msg').empty();
   };
   this.mostrarModal = function(msg) {
     $("#mModalMsg").remove(); 
@@ -125,4 +129,92 @@ function ControlWeb() {
     $('#mBody').append(cadena);
     $('#miModal').modal();
   };
+  this.mostrarHome = function() {
+        this.limpiar();
+        let nick = $.cookie("nick");
+        let cadena = `
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>Bienvenido, ${nick}</h3>
+                
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button id="btnCrearPartida" class="btn btn-primary btn-lg mr-2">Crear Nueva Partida</button>
+                    <button id="btnSalir" class="btn btn-outline-danger btn-lg">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-6 offset-md-3">
+                <h4>Partidas Disponibles</h4>
+                <div id="listaPartidas" class="list-group">
+                    <li class="list-group-item text-muted">Buscando partidas...</li>
+                </div>
+            </div>
+        </div>
+        `;
+        
+        $('#au').append(cadena);
+
+        $('#btnCrearPartida').on('click', function() {
+            $(this).prop('disabled', true);
+            ws.crearPartida();
+        });
+
+        $('#btnSalir').on('click', function() {
+            cw.salir();
+        });
+    };
+    this.mostrarPartida = function(codigo) {
+        this.limpiar();
+        
+        let cadena = `
+        <div class="text-center">
+            <h3>Partida: ${codigo}</h3>
+            <div id="tituloEstado" class="alert alert-info mb-4">Esperando rival...</div>
+            
+            <div id="tablero" data-codigo="${codigo}">
+                ${[0,1,2,3,4,5,6,7,8].map(i => 
+                    `<div class="casilla" id="c${i}" data-indice="${i}"></div>`
+                ).join('')}
+            </div>
+            
+            <button id="btnSalirPartida" class="btn btn-secondary mt-4">Salir al Menú</button>
+        </div>`;
+        
+        $('#au').append(cadena);
+        
+        // Evento: Salir de la partida
+        $('#btnSalirPartida').on('click', function() {
+            cw.mostrarHome();
+            // (Futura mejora: ws.abandonarPartida(codigo))
+        });
+    };
+    this.actualizarListaPartidas = function(lista) {
+        if ($('#listaPartidas').length === 0) return;
+
+        $('#listaPartidas').empty();
+        
+        if (lista.length === 0) {
+            $('#listaPartidas').append('<li class="list-group-item">No hay partidas disponibles</li>');
+        } else {
+            lista.forEach(partida => {
+                let item = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Código:</strong> ${partida.codigo} 
+                        <small class="text-muted ml-2">(Creador: ${partida.propietario})</small>
+                    </div>
+                    <button class="btn btn-success btn-sm btnUnirse" data-codigo="${partida.codigo}">Unirse</button>
+                </li>`;
+                $('#listaPartidas').append(item);
+            });
+
+            $('.btnUnirse').off('click').on('click', function() {
+                let codigo = $(this).data('codigo');
+                ws.unirAPartida(codigo);
+            });
+        }
+    };
+
 }

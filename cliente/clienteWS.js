@@ -13,15 +13,18 @@ function ClienteWS(){
         this.socket.on("partidaCreada", function(datos) {
             console.log("Partida creada con código:", datos.codigo);
             cli.codigo = datos.codigo;
+            cw.mostrarPartida(datos.codigo);
         });
 
         this.socket.on("unidoAPartida", function(datos) {
             console.log("Te has unido a la partida:", datos.codigo);
             cli.codigo = datos.codigo;
+            cw.mostrarPartida(datos.codigo);
         });
 
         this.socket.on("listaPartidas", function(lista) {
             console.log("Partidas disponibles:", lista);
+            cw.actualizarListaPartidas(lista);
         });
     }
     this.crearPartida = function() {

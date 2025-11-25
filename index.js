@@ -170,12 +170,13 @@ app.post("/registrarUsuario",function(request,response){
   });
 });
 
-// --- LANZAMIENTO DEL SERVIDOR ---
-
-// 3. Lanzar WebSockets pasando 'sistema'
 ws.lanzarServidor(io, sistema); 
 
-// 4. Arrancar el servidor HTTP (Una sola vez al final)
+app.get("/obtenerPartidas", haIniciado, function(request, response) {
+    let lista = sistema.obtenerPartidasDisponibles();
+    response.send(lista);
+});
+
 httpServer.listen(PORT, () => {
     console.log(`App está escuchando en el puerto ${PORT}`);
     console.log('Ctrl+C para salir');

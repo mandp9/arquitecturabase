@@ -144,5 +144,9 @@ this.agregarUsuario2 = function (nick) {
     });
 };
 
-  
+this.obtenerPartidasDisponibles = function() {
+  $.getJSON("/obtenerPartidas", function(lista) {
+      cw.actualizarListaPartidas(lista);
+  });
+};
 }
