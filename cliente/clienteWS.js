@@ -38,7 +38,16 @@ function ClienteWS(){
         this.socket.emit("unirAPartida", { "email": this.email, "codigo": codigo });
     }
     this.abandonarPartida = function(codigo) {
-    this.socket.emit("abandonarPartida", { "email": this.email, "codigo": codigo });
+        let nick = $.cookie("nick");
+        if (nick) {
+            this.email = nick;
+        }
+        this.socket.emit("abandonarPartida", { "email": this.email, "codigo": codigo });
+    }
+    // En cliente/clienteWS.js
+
+    this.reconectar = function(codigo) {
+        this.socket.emit("unirAPartida", { "email": this.email, "codigo": codigo });
     }
     this.ini();
 }

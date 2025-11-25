@@ -149,4 +149,26 @@ this.obtenerPartidasDisponibles = function() {
       cw.actualizarListaPartidas(lista);
   });
 };
+
+this.comprobarPartidaActiva = function() {
+    let email = $.cookie("nick");
+    if (email) {
+        $.getJSON("/partidaActiva/" + email, function(data) {
+            if (data && data.codigo) {
+                console.log("Reconectando a partida: " + data.codigo);
+                
+                ws.codigo = data.codigo;
+                ws.email = email;
+                
+                cw.mostrarPartida(data.codigo);
+        
+                ws.reconectar(data.codigo);
+            } else {
+                cw.mostrarHome();
+            }
+        });
+    } else {
+        cw.mostrarLogin();
+    }
+};
 }

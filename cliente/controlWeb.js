@@ -90,6 +90,7 @@ function ControlWeb() {
     this.pintarMenu(nick);
     $('#au').empty();
     if (nick){
+      rest.comprobarPartidaActiva();
       this.mostrarMensaje("Bienvenido al sistema, " + nick, true);
       this.mostrarHome();
     }

@@ -177,6 +177,12 @@ app.get("/obtenerPartidas", haIniciado, function(request, response) {
     response.send(lista);
 });
 
+app.get("/partidaActiva/:email", haIniciado, function(request, response) {
+    let email = request.params.email;
+    let res = sistema.buscarPartidaDeUsuario(email);
+    response.send(res); // Devuelve {codigo: "...", ...} o "" (vacío)
+});
+
 httpServer.listen(PORT, () => {
     console.log(`App está escuchando en el puerto ${PORT}`);
     console.log('Ctrl+C para salir');

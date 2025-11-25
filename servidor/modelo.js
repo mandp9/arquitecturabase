@@ -153,6 +153,15 @@ this.unirAPartida = function(email, codigo) {
     }
     return { codigo: -1 };
 };
+    this.buscarPartidaDeUsuario = function(email) {
+        for (let codigo in this.partidas) {
+            let partida = this.partidas[codigo];
+            if (partida.jugadores.includes(email)) {
+                return { codigo: codigo, propietario: partida.propietario };
+            }
+        }
+        return null; // No está en ninguna partida
+    };
 }
 
 function Usuario(nick){

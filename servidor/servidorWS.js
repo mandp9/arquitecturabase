@@ -9,6 +9,9 @@ function WSServer() {
                 if (res.codigo != -1) {
                     socket.join(res.codigo);
                     
+                    socket.codigo = res.codigo;
+                    socket.email = datos.email;
+
                     srv.enviarAlRemitente(socket, "partidaCreada", res);
                     
                     let lista = sistema.obtenerPartidasDisponibles();
@@ -25,6 +28,9 @@ function WSServer() {
                 if (res.codigo != -1) {
                     socket.join(datos.codigo);
                     
+                    socket.codigo = datos.codigo;
+                    socket.email = datos.email;
+
                     srv.enviarAlRemitente(socket, "unidoAPartida", res);
                     
                     let lista = sistema.obtenerPartidasDisponibles();
@@ -32,24 +38,34 @@ function WSServer() {
                 }
             });
 
-            socket.on("abandonarPartida", function(datos) {
-                let res = sistema.abandonarPartida(datos.email, datos.codigo);
+           socket.on("abandonarPartida", function(datos) {
+                gestionarAbandono(socket, datos.codigo, datos.email);
+            });
+
+            socket.on("disconnect", function() {
+                console.log("Usuario desconectado: " + socket.email);
+            });
+        });
+        function gestionarAbandono(socket, codigo, email) {
+                let res = sistema.abandonarPartida(email, codigo);
                 
                 if (res.codigo != -1) {
-                    socket.leave(datos.codigo);
+                    socket.leave(codigo);
                     
+                    socket.codigo = undefined;
+                    socket.email = undefined;
+
                     let lista = sistema.obtenerPartidasDisponibles();
-                    srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
+                    srv.enviarGlobal(io, "listaPartidas", lista);
                     
                     if (!res.eliminado) {
-                        io.to(datos.codigo).emit("jugadorAbandona", {
+                        io.to(codigo).emit("jugadorAbandona", {
                             mensaje: "El rival ha abandonado. Esperando nuevo jugador...",
                             propietario: res.propietario
                         });
                     }
                 }
-            });
-        });
+            }
     }
     this.enviarAlRemitente = function(socket, mensaje, datos) {
         socket.emit(mensaje, datos);
