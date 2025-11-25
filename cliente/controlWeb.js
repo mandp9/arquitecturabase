@@ -117,8 +117,8 @@ function ControlWeb() {
     setTimeout(() => location.reload(), 1200);
   };
   this.limpiar = function() {
-    $('#au').empty(); // Contenedor de "agregar usuario" / mensajes
-    $('#registro').empty(); // Contenedor del formulario de registro
+    $('#au').empty(); 
+    $('#registro').empty(); 
     $('#msg').empty();
   };
   this.mostrarModal = function(msg) {
@@ -128,6 +128,7 @@ function ControlWeb() {
     $('#miModal').modal();
   };
   this.mostrarHome = function() {
+        $('body').css('background-image', 'none');
         this.limpiar();
         let nick = $.cookie("nick");
         let cadena = `
@@ -165,29 +166,40 @@ function ControlWeb() {
     };
     this.mostrarPartida = function(codigo) {
         this.limpiar();
+        $('body').css({
+          'background-image': 'url("./cliente/img/gifCarga.gif")',
+          'background-size': 'cover',
+          'background-position': 'center',
+          'background-attachment': 'fixed'
+        });
         let cadena = `
         <div class="text-center">
-          <h2 class="mb-4">Partida: <span class="text-primary">${codigo}</span></h2>
-          
-          <div class="alert alert-secondary mb-4">
-              Jugadores: <span id="contadorJugadores">1/2</span>
-          </div>
-
-          <div id="tituloEstado" class="alert alert-info mb-4">Esperando rival...</div>
-          
-          <div id="zonaJuego" class="p-5 mb-4 bg-light border rounded">
-              <h4>Zona de Juego</h4>
-              <p class="text-muted">Aquí aparecerá la interfaz del juego cuando lo decidas.</p>
-          </div>
-          
-          <button id="btnSalirPartida" class="btn btn-secondary">Salir al Menú</button>
-        </div>`;
+        <h2 class="mb-4">Sala de Espera: <span class="text-primary">${codigo}</span></h2>
+        
+        <div class="card p-4 mb-4" style="max-width: 500px; margin: 0 auto;">
+            <h4>Jugadores Conectados</h4>
+            <div id="listaJugadoresSala" class="list-group mb-3">
+                <li class="list-group-item">Esperando...</li>
+            </div>
+            
+            <div id="tituloEstado" class="alert alert-info">Esperando rival...</div>
+            
+            <button id="btnIrAlJuego" class="btn btn-success btn-lg btn-block" style="display:none;">
+                 ⚔️ ¡IR AL JUEGO!
+            </button>
+        </div>
+        
+        <button id="btnSalirPartida" class="btn btn-secondary mt-2">Abandonar Sala</button>
+      </div>`;
         
         $('#au').append(cadena);
         
         $('#btnSalirPartida').on('click', function() {
             ws.abandonarPartida(codigo);
             cw.mostrarHome();
+        });
+        $('#btnIrAlJuego').on('click', function() {
+            cw.mostrarTablero(codigo);
         });
     };
     this.actualizarListaPartidas = function(lista) {
@@ -226,14 +238,37 @@ function ControlWeb() {
               .removeClass('alert-info')
               .addClass('alert-success')
               .text("¡Partida llena! A jugar.");
-              
-          $('#tablero').removeClass('disabled-board');
       } else {
           $('#tituloEstado').text("Esperando rival...");
       }
     };
+    this.actualizarEstadoPartida = function(datos) {
+      // Si no estamos en la sala de espera, no hacemos nada
+      if ($('#listaJugadoresSala').length === 0) return;
+
+      let numJugadores = datos.jugadores.length;
+      let max = datos.maxJug || 2;
+
+      // Actualizar lista visual de nombres
+      $('#listaJugadoresSala').empty();
+      datos.jugadores.forEach(jugador => {
+          $('#listaJugadoresSala').append(`<li class="list-group-item">${jugador}</li>`);
+      });
+
+      if (numJugadores === max) {
+          $('#tituloEstado')
+              .removeClass('alert-info')
+              .addClass('alert-success')
+              .text("¡Sala llena! Todo listo.");
+              
+          $('#btnIrAlJuego').show(); // Mostrar botón
+      } else {
+          $('#tituloEstado').text("Esperando rival...");
+          $('#btnIrAlJuego').hide();
+      }
+    };
     this.mostrarAviso = function(msg) {
-    $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);
-  };
+      $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);
+    };
 
 }
