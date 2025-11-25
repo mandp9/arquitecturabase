@@ -40,7 +40,7 @@ function WSServer() {
                     io.in(datos.codigo).emit("jugadores", {
                         jugadores: partida.jugadores,
                         maxJug: partida.maxJug, 
-                        mensaje: "¡A jugar!" 
+                        mensaje: (partida.jugadores.length === partida.maxJug) ? "¡A jugar!" : "Esperando..." 
                     });
                 }
             });

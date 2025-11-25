@@ -38,6 +38,9 @@ function ClienteWS(){
         this.socket.emit("crearPartida", { "email": this.email });
     }
     this.unirAPartida = function(codigo) {
+        if (!this.email) {
+        this.email = $.cookie("nick");
+        }
         this.socket.emit("unirAPartida", { "email": this.email, "codigo": codigo });
     }
     this.abandonarPartida = function(codigo) {
