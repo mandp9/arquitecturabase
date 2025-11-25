@@ -26,12 +26,19 @@ function ClienteWS(){
             console.log("Partidas disponibles:", lista);
             cw.actualizarListaPartidas(lista);
         });
+        this.socket.on("jugadores", function(datos) {
+            console.log("Partida lista!");
+            cw.mostrarAviso("¡Ya estáis los dos jugadores! A jugar.");
+        });
     }
     this.crearPartida = function() {
         this.socket.emit("crearPartida", { "email": this.email });
     }
     this.unirAPartida = function(codigo) {
         this.socket.emit("unirAPartida", { "email": this.email, "codigo": codigo });
+    }
+    this.abandonarPartida = function(codigo) {
+    this.socket.emit("abandonarPartida", { "email": this.email, "codigo": codigo });
     }
     this.ini();
 }

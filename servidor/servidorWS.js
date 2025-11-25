@@ -13,6 +13,10 @@ function WSServer() {
                     
                     let lista = sistema.obtenerPartidasDisponibles();
                     srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
+                    io.in(datos.codigo).emit("jugadores", { 
+                        jugadores: [res.propietario, datos.email], 
+                        mensaje: "¡A jugar!"
+                    });
                 }
             });
             socket.on("unirAPartida", function(datos) {
@@ -27,6 +31,19 @@ function WSServer() {
                     srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
                 }
             });
+
+        socket.on("abandonarPartida", function(datos) {
+            let res = sistema.abandonarPartida(datos.email, datos.codigo);
+            
+            if (res.eliminado) {
+                socket.leave(datos.codigo);
+                
+                let lista = sistema.obtenerPartidasDisponibles();
+                srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
+                
+                srv.enviarAlRemitente(socket, "partidaAbandonada", res);
+            }
+        });
         });
     }
     this.enviarAlRemitente = function(socket, mensaje, datos) {

@@ -69,17 +69,14 @@ function Sistema(test){
 };
 this.confirmarUsuario = function(obj, callback) {
     let modelo = this;
-    // Buscamos al usuario con el email, la key y que NO esté confirmada [cite: 768-769]
     this.cad.buscarUsuario({ "email": obj.email, "confirmada": false, "key": obj.key }, function(usr) {
         if (usr) {
-            // Si lo encontramos, lo marcamos como confirmado
-            usr.confirmada = true; // [cite: 771]
-            // Y llamamos a la CAD para actualizarlo en la BBDD
+            usr.confirmada = true; 
             modelo.cad.actualizarUsuario(usr, function(res) {
-                callback({ "email": res.email }); // [cite: 773]
+                callback({ "email": res.email }); 
             });
         } else {
-            callback({ "email": -1 }); // [cite: 778]
+            callback({ "email": -1 }); 
         }
     });
 };
@@ -88,17 +85,14 @@ this.loginUsuario = function(obj, callback) {
     let modelo = this;
     this.cad.buscarUsuario({ "email": obj.email, "confirmada": true }, function(usr) {
         if (!usr) {
-            // Usuario no encontrado o no confirmado
             callback(undefined);
             return -1;
         }
         
         bcrypt.compare(obj.password, usr.password, function(err, result) {
             if (result) {
-                // Contraseña correcta
                 callback(usr);
             } else {
-                // Contraseña incorrecta
                 callback(undefined);
             }
         });
@@ -138,6 +132,17 @@ this.unirAPartida = function(email, codigo) {
         }
         return nombre;
   };
+  this.abandonarPartida = function(email, codigo) {
+    if (this.partidas[codigo]) {
+        let partida = this.partidas[codigo];
+        
+        if (partida.estado === "abierta" && partida.propietario === email) {
+            delete this.partidas[codigo];
+            return { codigo: codigo, eliminado: true };
+        }
+    }
+    return { codigo: -1 };
+};
 }
 
 function Usuario(nick){

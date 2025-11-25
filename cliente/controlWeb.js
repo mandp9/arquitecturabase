@@ -184,10 +184,9 @@ function ControlWeb() {
         
         $('#au').append(cadena);
         
-        // Evento: Salir de la partida
         $('#btnSalirPartida').on('click', function() {
+            ws.abandonarPartida(codigo);
             cw.mostrarHome();
-            // (Futura mejora: ws.abandonarPartida(codigo))
         });
     };
     this.actualizarListaPartidas = function(lista) {
@@ -216,5 +215,8 @@ function ControlWeb() {
             });
         }
     };
+    this.mostrarAviso = function(msg) {
+    $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);
+  };
 
 }
