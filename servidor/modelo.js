@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 
 function Sistema(test){
   this.usuarios = {};
+  this.partidas = {};
   this.cad=new datos.CAD();
  
   if(!test.test){

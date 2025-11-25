@@ -1,3 +1,18 @@
+jest.mock('@google-cloud/secret-manager', () => ({
+    SecretManagerServiceClient: class {
+        async accessSecretVersion() {
+            return [{ payload: { data: Buffer.from("secreto_falso") } }];
+        }
+    }
+}));
+
+// Simular Nodemailer
+jest.mock('nodemailer', () => ({
+    createTransport: jest.fn().mockReturnValue({
+        sendMail: jest.fn().mockResolvedValue(true)
+    })
+}));
+
 const modelo = require("./modelo.js");
 
 describe('El sistema', function() {
