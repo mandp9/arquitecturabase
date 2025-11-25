@@ -156,13 +156,12 @@ this.comprobarPartidaActiva = function() {
         $.getJSON("/partidaActiva/" + email, function(data) {
             if (data && data.codigo) {
                 console.log("Reconectando a partida: " + data.codigo);
-                
-                ws.codigo = data.codigo;
-                ws.email = email;
-                
+                if (ws) {
+                  ws.email = email;
+                  ws.codigo = data.codigo;
+                  ws.unirAPartida(data.codigo);
+                }
                 cw.mostrarPartida(data.codigo);
-        
-                ws.reconectar(data.codigo);
             } else {
                 cw.mostrarHome();
             }

@@ -27,7 +27,6 @@ function WSServer() {
                 
                 if (res.codigo != -1) {
                     socket.join(datos.codigo);
-                    
                     socket.codigo = datos.codigo;
                     socket.email = datos.email;
 
