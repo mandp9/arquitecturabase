@@ -5,6 +5,8 @@ this.agregarUsuario = function(nick) {
       console.log("Usuario " + nick + " ha sido registrado");
       const msg = "Bienvenido al sistema, " + nick;
       $.cookie("nick", nick, { path: '/' });
+      ws.email = data.nick; 
+      cw.limpiar();
       cw.comprobarSesion();
     } else {
       console.log("El nick ya está ocupado");
@@ -113,6 +115,9 @@ this.agregarUsuario2 = function (nick) {
         if (data.nick != "nook") {
           console.log("Usuario " + data.nick + " ha iniciado sesión");
           $.cookie("nick", data.nick);
+          if (ws) {
+              ws.email = data.nick; 
+          }
           cw.limpiar();
           cw.comprobarSesion(); 
         } else {

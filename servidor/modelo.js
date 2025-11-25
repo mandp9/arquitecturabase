@@ -103,11 +103,65 @@ this.loginUsuario = function(obj, callback) {
         });
     });
 };
+this.crearPartida = function(email) {
+        let codigo = this.obtenerCodigo();
+        let partida = new Partida(codigo, email);
+        partida.agregarJugador(email);
+        this.partidas[codigo] = partida;
+        return { codigo: codigo };
+    };
+this.unirAPartida = function(email, codigo) {
+        let partida = this.partidas[codigo];
+        if (partida && partida.estado === "abierta") {
+            partida.agregarJugador(email);
+            return { codigo: codigo, estado: partida.estado };
+        } else {
+            return { codigo: -1 };
+        }
+  };
+  this.obtenerPartidasDisponibles = function() {
+        let lista = [];
+        for (let key in this.partidas) {
+            let partida = this.partidas[key];
+            if (partida.estado === "abierta") {
+                lista.push({ codigo: partida.codigo, propietario: partida.propietario });
+            }
+        }
+        return lista;
+  };
+  this.obtenerCodigo = function() {
+        let cadena = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let nombre = "";
+        for (let i = 0; i < 6; i++) {
+            nombre += cadena.charAt(Math.floor(Math.random() * cadena.length));
+        }
+        return nombre;
+  };
 }
 
 function Usuario(nick){
   this.nick = nick;
 }
+
+function Partida(codigo, propietario) {
+    this.codigo = codigo;
+    this.propietario = propietario;
+    this.jugadores = [];
+    this.maxJug = 2;
+    this.estado = "abierta"; // "abierta", "completa", "terminada"
+
+    this.agregarJugador = function(nick) {
+        if (this.jugadores.length < this.maxJug) {
+            this.jugadores.push(nick);
+            if (this.jugadores.length === this.maxJug) {
+                this.estado = "completa";
+            }
+            return true;
+        }
+        return false;
+    }
+}
+
 
 
 module.exports.Sistema = Sistema;
