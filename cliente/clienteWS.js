@@ -30,6 +30,9 @@ function ClienteWS(){
             console.log("Partida lista!");
             cw.mostrarAviso("¡Ya estáis los dos jugadores! A jugar.");
         });
+        this.socket.on("jugadores", function(datos) {
+            cw.actualizarEstadoPartida(datos);
+        });
     }
     this.crearPartida = function() {
         this.socket.emit("crearPartida", { "email": this.email });

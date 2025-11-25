@@ -62,17 +62,14 @@ function ControlWeb() {
 
   this.mostrarLogin = function() {
     $("#fmLogin").remove();
-    // Limpiamos el div de registro si estuviera
     $("#fmRegistro").remove(); 
     
     $("#registro").load("./cliente/login.html", function() {
-      // Deshabilitar botón al enviar
       $("#btnLogin").off("click").on("click", function(e) {
         e.preventDefault();
         let email = $("#email").val();
         let pwd = $("#pwd").val();
         if (email && pwd) {
-          // Deshabilitamos botón
           $(this).prop("disabled", true).text("Iniciando sesión...");
           rest.loginUsuario(email, pwd);
         }
@@ -168,19 +165,22 @@ function ControlWeb() {
     };
     this.mostrarPartida = function(codigo) {
         this.limpiar();
-        
         let cadena = `
         <div class="text-center">
-            <h3>Partida: ${codigo}</h3>
-            <div id="tituloEstado" class="alert alert-info mb-4">Esperando rival...</div>
-            
-            <div id="tablero" data-codigo="${codigo}">
-                ${[0,1,2,3,4,5,6,7,8].map(i => 
-                    `<div class="casilla" id="c${i}" data-indice="${i}"></div>`
-                ).join('')}
-            </div>
-            
-            <button id="btnSalirPartida" class="btn btn-secondary mt-4">Salir al Menú</button>
+          <h2 class="mb-4">Partida: <span class="text-primary">${codigo}</span></h2>
+          
+          <div class="alert alert-secondary mb-4">
+              Jugadores: <span id="contadorJugadores">1/2</span>
+          </div>
+
+          <div id="tituloEstado" class="alert alert-info mb-4">Esperando rival...</div>
+          
+          <div id="zonaJuego" class="p-5 mb-4 bg-light border rounded">
+              <h4>Zona de Juego</h4>
+              <p class="text-muted">Aquí aparecerá la interfaz del juego cuando lo decidas.</p>
+          </div>
+          
+          <button id="btnSalirPartida" class="btn btn-secondary">Salir al Menú</button>
         </div>`;
         
         $('#au').append(cadena);
@@ -215,6 +215,22 @@ function ControlWeb() {
                 ws.unirAPartida(codigo);
             });
         }
+    };
+    this.actualizarEstadoPartida = function(datos) {
+      let numJugadores = datos.jugadores.length;
+      let max = datos.maxJug || 2;
+      $('#contadorJugadores').text(`${numJugadores}/${max}`);
+
+      if (numJugadores === max) {
+          $('#tituloEstado')
+              .removeClass('alert-info')
+              .addClass('alert-success')
+              .text("¡Partida llena! A jugar.");
+              
+          $('#tablero').removeClass('disabled-board');
+      } else {
+          $('#tituloEstado').text("Esperando rival...");
+      }
     };
     this.mostrarAviso = function(msg) {
     $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);

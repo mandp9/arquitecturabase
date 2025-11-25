@@ -35,6 +35,13 @@ function WSServer() {
                     
                     let lista = sistema.obtenerPartidasDisponibles();
                     srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
+
+                    let partida = sistema.partidas[datos.codigo];
+                    io.in(datos.codigo).emit("jugadores", {
+                        jugadores: partida.jugadores,
+                        maxJug: partida.maxJug, 
+                        mensaje: "¡A jugar!" 
+                    });
                 }
             });
 
