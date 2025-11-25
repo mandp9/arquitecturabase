@@ -27,8 +27,11 @@ function ClienteWS(){
             cw.actualizarListaPartidas(lista);
         });
         this.socket.on("jugadores", function(datos) {
-            console.log("Partida lista!");
-            cw.mostrarAviso("¡Ya estáis los dos jugadores! A jugar.");
+            let jugadores = (datos.jugadores || []).filter(Boolean);
+            if (datos.mensaje) {
+                cw.mostrarAviso(datos.mensaje);
+            }
+            cw.actualizarEstadoPartida({ ...datos, jugadores });
         });
         this.socket.on("jugadores", function(datos) {
             cw.actualizarEstadoPartida(datos);

@@ -46,36 +46,31 @@ function WSServer() {
             });
             
            socket.on("abandonarPartida", function(datos) {
-                gestionarAbandono(socket, datos.codigo, datos.email);
+                let res = sistema.abandonarPartida(datos.email, datos.codigo);
+    
+                if (res.codigo != -1) {
+                    socket.leave(datos.codigo); 
+                    
+                    let lista = sistema.obtenerPartidasDisponibles();
+                    srv.enviarGlobal(io, "listaPartidas", lista);
+                    
+
+                    if (!res.eliminado) {
+                        let partida = sistema.partidas[datos.codigo];
+                        
+                        io.to(datos.codigo).emit("jugadores", {
+                            jugadores: partida.jugadores,
+                            maxJug: partida.maxJug,
+                            mensaje: "El rival ha abandonado. Esperando nuevo jugador..."
+                        });
+                    }
+                }
             });
 
             socket.on("disconnect", function() {
                 console.log("Usuario desconectado: " + socket.email);
             });
         });
-        function gestionarAbandono(socket, codigo, email) {
-                let res = sistema.abandonarPartida(email, codigo);
-            
-            if (res.codigo != -1) {
-                socket.leave(codigo);
-                
-                socket.codigo = undefined;
-                socket.email = undefined;
-
-                let lista = sistema.obtenerPartidasDisponibles();
-                srv.enviarGlobal(io, "listaPartidas", lista);
-                
-                if (!res.eliminado) {
-                    let partida = sistema.partidas[codigo];
-                    
-                    io.to(codigo).emit("jugadores", {
-                        jugadores: partida.jugadores,
-                        maxJug: partida.maxJug,
-                        mensaje: "El rival ha abandonado. Esperando nuevo jugador..."
-                    });
-                }
-            }
-        }
     }
     this.enviarAlRemitente = function(socket, mensaje, datos) {
         socket.emit(mensaje, datos);

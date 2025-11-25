@@ -243,29 +243,30 @@ function ControlWeb() {
       }
     };
     this.actualizarEstadoPartida = function(datos) {
-      // Si no estamos en la sala de espera, no hacemos nada
-      if ($('#listaJugadoresSala').length === 0) return;
+        if ($('#listaJugadoresSala').length === 0) return;
+        
+        let numJugadores = datos.jugadores.length;
+        let max = datos.maxJug || 2;
+        
+        $('#listaJugadoresSala').empty();
+        datos.jugadores.forEach(jugador => {
+            $('#listaJugadoresSala').append(`<li class="list-group-item">${jugador}</li>`);
+        });
 
-      let numJugadores = datos.jugadores.length;
-      let max = datos.maxJug || 2;
-
-      // Actualizar lista visual de nombres
-      $('#listaJugadoresSala').empty();
-      datos.jugadores.forEach(jugador => {
-          $('#listaJugadoresSala').append(`<li class="list-group-item">${jugador}</li>`);
-      });
-
-      if (numJugadores === max) {
-          $('#tituloEstado')
-              .removeClass('alert-info')
-              .addClass('alert-success')
-              .text("¡Sala llena! Todo listo.");
-              
-          $('#btnIrAlJuego').show(); // Mostrar botón
-      } else {
-          $('#tituloEstado').text("Esperando rival...");
-          $('#btnIrAlJuego').hide();
-      }
+        if (numJugadores === max) {
+            $('#tituloEstado')
+                .removeClass('alert-info alert-warning')
+                .addClass('alert-success')
+                .text("¡Sala llena! Todo listo.");
+            $('#btnIrAlJuego').show();
+        } else {
+            let mensaje = datos.mensaje || "Esperando rival..."; // Usa el mensaje del servidor
+            $('#tituloEstado')
+                .removeClass('alert-success')
+                .addClass('alert-info')
+                .text(mensaje);
+            $('#btnIrAlJuego').hide();
+        }
     };
     this.mostrarAviso = function(msg) {
       $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);
