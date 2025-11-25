@@ -34,16 +34,17 @@ function WSServer() {
                     
                     let lista = sistema.obtenerPartidasDisponibles();
                     srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
-
+                    
                     let partida = sistema.partidas[datos.codigo];
+                
                     io.in(datos.codigo).emit("jugadores", {
                         jugadores: partida.jugadores,
-                        maxJug: partida.maxJug, 
-                        mensaje: (partida.jugadores.length === partida.maxJug) ? "¡A jugar!" : "Esperando..." 
+                        maxJug: partida.maxJug,
+                        mensaje: (partida.jugadores.length === partida.maxJug) ? "¡Sala llena! Todo listo." : "Esperando rival..."
                     });
                 }
             });
-
+            
            socket.on("abandonarPartida", function(datos) {
                 gestionarAbandono(socket, datos.codigo, datos.email);
             });
@@ -54,24 +55,27 @@ function WSServer() {
         });
         function gestionarAbandono(socket, codigo, email) {
                 let res = sistema.abandonarPartida(email, codigo);
+            
+            if (res.codigo != -1) {
+                socket.leave(codigo);
                 
-                if (res.codigo != -1) {
-                    socket.leave(codigo);
-                    
-                    socket.codigo = undefined;
-                    socket.email = undefined;
+                socket.codigo = undefined;
+                socket.email = undefined;
 
-                    let lista = sistema.obtenerPartidasDisponibles();
-                    srv.enviarGlobal(io, "listaPartidas", lista);
+                let lista = sistema.obtenerPartidasDisponibles();
+                srv.enviarGlobal(io, "listaPartidas", lista);
+                
+                if (!res.eliminado) {
+                    let partida = sistema.partidas[codigo];
                     
-                    if (!res.eliminado) {
-                        io.to(codigo).emit("jugadorAbandona", {
-                            mensaje: "El rival ha abandonado. Esperando nuevo jugador...",
-                            propietario: res.propietario
-                        });
-                    }
+                    io.to(codigo).emit("jugadores", {
+                        jugadores: partida.jugadores,
+                        maxJug: partida.maxJug,
+                        mensaje: "El rival ha abandonado. Esperando nuevo jugador..."
+                    });
                 }
             }
+        }
     }
     this.enviarAlRemitente = function(socket, mensaje, datos) {
         socket.emit(mensaje, datos);
