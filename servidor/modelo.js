@@ -147,7 +147,6 @@ this.unirAPartida = function(email, codigo) {
             }
             
             partida.estado = "abierta";
-            
             partida.propietario = partida.jugadores[0]; 
             
             return { codigo: codigo, eliminado: false, propietario: partida.propietario };

@@ -244,27 +244,24 @@ function ControlWeb() {
     };
     this.actualizarEstadoPartida = function(datos) {
         if ($('#listaJugadoresSala').length === 0) return;
-        
+        let jugadoresValidos = datos.jugadores.filter(jugador => jugador);
         let numJugadores = datos.jugadores.length;
         let max = datos.maxJug || 2;
         
         $('#listaJugadoresSala').empty();
+
         datos.jugadores.forEach(jugador => {
             $('#listaJugadoresSala').append(`<li class="list-group-item">${jugador}</li>`);
         });
-
+        for (let i = jugadoresValidos.length; i < max; i++) {
+          $('#listaJugadoresSala').append(`<li class="list-group-item text-muted">Esperando jugador...</li>`);
+        }
         if (numJugadores === max) {
-            $('#tituloEstado')
-                .removeClass('alert-info alert-warning')
-                .addClass('alert-success')
-                .text("¡Sala llena! Todo listo.");
+            $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text("¡Sala llena! Todo listo.");
             $('#btnIrAlJuego').show();
         } else {
             let mensaje = datos.mensaje || "Esperando rival..."; // Usa el mensaje del servidor
-            $('#tituloEstado')
-                .removeClass('alert-success')
-                .addClass('alert-info')
-                .text(mensaje);
+            $('#tituloEstado').removeClass('alert-success').addClass('alert-info').text(mensaje);
             $('#btnIrAlJuego').hide();
         }
     };
