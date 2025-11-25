@@ -109,17 +109,20 @@ function ControlWeb() {
   };
 
   this.salir = function () {
-    //const nick = $.cookie('nick') || localStorage.getItem('nick'); // fallback opcional
     const nick = $.cookie('nick');
-    // borrar sesión
     $.removeCookie("nick");
     rest.cerrarSesion();
-    // actualizar UI + despedida y recarga
     cw.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
     setTimeout(() => location.reload(), 1200);
   };
   this.limpiar = function() {
     $('#au').empty(); // Contenedor de "agregar usuario" / mensajes
     $('#registro').empty(); // Contenedor del formulario de registro
+  };
+  this.mostrarModal = function(msg) {
+    $("#mModalMsg").remove(); 
+    let cadena = "<div id='mModalMsg'>" + msg + "</div>";
+    $('#mBody').append(cadena);
+    $('#miModal').modal();
   };
 }
