@@ -199,7 +199,7 @@ function Partida(codigo, propietario) {
     this.propietario = propietario;
     this.jugadores = [];
     this.maxJug = 2;
-    this.estado = "abierta"; // "abierta", "completa", "terminada"
+    this.estado = "abierta"; 
 
     this.agregarJugador = function(nick) {
         if (this.jugadores.includes(nick)) {

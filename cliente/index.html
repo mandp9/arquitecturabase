@@ -11,22 +11,20 @@
   <style>
     /* ESTILOS PARA EL TÍTULO MÁGICO */
     #gameTitle {
-        font-family: 'Cinzel Decorative', cursive; /* Fuente fantasía */
-        font-size: 4rem; /* Grande */
-        text-align: center; /* Centrado */
-        color: #FFD700; /* Color Oro */
-        
-        /* MARGEN SUPERIOR EXACTO PARA CENTRARLO VISUALMENTE */
+        font-family: 'Cinzel Decorative', cursive;
+        font-size: 4rem; 
+        text-align: center; 
+        color: #FFD700; 
         margin-top: 80px; 
         margin-bottom: 40px;
         
         line-height: 1.2;
         text-shadow: 
-            0 0 10px #FF8C00,   /* Resplandor naranja */
-            0 0 20px #FF0000,   /* Resplandor rojo */
-            3px 3px 0px #000000; /* Borde negro */
+            0 0 10px #FF8C00,   
+            0 0 20px #FF0000,  
+            3px 3px 0px #000000; 
             
-        animation: flotarBrillo 3s ease-in-out infinite; /* Animación */
+        animation: flotarBrillo 3s ease-in-out infinite; 
         width: 100%;
     }
 
@@ -42,6 +40,117 @@
         #gameTitle {
             font-size: 2.5rem;
             margin-top: 40px;
+        }
+    }
+    /* --- ESTILOS DEL BOTÓN FLOTANTE DE HISTORIA --- */
+    .btn-historia-flotante {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999; 
+        
+        /* Estilo medieval */
+        font-family: 'MedievalSharp', cursive;
+        background-color: #8b4513; 
+        color: #fdf6e3;            
+        border: 3px solid #5d4037;
+        border-radius: 50px;       
+        padding: 15px 25px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .btn-historia-flotante:hover {
+        transform: scale(1.1) rotate(-2deg); /* Efecto al pasar el ratón */
+        background-color: #a0522d;
+        box-shadow: 0 0 20px #FFD700; /* Resplandor dorado */
+    }
+
+    /* --- ESTILOS DEL MODAL (Fondo oscuro) --- */
+    .modal-overlay-historia {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.85); /* Fondo negro semitransparente */
+        z-index: 10000; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    /* --- ESTILOS DEL CONTENEDOR DEL PERGAMINO (La imagen de fondo) --- */
+    .pergamino-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        height: 90vh;
+        
+        background-image: url('./cliente/img/pergamino.png');
+        background-size: 100% 100%; 
+        background-repeat: no-repeat;
+        
+        padding: 150px 90px 120px 90px; 
+        
+        box-sizing: border-box;
+        filter: drop-shadow(0 0 30px rgba(0,0,0,0.8));
+    }
+
+    /* --- ESTILOS DEL TEXTO DENTRO DEL PERGAMINO --- */
+    .pergamino-texto {
+        width: 65%;
+        height: 65%;
+        overflow-y: auto; 
+        
+        font-family: 'MedievalSharp', cursive;
+        font-size: 1.3rem;
+        line-height: 1.6;
+        font-weight: bold;
+        color: #3e2723; 
+        
+        scrollbar-width: thin;
+        scrollbar-color: #8b4513 transparent;
+        margin-top: 75px;   
+        margin-left: 130px;
+    }
+    .pergamino-texto::-webkit-scrollbar { width: 8px; }
+    .pergamino-texto::-webkit-scrollbar-thumb { background-color: #8b4513; border-radius: 10px; }
+    /* --- BOTÓN DE CERRAR (X) --- */
+    .close-pergamino {
+        position: absolute;
+        top: 110px;   
+        right: 150px; 
+        
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: #8b0000;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+        z-index: 10001;
+    }
+    .close-pergamino:hover { transform: scale(1.3); }
+    @media (max-width: 768px) {
+        .pergamino-container { 
+            padding: 120px 60px 100px 60px; 
+        }
+        .close-pergamino { top: 80px; right: 50px; }
+        .pergamino-texto { font-size: 1rem; }
+    }
+    /* --- CABALLERO DESCANSANDO --- */
+    .caballero-descanso {
+        position: absolute;
+        bottom: 70px;      
+        right: -330px;    
+        width: 400px;    
+        image-rendering: pixelated;
+        z-index: 10002;
+        filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.6)); 
+    }
+    @media (max-width: 1100px) {
+        .caballero-descanso {
+            display: none;
         }
     }
   </style>
@@ -67,7 +176,45 @@
     </div>
   </div>
 
-  <div class="modal" id="miModal">
+  <button id="btnAbrirHistoria" class="btn-historia-flotante shadow-lg animate__animated animate__pulse animate__infinite">
+    📜 La Leyenda
+  </button>
+
+<div id="modalHistoria" class="modal-overlay-historia" style="display: none;">
+    <div class="pergamino-container">
+        <button id="btnCerrarHistoria" class="close-pergamino">✖</button>
+        <div class="pergamino-texto">
+            <h2 class="text-center mb-4" style="color: #5d4037; border-bottom: 2px dashed #8b4513; padding-bottom: 15px;">
+                🏹 Comunicado Real 🗡️
+            </h2>
+            <p>Sea sabido por todas las tierras del reino de Galanthia y los valles verdes de Auren. </p>
+            <p>Por el mandato de Su Majestad el Rey Aladric IV, se decreta lo siguiente:</p>
+            <p>Todos los caballeros juramentados de Galanthia, sin importar orden ni linaje, deberán
+               proteger todas las tierras del reino ante la inminente amenaza que se levanta más allá de nuestras fronteras.</p>
+            <p>Los vigías han reportado movimientos inusuales de criaturas oscuras y fuerzas desconocidas en los bosques del Este.
+               Se sospecha que algún enemigo de la corte ha encontrado el legendario Grimorio Perdido, un tomo de magia ancestral que
+               otorga un poder inmenso a quien lo posea.
+               Este poder permetirá al poseedor abrir portales entre dimensiones, convocar criaturas de otros mundos y manipular las fuerzas de la naturaleza a su antojo.
+            </p>
+            <p>
+                El rey concederá jugosas recompensas a aquellos caballeros, escuderos o aventureros que defendan al reino de estas criaturas y aporten información sobre el paradero del Grimorio.
+            </p>    
+            <p>
+              Que este Comunicado Real sirva como llamado a la valentía y al honor.
+            </p>
+            <p>
+              
+            </p>
+            </p>
+            <p class="text-center mt-4" style="font-style: italic; color: #8b4513;">
+                — "Gloria a Galanthia y que la luz del reino nunca se apague." —
+            </p>
+            <br><br>
+        </div>
+        <img src="./cliente/img/caballero.gif" class="caballero-descanso" alt="Caballero descansando">
+    </div>
+</div> 
+<div class="modal" id="miModal">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -81,7 +228,6 @@
       </div>
     </div>
   </div>
-
   <div
     id="g_id_onload"
     data-client_id="%%GOOGLE_CLIENT_ID%%"
@@ -108,6 +254,20 @@
     $("#menu").on("click", "#lnkSalir", function(e) {
         e.preventDefault();
         cw.salir(); 
+    });
+    // Lógica del botón de Historia
+    $("#btnAbrirHistoria").on("click", function() {
+        $("#modalHistoria").fadeIn(); // Muestra el pergamino suavemente
+    });
+
+    $("#btnCerrarHistoria").on("click", function() {
+        $("#modalHistoria").fadeOut(); 
+    });
+
+    $("#modalHistoria").on("click", function(e) {
+        if (e.target === this) {
+            $(this).fadeOut();
+        }
     });
     cw.comprobarSesion();
   </script>
