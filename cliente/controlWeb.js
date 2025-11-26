@@ -39,6 +39,7 @@ function ControlWeb() {
   });
 };
   this.mostrarRegistro=function(){
+  $('body').css('background-image', 'none');
   $("#fmRegistro").remove();
   $("#fmLogin").remove();
   $("#registro").load("./cliente/registro.html",function(){
@@ -61,11 +62,24 @@ function ControlWeb() {
   };
 
   this.mostrarLogin = function() {
+    $('body').css({
+            'background-image': 'url("./cliente/img/fire.gif")',
+            'background-size': 'cover',
+            'background-position': 'center',
+            'background-attachment': 'fixed'
+    });
     $("#fmLogin").remove();
     $("#fmRegistro").remove(); 
     $('#gameTitle').show();
 
     $("#registro").load("./cliente/login.html", function() {
+      $("#email, #pwd").css({
+            "background-color": "rgba(0, 0, 0, 0.5)", // Fondo oscuro transparente
+            "color": "white",                          // Texto blanco al escribir
+            "border": "1px solid rgba(255, 255, 255, 0.5)", // Borde sutil
+            "backdrop-filter": "blur(5px)",            // Efecto borroso
+            "border-radius": "5px"
+      });
       $("#btnLogin").off("click").on("click", function(e) {
         e.preventDefault();
         let email = $("#email").val();
@@ -75,8 +89,12 @@ function ControlWeb() {
           rest.loginUsuario(email, pwd);
         }
       });
-      $("#registro").append('<p>¿No tienes cuenta? <a href="#" id="linkRegistro">Regístrate aquí</a></p>');
-      $("#linkRegistro").on("click", function(e){
+      $("#registro").append(
+            '<p style="color: #ffffffff; font-weight: bold;">¿No tienes cuenta? ' + 
+            '<a href="#" id="linkRegistro" style="color: #edf345ff; text-decoration: underline;">Regístrate aquí</a>' +
+            '</p></div>'
+        );      
+        $("#linkRegistro").on("click", function(e){
         e.preventDefault();
         cw.mostrarRegistro();
       });
@@ -129,7 +147,12 @@ function ControlWeb() {
     $('#miModal').modal();
   };
   this.mostrarHome = function() {
-        $('body').css('background-image', 'none');
+        $('body').css({
+            'background-image': 'url("./cliente/img/casss.png")',
+            'background-size': 'cover',
+            'background-position': 'center',
+            'background-attachment': 'fixed'
+        });
         this.limpiar();
         let nick = $.cookie("nick");
         
