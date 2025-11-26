@@ -131,6 +131,7 @@ function ControlWeb() {
         $('body').css('background-image', 'none');
         this.limpiar();
         let nick = $.cookie("nick");
+        this.ultimasPartidas = [];
         let cadena = `
         <div class="row">
             <div class="col-md-12 text-center">
@@ -146,14 +147,23 @@ function ControlWeb() {
         <div class="row mt-5">
             <div class="col-md-6 offset-md-3">
                 <h4>Partidas Disponibles</h4>
+                
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">🔍</span>
+                    </div>
+                    <input type="text" id="buscador" class="form-control" placeholder="Escribe el código para filtrar...">
+                </div>
                 <div id="listaPartidas" class="list-group">
                     <li class="list-group-item text-muted">Buscando partidas...</li>
                 </div>
             </div>
         </div>
+         
         `;
         
         $('#au').append(cadena);
+        rest.obtenerPartidasDisponibles();
 
         $('#btnCrearPartida').on('click', function() {
             $(this).prop('disabled', true);
@@ -162,6 +172,9 @@ function ControlWeb() {
 
         $('#btnSalir').on('click', function() {
             cw.salir();
+        });
+        $('#buscador').on('keyup', function() {
+            cw.actualizarListaPartidas(cw.ultimasPartidas); 
         });
     };
     this.mostrarPartida = function(datos) {
@@ -229,14 +242,30 @@ function ControlWeb() {
     };
     
     this.actualizarListaPartidas = function(lista) {
-      if ($('#listaPartidas').length === 0) return;
+      if (lista) {
+            this.ultimasPartidas = lista;
+        } else {
+            lista = this.ultimasPartidas || []; 
+        }
 
+        if ($('#listaPartidas').length === 0) return;
         $('#listaPartidas').empty();
 
-        if (lista.length === 0) {
-            $('#listaPartidas').append('<li class="list-group-item">No hay partidas disponibles</li>');
+        let textoBusqueda = $('#buscador').val() || ""; 
+        textoBusqueda = textoBusqueda.trim().toLowerCase();
+
+        let listaFiltrada = lista.filter(partida => {
+            return partida.codigo.toLowerCase().includes(textoBusqueda);
+        });
+
+        if (listaFiltrada.length === 0) {
+            if (lista.length === 0) {
+                $('#listaPartidas').append('<li class="list-group-item">No hay partidas disponibles</li>');
+            } else {
+                $('#listaPartidas').append('<li class="list-group-item">No hay coincidencias con ese código</li>');
+            }
         } else {
-            lista.forEach(partida => {
+            listaFiltrada.forEach(partida => {
                 let item = `
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
@@ -280,5 +309,5 @@ function ControlWeb() {
     this.mostrarAviso = function(msg) {
       $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);
     };
-
+    
 }
