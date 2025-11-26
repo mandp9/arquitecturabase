@@ -185,30 +185,86 @@ function ControlWeb() {
         this.limpiar();
         $('body').css({
           'background-image': 'url("./cliente/img/gifCarga.gif")',
-          'background-size': 'cover',
-          'background-position': 'center',
-          'background-attachment': 'fixed'
+            'background-size': 'cover',
+            'background-position': 'center',
+            'background-attachment': 'fixed',
+            'overflow': 'hidden'
         });
         let cadena = `
-        <div class="text-center">
-            <h2 class="mb-4">Sala de Espera: <span class="text-primary">${codigoStr}</span></h2>
+        <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 9999; 
+        ">
+            <audio id="audioLobby" loop>
+                <source src="./cliente/musica/lobby.mp3" type="audio/mpeg">
+            </audio>
+
+            <div id="btnAudio" class="btn btn-sm btn-light shadow-sm" 
+                     style="position: absolute; top: 80px; right: 15px; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border: 1px solid #ccc;">
+                    🔊
+            </div>
+
+            <h2 class="mb-4 text-white" style="text-shadow: 2px 2px 4px #000; font-weight: bold; z-index: 10;">
+                Sala de Espera: <span class="text-warning" style="text-shadow: 2px 2px 8px rgba(255,193,7,0.6);">${codigoStr}</span>
+            </h2>
             
-            <div class="card p-4 mb-4" style="max-width: 500px; margin: 0 auto;">
-                <h4>Jugadores Conectados</h4>
-                <div id="listaJugadoresSala" class="list-group mb-3">
-                    <li class="list-group-item">Esperando...</li>
+            <div class="card p-4 mb-4 shadow-lg" 
+                 style="
+                    width: 90%; 
+                    max-width: 500px; 
+                    background-color: rgba(255, 255, 255, 0.5); /* Más transparente (0.5) */
+                    backdrop-filter: blur(10px); /* Más borroso para legibilidad */
+                    -webkit-backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+                 ">
+                
+                <h4 class="text-center mb-3 font-weight-bold text-dark">Jugadores Conectados</h4>
+                
+                <div id="listaJugadoresSala" class="list-group mb-3 font-weight-bold shadow-sm">
+                    <li class="list-group-item" style="background-color: rgba(255,255,255,0.7);">Esperando...</li>
                 </div>
                 
-                <div id="tituloEstado" class="alert alert-info">Esperando rival...</div>
+                <div id="tituloEstado" class="alert alert-info text-center font-weight-bold shadow-sm" style="background-color: rgba(23, 162, 184, 0.8); color: white; border: none;">
+                    Esperando rival...
+                </div>
                 
-                <button id="btnIrAlJuego" class="btn btn-success btn-lg btn-block" style="display:none;">
+                <button id="btnIrAlJuego" class="btn btn-warning btn-lg btn-block shadow font-weight-bold text-white" 
+                        style="display:none; border: 2px solid white;">
                     ⚔️ ¡IR AL JUEGO!
                 </button>
             </div>
             
-            <div id="zonaBotones"></div> 
+            <div id="zonaBotones" style="width: 100%; max-width: 500px; text-align: center;"></div> 
         </div>`;
+        
         $('#au').append(cadena);
+        
+        let audio = document.getElementById("audioLobby");
+        audio.play().catch(function(error) {
+            console.log("El navegador bloqueó el autoplay, hay que pulsar el botón.");
+            $('#btnAudio').text("🔇");
+        });
+        $('#btnAudio').on('click', function() {
+            if (audio.paused) {
+                audio.play();
+                $(this).text("🔊"); 
+                $(this).removeClass("btn-danger").addClass("btn-light");
+            } else {
+                audio.pause();
+                $(this).text("🔇"); 
+                $(this).removeClass("btn-light").addClass("btn-danger");
+            }
+        });
         let botones = "";
 
         if (nick === propietario) {
@@ -232,7 +288,7 @@ function ControlWeb() {
         });
         $('#btnEliminarPartida').on('click', function() {
           if(confirm("¿Seguro que quieres cerrar la sala?")) {
-              ws.eliminarPartida(codigoStr); // Llama a la nueva función
+              ws.eliminarPartida(codigoStr); 
           }
         });
 
