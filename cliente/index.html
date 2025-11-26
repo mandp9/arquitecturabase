@@ -3,29 +3,66 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sistema</title>
+  <title>El Grimorio Perdido</title>
 
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=MedievalSharp&display=swap" rel="stylesheet">
 
-<style>
+  <style>
+    /* ESTILOS PARA EL TÍTULO MÁGICO */
+    #gameTitle {
+        font-family: 'Cinzel Decorative', cursive; /* Fuente fantasía */
+        font-size: 4rem; /* Grande */
+        text-align: center; /* Centrado */
+        color: #FFD700; /* Color Oro */
+        
+        /* MARGEN SUPERIOR EXACTO PARA CENTRARLO VISUALMENTE */
+        margin-top: 80px; 
+        margin-bottom: 40px;
+        
+        line-height: 1.2;
+        text-shadow: 
+            0 0 10px #FF8C00,   /* Resplandor naranja */
+            0 0 20px #FF0000,   /* Resplandor rojo */
+            3px 3px 0px #000000; /* Borde negro */
+            
+        animation: flotarBrillo 3s ease-in-out infinite; /* Animación */
+        width: 100%;
+    }
+
+    /* Animación suave de flotar */
+    @keyframes flotarBrillo {
+        0% { transform: translateY(0px); text-shadow: 0 0 10px #FF8C00, 3px 3px 0 #000; }
+        50% { transform: translateY(-10px); text-shadow: 0 0 25px #FFD700, 3px 3px 0 #000; }
+        100% { transform: translateY(0px); text-shadow: 0 0 10px #FF8C00, 3px 3px 0 #000; }
+    }
     
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        #gameTitle {
+            font-size: 2.5rem;
+            margin-top: 40px;
+        }
+    }
   </style>
 </head>
+
 <body>
-  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
     <a class="navbar-brand" href="#">Sistema</a>
     <ul class="navbar-nav ml-auto" id="menu"></ul>
   </nav>
 
-  <div class="container py-4">
+  <div class="container" style="padding-top: 60px;">
     <div class="row">
-      <div class="col-12 col-lg-8 offset-lg-1">
-        <h1 class="mb-4">Sistema</h1>
+      <div class="col-12"> 
+        
+        <h1 id="gameTitle" class="mb-4">El Grimorio Perdido</h1>
 
         <div id="au"></div>
         <div id="registro"></div>
         <div id="msg"></div>
+        
       </div>
     </div>
   </div>
@@ -33,18 +70,14 @@
   <div class="modal" id="miModal">
     <div class="modal-dialog">
       <div class="modal-content">
-      
         <div class="modal-header">
           <h4 class="modal-title">Atención</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
-        
         <div class="modal-body" id="mBody"></div>
-        
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
         </div>
-        
       </div>
     </div>
   </div>
@@ -55,7 +88,6 @@
     data-login_uri="%%GOOGLE_ONETAP_CALLBACK%%"
     data-skip_prompt_cookie="nick"
   ></div>
-  
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>

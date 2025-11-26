@@ -63,7 +63,8 @@ function ControlWeb() {
   this.mostrarLogin = function() {
     $("#fmLogin").remove();
     $("#fmRegistro").remove(); 
-    
+    $('#gameTitle').show();
+
     $("#registro").load("./cliente/login.html", function() {
       $("#btnLogin").off("click").on("click", function(e) {
         e.preventDefault();
@@ -131,7 +132,9 @@ function ControlWeb() {
         $('body').css('background-image', 'none');
         this.limpiar();
         let nick = $.cookie("nick");
+        
         this.ultimasPartidas = [];
+
         let cadena = `
         <div class="row">
             <div class="col-md-12 text-center">
@@ -149,17 +152,17 @@ function ControlWeb() {
                 <h4>Partidas Disponibles</h4>
                 
                 <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">🔍</span>
+                    <input type="text" id="buscador" class="form-control" placeholder="Escribe el código...">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="btnBuscar">🔍 Buscar</button>
                     </div>
-                    <input type="text" id="buscador" class="form-control" placeholder="Escribe el código para filtrar...">
                 </div>
+
                 <div id="listaPartidas" class="list-group">
                     <li class="list-group-item text-muted">Buscando partidas...</li>
                 </div>
             </div>
         </div>
-         
         `;
         
         $('#au').append(cadena);
@@ -173,7 +176,12 @@ function ControlWeb() {
         $('#btnSalir').on('click', function() {
             cw.salir();
         });
+
         $('#buscador').on('keyup', function() {
+            cw.actualizarListaPartidas(cw.ultimasPartidas); 
+        });
+
+        $('#btnBuscar').on('click', function() {
             cw.actualizarListaPartidas(cw.ultimasPartidas); 
         });
     };
@@ -183,6 +191,8 @@ function ControlWeb() {
         let nick = $.cookie("nick");
 
         this.limpiar();
+        $('#gameTitle').hide();
+        
         $('body').css({
           'background-image': 'url("./cliente/img/gifCarga.gif")',
             'background-size': 'cover',
@@ -221,8 +231,8 @@ function ControlWeb() {
                     width: 90%; 
                     max-width: 500px; 
                     background-color: rgba(255, 255, 255, 0.5); /* Más transparente (0.5) */
-                    backdrop-filter: blur(10px); /* Más borroso para legibilidad */
-                    -webkit-backdrop-filter: blur(10px);
+                    backdrop-filter: blur(2px); /* Más borroso para legibilidad */
+                    -webkit-backdrop-filter: blur(7px);
                     border: 1px solid rgba(255, 255, 255, 0.3);
                     border-radius: 20px;
                     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -271,12 +281,12 @@ function ControlWeb() {
         botones = `
           <div class="alert alert-warning small mt-2">Eres el creador de la sala.</div>
           <button id="btnEliminarPartida" class="btn btn-danger btn-lg mt-2">
-              ⚠️ Eliminar Sala
+              📜🪶 Eliminar Sala
           </button>`;
         } else {
           botones = `
           <button id="btnSalirPartida" class="btn btn-secondary btn-lg mt-2">
-              Abandonar Sala
+              Abandonar Sala 🧙‍♂️
           </button>`;
         }
 
