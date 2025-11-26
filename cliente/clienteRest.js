@@ -161,7 +161,7 @@ this.comprobarPartidaActiva = function() {
                   ws.codigo = data.codigo;
                   ws.unirAPartida(data.codigo);
                 }
-                cw.mostrarPartida(data.codigo);
+                cw.mostrarPartida(data);
             } else {
                 cw.mostrarHome();
             }

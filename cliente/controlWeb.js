@@ -164,7 +164,11 @@ function ControlWeb() {
             cw.salir();
         });
     };
-    this.mostrarPartida = function(codigo) {
+    this.mostrarPartida = function(datos) {
+        let codigoStr = datos.codigo || datos;
+        let propietario = datos.propietario;
+        let nick = $.cookie("nick");
+
         this.limpiar();
         $('body').css({
           'background-image': 'url("./cliente/img/gifCarga.gif")',
@@ -174,39 +178,61 @@ function ControlWeb() {
         });
         let cadena = `
         <div class="text-center">
-        <h2 class="mb-4">Sala de Espera: <span class="text-primary">${codigo}</span></h2>
-        
-        <div class="card p-4 mb-4" style="max-width: 500px; margin: 0 auto;">
-            <h4>Jugadores Conectados</h4>
-            <div id="listaJugadoresSala" class="list-group mb-3">
-                <li class="list-group-item">Esperando...</li>
+            <h2 class="mb-4">Sala de Espera: <span class="text-primary">${codigoStr}</span></h2>
+            
+            <div class="card p-4 mb-4" style="max-width: 500px; margin: 0 auto;">
+                <h4>Jugadores Conectados</h4>
+                <div id="listaJugadoresSala" class="list-group mb-3">
+                    <li class="list-group-item">Esperando...</li>
+                </div>
+                
+                <div id="tituloEstado" class="alert alert-info">Esperando rival...</div>
+                
+                <button id="btnIrAlJuego" class="btn btn-success btn-lg btn-block" style="display:none;">
+                    ⚔️ ¡IR AL JUEGO!
+                </button>
             </div>
             
-            <div id="tituloEstado" class="alert alert-info">Esperando rival...</div>
-            
-            <button id="btnIrAlJuego" class="btn btn-success btn-lg btn-block" style="display:none;">
-                 ⚔️ ¡IR AL JUEGO!
-            </button>
-        </div>
-        
-        <button id="btnSalirPartida" class="btn btn-secondary mt-2">Abandonar Sala</button>
-      </div>`;
-        
+            <div id="zonaBotones"></div> 
+        </div>`;
         $('#au').append(cadena);
+        let botones = "";
+
+        if (nick === propietario) {
+        botones = `
+          <div class="alert alert-warning small mt-2">Eres el creador de la sala.</div>
+          <button id="btnEliminarPartida" class="btn btn-danger btn-lg mt-2">
+              ⚠️ Eliminar Sala
+          </button>`;
+        } else {
+          botones = `
+          <button id="btnSalirPartida" class="btn btn-secondary btn-lg mt-2">
+              Abandonar Sala
+          </button>`;
+        }
+
+        $('#zonaBotones').append(botones);
         
         $('#btnSalirPartida').on('click', function() {
-            ws.abandonarPartida(codigo);
+            ws.abandonarPartida(codigoStr);
             cw.mostrarHome();
         });
+        $('#btnEliminarPartida').on('click', function() {
+          if(confirm("¿Seguro que quieres cerrar la sala?")) {
+              ws.eliminarPartida(codigoStr); // Llama a la nueva función
+          }
+        });
+
         $('#btnIrAlJuego').on('click', function() {
-            cw.mostrarTablero(codigo);
+            cw.mostrarTablero(codigoStr);
         });
     };
+    
     this.actualizarListaPartidas = function(lista) {
-        if ($('#listaPartidas').length === 0) return;
+      if ($('#listaPartidas').length === 0) return;
 
         $('#listaPartidas').empty();
-        
+
         if (lista.length === 0) {
             $('#listaPartidas').append('<li class="list-group-item">No hay partidas disponibles</li>');
         } else {
@@ -227,20 +253,6 @@ function ControlWeb() {
                 ws.unirAPartida(codigo);
             });
         }
-    };
-    this.actualizarEstadoPartida = function(datos) {
-      let numJugadores = datos.jugadores.length;
-      let max = datos.maxJug || 2;
-      $('#contadorJugadores').text(`${numJugadores}/${max}`);
-
-      if (numJugadores === max) {
-          $('#tituloEstado')
-              .removeClass('alert-info')
-              .addClass('alert-success')
-              .text("¡Partida llena! A jugar.");
-      } else {
-          $('#tituloEstado').text("Esperando rival...");
-      }
     };
     this.actualizarEstadoPartida = function(datos) {
         if ($('#listaJugadoresSala').length === 0) return;

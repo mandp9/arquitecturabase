@@ -2,23 +2,29 @@ function WSServer() {
     this.lanzarServidor = function(io, sistema) {
         let srv = this;
         io.on('connection', function(socket) {
-            console.log("Capa WS activa");
+            let emailHandshake = socket.handshake.query.email;
+            if(emailHandshake && emailHandshake !== "undefined") {
+                socket.email = emailHandshake;
+            }
+            console.log("Capa WS activa. Usuario: " + (socket.email || "Anónimo"));
+
             socket.on("crearPartida", function(datos) {
                 let res = sistema.crearPartida(datos.email);
                 
                 if (res.codigo != -1) {
                     socket.join(res.codigo);
-                    
                     socket.codigo = res.codigo;
                     socket.email = datos.email;
 
                     srv.enviarAlRemitente(socket, "partidaCreada", res);
                     
                     let lista = sistema.obtenerPartidasDisponibles();
-                    srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
-                    io.in(datos.codigo).emit("jugadores", { 
-                        jugadores: [res.propietario, datos.email], 
-                        mensaje: "¡A jugar!"
+                    srv.enviarGlobal(io, "listaPartidas", lista);
+                    
+                    io.in(res.codigo).emit("jugadores", { 
+                        jugadores: [datos.email],
+                        maxJug: 2,
+                        mensaje: "Esperando rival..."
                     });
                 }
             });
@@ -33,7 +39,7 @@ function WSServer() {
                     srv.enviarAlRemitente(socket, "unidoAPartida", res);
                     
                     let lista = sistema.obtenerPartidasDisponibles();
-                    srv.enviarATodosMenosRemitente(socket, "listaPartidas", lista);
+                    srv.enviarGlobal(io, "listaPartidas", lista);
                     
                     let partida = sistema.partidas[datos.codigo];
                 
@@ -66,7 +72,23 @@ function WSServer() {
                     }
                 }
             });
-
+            socket.on("eliminarPartida", function(datos) {
+                let res = sistema.eliminarPartida(datos.email, datos.codigo);
+                if (res.eliminado) {
+                    // 1. Avisar a todos en la sala que se acabó
+                    io.in(datos.codigo).emit("partidaTerminada", { 
+                        mensaje: "El creador ha cerrado la sala. Todos fuera." 
+                    });
+                    
+                    // 2. Desconectar sockets de la sala (opcional, pero limpio)
+                    io.in(datos.codigo).socketsLeave(datos.codigo); 
+                    
+                    // 3. Actualizar la lista global
+                    let lista = sistema.obtenerPartidasDisponibles();
+                    srv.enviarGlobal(io, "listaPartidas", lista);
+                }
+            });
+            
             socket.on("disconnect", function() {
                 console.log("Usuario desconectado: " + socket.email);
             });

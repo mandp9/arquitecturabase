@@ -103,17 +103,32 @@ this.crearPartida = function(email) {
         let partida = new Partida(codigo, email);
         partida.agregarJugador(email);
         this.partidas[codigo] = partida;
-        return { codigo: codigo };
-    };
+        return { codigo: codigo, propietario: email };
+};
 this.unirAPartida = function(email, codigo) {
         let partida = this.partidas[codigo];
-        if (partida && partida.estado === "abierta") {
-            partida.agregarJugador(email);
-            return { codigo: codigo, estado: partida.estado };
-        } else {
-            return { codigo: -1 };
+        if (partida) {
+            if (partida.jugadores.includes(email)) {
+                console.log("El usuario " + email + " se reconecta a la partida " + codigo);
+                return { 
+                    codigo: codigo, 
+                    estado: partida.estado, 
+                    propietario: partida.propietario 
+                };
+            }
+            if (partida.estado === "abierta") {
+                partida.agregarJugador(email);
+                return { 
+                    codigo: codigo, 
+                    estado: partida.estado, 
+                    propietario: partida.propietario 
+                };
+            }
         }
-  };
+        
+        // Si la partida no existe o está llena
+        return { codigo: -1 };
+    };
   this.obtenerPartidasDisponibles = function() {
         let lista = [];
         for (let key in this.partidas) {
@@ -153,6 +168,17 @@ this.unirAPartida = function(email, codigo) {
         }
         return { codigo: -1 };
     };
+    this.eliminarPartida = function(email, codigo) {
+        if (this.partidas[codigo]) {
+            // Solo el propietario puede borrarla manualmente
+            if (this.partidas[codigo].propietario === email) {
+                delete this.partidas[codigo];
+                return { codigo: codigo, eliminado: true };
+            }
+        }
+        return { codigo: -1, eliminado: false };
+    };
+
     this.buscarPartidaDeUsuario = function(email) {
         for (let codigo in this.partidas) {
             let partida = this.partidas[codigo];
@@ -176,6 +202,10 @@ function Partida(codigo, propietario) {
     this.estado = "abierta"; // "abierta", "completa", "terminada"
 
     this.agregarJugador = function(nick) {
+        if (this.jugadores.includes(nick)) {
+            return true; 
+        }
+        
         if (this.jugadores.length < this.maxJug) {
             this.jugadores.push(nick);
             if (this.jugadores.length === this.maxJug) {

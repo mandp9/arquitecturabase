@@ -20,7 +20,12 @@ let sistema = new modelo.Sistema({test:false});
 
 // 2. Crear instancias de WS
 let ws = new moduloWS.WSServer();
-let io = new Server(httpServer);
+let io = new Server(httpServer, {
+    cors: {
+        origin: "*", // Permite conexiones desde cualquier URL (localhost:5173, etc.)
+        methods: ["GET", "POST"]
+    }
+});
 
 // --- MIDDLEWARE DE EXPRESS (Configuración) ---
 
@@ -189,4 +194,3 @@ httpServer.listen(PORT, () => {
 });
 
 //node index.js
-//probando
