@@ -63,7 +63,7 @@ function ControlWeb() {
 
   this.mostrarLogin = function() {
     $('body').css({
-            'background-image': 'url("./cliente/img/cave.jpg")',
+            'background-image': 'url("./cliente/img/dragon.gif")',
             'background-size': 'cover',
             'background-position': 'center',
             'background-attachment': 'fixed'
@@ -74,10 +74,10 @@ function ControlWeb() {
 
     $("#registro").load("./cliente/login.html", function() {
       $("#email, #pwd").css({
-            "background-color": "rgba(0, 0, 0, 0.5)", // Fondo oscuro transparente
-            "color": "white",                          // Texto blanco al escribir
-            "border": "1px solid rgba(255, 255, 255, 0.5)", // Borde sutil
-            "backdrop-filter": "blur(5px)",            // Efecto borroso
+            "background-color": "rgba(0, 0, 0, 0.5)", 
+            "color": "white",                         
+            "border": "1px solid rgba(255, 255, 255, 0.5)", 
+            "backdrop-filter": "blur(5px)",            
             "border-radius": "5px"
       });
       $("#btnLogin").off("click").on("click", function(e) {
@@ -252,22 +252,17 @@ function ControlWeb() {
         let cadena = `
         <div style="
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 9999; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999;
+            font-family: 'MedievalSharp', cursive; /* FUENTE MEDIEVAL GLOBAL */
         ">
             <audio id="audioLobby" loop>
                 <source src="./cliente/musica/lobby.mp3" type="audio/mpeg">
             </audio>
 
-            <div id="btnAudio" class="btn btn-sm btn-light shadow-sm" 
-                     style="position: absolute; top: 80px; right: 15px; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border: 1px solid #ccc;">
+            <div id="btnAudio" class="btn btn-sm shadow-sm" 
+                     style="position: absolute; top: 80px; right: 15px; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border: 1px solid #FFD700; color: #FFD700; cursor: pointer; background: rgba(0,0,0,0.5);">
                     🔊
             </div>
 
@@ -279,16 +274,19 @@ function ControlWeb() {
                  style="
                     width: 90%; 
                     max-width: 500px; 
-                    background-color: rgba(255, 255, 255, 0.5); /* Más transparente (0.5) */
-                    backdrop-filter: blur(2px); /* Más borroso para legibilidad */
-                    -webkit-backdrop-filter: blur(7px);
-                    border: 1px solid rgba(255, 255, 255, 0.3);
-                    border-radius: 20px;
-                    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+                    position: relative;
+                    background-color: rgba(52, 52, 48, 0.6); 
+                    backdrop-filter: blur(1px);
+                    -webkit-backdrop-filter: blur(10px);
+                    border: 4px double #FFD700;
+                    border-radius: 15px;
+                    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+                    color: white;
                  ">
                 
-                <h4 class="text-center mb-3 font-weight-bold text-dark">Jugadores Conectados</h4>
-                
+                <h4 class="text-center mb-3 font-weight-bold" style="color: #ffffffff; text-shadow: 2px 2px 0 #000;">
+                    Jugadores
+                </h4>                
                 <div id="listaJugadoresSala" class="list-group mb-3 font-weight-bold shadow-sm">
                     <li class="list-group-item" style="background-color: rgba(255,255,255,0.7);">Esperando...</li>
                 </div>
@@ -299,7 +297,7 @@ function ControlWeb() {
                 
                 <button id="btnIrAlJuego" class="btn btn-warning btn-lg btn-block shadow font-weight-bold text-white" 
                         style="display:none; border: 2px solid white;">
-                    ⚔️ ¡IR AL JUEGO!
+                    ⚔️ ¡A LA BATALLA!
                 </button>
             </div>
             
@@ -328,10 +326,28 @@ function ControlWeb() {
 
         if (nick === propietario) {
         botones = `
-          <div class="alert alert-warning small mt-2">Eres el creador de la sala.</div>
-          <button id="btnEliminarPartida" class="btn btn-danger btn-lg mt-2">
-              📜🪶 Eliminar Sala
-          </button>`;
+            <div class="alert mt-3 shadow" 
+                 style="
+                    background-color: rgba(60, 40, 10, 0.9); 
+                    color: #FFD700;                          
+                    border: 2px solid #FFD700;               
+                    font-family: 'MedievalSharp', cursive;   
+                    font-size: 1.2rem;
+                    text-shadow: 2px 2px 0px #000;           
+                    text-transform: uppercase;              
+                    letter-spacing: 1px;
+                 ">
+                 👑 Eres el Señor de la Sala 👑
+            </div>
+
+            <button id="btnEliminarPartida" class="btn btn-danger btn-lg mt-2 shadow" 
+                    style="
+                        font-family: 'MedievalSharp', cursive; 
+                        border: 2px solid #800000; 
+                        background-color: #b30000;
+                    ">
+                📜🪶 Disolver equipo
+            </button>`;
         } else {
           botones = `
           <button id="btnSalirPartida" class="btn btn-secondary btn-lg mt-2">
@@ -407,7 +423,11 @@ function ControlWeb() {
         $('#listaJugadoresSala').empty();
 
         datos.jugadores.forEach(jugador => {
-            $('#listaJugadoresSala').append(`<li class="list-group-item">${jugador}</li>`);
+            $('#listaJugadoresSala').append(`
+                <li class="list-group-item" style="color: black; font-weight: bold;">
+                    ${jugador}
+                </li>
+            `);
         });
         for (let i = jugadoresValidos.length; i < max; i++) {
           $('#listaJugadoresSala').append(`<li class="list-group-item text-muted">Esperando jugador...</li>`);
