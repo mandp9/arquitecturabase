@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 
 function Sistema(test){
   this.usuarios = {};
+  this.partidas = {};
   this.cad=new datos.CAD();
  
   if(!test.test){
@@ -30,6 +31,7 @@ function Sistema(test){
     return this.usuarios.hasOwnProperty(nick);
   };
   this.eliminarUsuario = function(nick){
+    this.insertarLog("cerrarSesion", nick);
     if(this.usuarioActivo(nick)){
         delete this.usuarios[nick];
         return true;
@@ -41,8 +43,10 @@ function Sistema(test){
     return Object.keys(this.usuarios).length;
   };
   this.usuarioGoogle=function(usr,callback){
+    let modelo = this;
     this.cad.buscarOCrearUsuario(usr,function(obj){
     callback(obj);
+    modelo.insertarLog("inicioGoogle", obj.email);
   });
   };
   this.registrarUsuario=function(obj,callback){
@@ -58,6 +62,7 @@ function Sistema(test){
       modelo.cad.insertarUsuario(obj, function(res) {
           correo.enviarEmail(obj.email, obj.key, "Confirma cuenta");
           callback(res);
+          modelo.insertarLog("registroUsuario", res.email);
       });
     }
     else
@@ -68,17 +73,14 @@ function Sistema(test){
 };
 this.confirmarUsuario = function(obj, callback) {
     let modelo = this;
-    // Buscamos al usuario con el email, la key y que NO esté confirmada [cite: 768-769]
     this.cad.buscarUsuario({ "email": obj.email, "confirmada": false, "key": obj.key }, function(usr) {
         if (usr) {
-            // Si lo encontramos, lo marcamos como confirmado
-            usr.confirmada = true; // [cite: 771]
-            // Y llamamos a la CAD para actualizarlo en la BBDD
+            usr.confirmada = true; 
             modelo.cad.actualizarUsuario(usr, function(res) {
-                callback({ "email": res.email }); // [cite: 773]
+                callback({ "email": res.email }); 
             });
         } else {
-            callback({ "email": -1 }); // [cite: 778]
+            callback({ "email": -1 }); 
         }
     });
 };
@@ -87,27 +89,160 @@ this.loginUsuario = function(obj, callback) {
     let modelo = this;
     this.cad.buscarUsuario({ "email": obj.email, "confirmada": true }, function(usr) {
         if (!usr) {
-            // Usuario no encontrado o no confirmado
             callback(undefined);
             return -1;
         }
         
         bcrypt.compare(obj.password, usr.password, function(err, result) {
             if (result) {
-                // Contraseña correcta
                 callback(usr);
+                modelo.insertarLog("inicioLocal", usr.email);
             } else {
-                // Contraseña incorrecta
                 callback(undefined);
             }
         });
     });
 };
+this.crearPartida = function(email) {
+        let codigo = this.obtenerCodigo();
+        let partida = new Partida(codigo, email);
+        partida.agregarJugador(email);
+        this.partidas[codigo] = partida;
+        this.insertarLog("crearPartida", email);
+        return { codigo: codigo, propietario: email };
+};
+this.unirAPartida = function(email, codigo) {
+        let partida = this.partidas[codigo];
+        if (partida) {
+            if (partida.jugadores.includes(email)) {
+                console.log("El usuario " + email + " se reconecta a la partida " + codigo);
+                return { 
+                    codigo: codigo, 
+                    estado: partida.estado, 
+                    propietario: partida.propietario 
+                };
+            }
+            if (partida.estado === "abierta") {
+                partida.agregarJugador(email);
+                this.insertarLog("unirAPartida", email);
+                return { 
+                    codigo: codigo, 
+                    estado: partida.estado, 
+                    propietario: partida.propietario 
+                };
+            }
+        }
+        
+        // Si la partida no existe o está llena
+        return { codigo: -1 };
+    };
+  this.obtenerPartidasDisponibles = function() {
+        let lista = [];
+        for (let key in this.partidas) {
+            let partida = this.partidas[key];
+            if (partida.estado === "abierta") {
+                lista.push({ codigo: partida.codigo, propietario: partida.propietario });
+            }
+        }
+        return lista;
+  };
+  this.obtenerCodigo = function() {
+        let cadena = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let nombre = "";
+        for (let i = 0; i < 6; i++) {
+            nombre += cadena.charAt(Math.floor(Math.random() * cadena.length));
+        }
+        return nombre;
+  };
+    this.abandonarPartida = function(email, codigo) {
+        if (this.partidas[codigo]) {
+            let partida = this.partidas[codigo];
+            
+            let index = partida.jugadores.indexOf(email);
+            if (index > -1) {
+                partida.jugadores.splice(index, 1);
+            }
+
+            if (partida.jugadores.length === 0) {
+                delete this.partidas[codigo];
+                return { codigo: codigo, eliminado: true, propietario: email };
+            }
+            
+            partida.estado = "abierta";
+            partida.propietario = partida.jugadores[0]; 
+            
+            return { codigo: codigo, eliminado: false, propietario: partida.propietario };
+        }
+        return { codigo: -1 };
+    };
+    this.eliminarPartida = function(email, codigo) {
+        if (this.partidas[codigo]) {
+            // Solo el propietario puede borrarla manualmente
+            if (this.partidas[codigo].propietario === email) {
+                delete this.partidas[codigo];
+                return { codigo: codigo, eliminado: true };
+            }
+        }
+        return { codigo: -1, eliminado: false };
+    };
+
+    this.buscarPartidaDeUsuario = function(email) {
+        for (let codigo in this.partidas) {
+            let partida = this.partidas[codigo];
+            if (partida.jugadores.includes(email)) {
+                return { codigo: codigo, propietario: partida.propietario };
+            }
+        }
+        return null; // No está en ninguna partida
+    };
+    this.insertarLog = function(tipo, usuario) {
+        let registro = {
+            "tipo-operacion": tipo,
+            "usuario": usuario,
+            "fecha-hora": new Date().toISOString()
+        };
+        if (this.cad) {
+            this.cad.insertarLog(registro, function(res) {
+                console.log("Log registrado: " + tipo);
+            });
+        }
+    };
+    this.obtenerLogs = function(callback) {
+        if (this.cad) {
+            this.cad.obtenerLogs(callback);
+        } else {
+            callback([]);
+        }
+    };
 }
 
 function Usuario(nick){
   this.nick = nick;
 }
+
+function Partida(codigo, propietario) {
+    this.codigo = codigo;
+    this.propietario = propietario;
+    this.jugadores = [];
+    this.maxJug = 2;
+    this.estado = "abierta"; 
+
+    this.agregarJugador = function(nick) {
+        if (this.jugadores.includes(nick)) {
+            return true; 
+        }
+        
+        if (this.jugadores.length < this.maxJug) {
+            this.jugadores.push(nick);
+            if (this.jugadores.length === this.maxJug) {
+                this.estado = "completa";
+            }
+            return true;
+        }
+        return false;
+    }
+}
+
 
 
 module.exports.Sistema = Sistema;

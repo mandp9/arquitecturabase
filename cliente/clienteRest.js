@@ -5,6 +5,8 @@ this.agregarUsuario = function(nick) {
       console.log("Usuario " + nick + " ha sido registrado");
       const msg = "Bienvenido al sistema, " + nick;
       $.cookie("nick", nick, { path: '/' });
+      ws.email = data.nick; 
+      cw.limpiar();
       cw.comprobarSesion();
     } else {
       console.log("El nick ya está ocupado");
@@ -22,15 +24,13 @@ this.agregarUsuario2 = function (nick) {
     $.ajax({
       type: 'GET',
       url: '/agregarUsuario/' + encodeURIComponent(nick),
-      dataType: 'json',               // esperamos JSON de respuesta
-      // contentType no es necesario en GET sin body
+      dataType: 'json',               
       success: function (data) {
         if (data.nick != -1) {
           console.log('Usuario ' + nick + ' ha sido registrado');
         } else {
           console.log('El nick ya está ocupado');
         }
-        // opcional: logSalida('agregarUsuario2', data);
       },
       error: function (xhr, textStatus, errorThrown) {
         console.log('Status: ' + textStatus);
@@ -39,7 +39,6 @@ this.agregarUsuario2 = function (nick) {
     });
   };
 
-  // Si quieres, añade el resto con $.ajax también:
   this.obtenerUsuarios = function () {
     return $.ajax({
       type: 'GET',
@@ -47,7 +46,6 @@ this.agregarUsuario2 = function (nick) {
       dataType: 'json'
     }).done(function (data) {
       console.log('Usuarios:', data);
-      // logSalida('obtenerUsuarios', data);
     }).fail(function (xhr, s, e) {
       console.log('Error obtenerUsuarios:', s, e);
     });
@@ -94,9 +92,9 @@ this.agregarUsuario2 = function (nick) {
       cw.mostrarLogin();
       }
       else{
-      console.log("El email ya está ocupado");
-      cw.mostrarMensaje("El email " + email + " ya está registrado. Prueba con otro.");
-      $("#btnRegistro").prop("disabled", false).text("Registrar");
+        console.log("Hay un usuario registrado con ese email");
+        cw.mostrarModal("No se ha podido registrar el usuario");
+        $("#btnRegistro").prop("disabled", false).text("Registrar");
       }
       },
       error:function(xhr, textStatus, errorThrown){
@@ -117,21 +115,20 @@ this.agregarUsuario2 = function (nick) {
         if (data.nick != "nook") {
           console.log("Usuario " + data.nick + " ha iniciado sesión");
           $.cookie("nick", data.nick);
+          if (ws) {
+              ws.email = data.nick; 
+          }
           cw.limpiar();
-          // Llamamos a comprobarSesion para que pinte el menú y el saludo
           cw.comprobarSesion(); 
         } else {
           console.log("Datos incorrectos. No se pudo iniciar sesión");
-          cw.mostrarMensaje("Error: Email o contraseña incorrectos.");
-          // Reactivamos el botón
+          cw.mostrarModal("Error: Email o contraseña incorrectos.");
           $("#btnLogin").prop("disabled", false).text("Iniciar sesión");
         }
       },
       error: function(xhr, textStatus, errorThrown) {
-        // TAREA CUMPLIDA: Mensaje en caso de error
         console.log("Status: " + textStatus);
         cw.mostrarMensaje("Error de conexión al iniciar sesión.");
-        // Reactivamos el botón
         $("#btnLogin").prop("disabled", false).text("Iniciar sesión");
       },
       contentType: 'application/json'
@@ -147,5 +144,30 @@ this.agregarUsuario2 = function (nick) {
     });
 };
 
-  
+this.obtenerPartidasDisponibles = function() {
+  $.getJSON("/obtenerPartidas", function(lista) {
+      cw.actualizarListaPartidas(lista);
+  });
+};
+
+this.comprobarPartidaActiva = function() {
+    let email = $.cookie("nick");
+    if (email) {
+        $.getJSON("/partidaActiva/" + email, function(data) {
+            if (data && data.codigo) {
+                console.log("Reconectando a partida: " + data.codigo);
+                if (ws) {
+                  ws.email = email;
+                  ws.codigo = data.codigo;
+                  ws.unirAPartida(data.codigo);
+                }
+                cw.mostrarPartida(data);
+            } else {
+                cw.mostrarHome();
+            }
+        });
+    } else {
+        cw.mostrarLogin();
+    }
+};
 }
