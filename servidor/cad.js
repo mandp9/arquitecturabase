@@ -13,35 +13,60 @@ const ObjectId = require("mongodb").ObjectId;
         }
         });
     }
-    function buscar(coleccion,criterio,callback){
-        coleccion.find(criterio).toArray(function(error,usuarios){
-        if (usuarios.length==0){
-         callback(undefined);
-        }
-        else{
-            callback(usuarios[0]);
-        }
-        });
+function buscar(coleccion,criterio,callback){
+    coleccion.find(criterio).toArray(function(error,usuarios){
+    if (usuarios.length==0){
+        callback(undefined);
     }
-    function insertar(coleccion,elemento,callback){
-        coleccion.insertOne(elemento,function(err,result){
-        if(err){
-            console.log("error");
-        }
-        else{
-            console.log("Nuevo elemento creado");
-            callback(elemento);
-        }
-        });
+    else{
+        callback(usuarios[0]);
     }
+    });
+}
+function insertar(coleccion,elemento,callback){
+    coleccion.insertOne(elemento,function(err,result){
+    if(err){
+        console.log("error");
+    }
+    else{
+        console.log("Nuevo elemento creado");
+        callback(elemento);
+    }
+    });
+}
+function insertarLog(coleccion, elemento, callback) {
+    coleccion.insertOne(elemento, function(err, result) {
+        if (err) {
+            console.log("Error al insertar log");
+        } else {
+            console.log("Nuevo log registrado");
+            if (callback) callback(result);
+        }
+    });
+}
+
+function obtenerLogs(coleccion, callback) {
+    coleccion.find({}).toArray(function(error, logs) {
+        if (error) {
+            callback([]);
+        } else {
+            callback(logs);
+        }
+    });
+}
+
 function CAD(){
     this.usuarios;
+    this.logs;
+
     this.conectar=async function(callback) {
         let cad=this;
         let client = new mongo(process.env.MONGO_URI); 
         await client.connect(); // Establece la conexión
         const database=client.db("sistema"); // Conéctate o crea la base de datos "sistema"
         cad.usuarios=database.collection("usuarios"); // Asigna la colección "usuarios"
+        cad.partidas=database.collection("partidas");
+        cad.logs = database.collection("logs");
         callback(database); // Ejecuta el callback
     }
     this.buscarOCrearUsuario=function(usr,callback){
@@ -56,7 +81,12 @@ function CAD(){
     this.actualizarUsuario = function(obj, callback) {
     actualizar(this.usuarios, obj, callback); 
     }
-
+    this.insertarLog = function(registro, callback) {
+        insertarLog(this.logs, registro, callback);
+    }
+    this.obtenerLogs = function(callback) {
+        obtenerLogs(this.logs, callback);
+    }
     function actualizar(coleccion, obj, callback) {
         // Buscamos por _id y actualizamos el objeto completo
         coleccion.findOneAndUpdate(

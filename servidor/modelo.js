@@ -31,6 +31,7 @@ function Sistema(test){
     return this.usuarios.hasOwnProperty(nick);
   };
   this.eliminarUsuario = function(nick){
+    this.insertarLog("cerrarSesion", nick);
     if(this.usuarioActivo(nick)){
         delete this.usuarios[nick];
         return true;
@@ -42,8 +43,10 @@ function Sistema(test){
     return Object.keys(this.usuarios).length;
   };
   this.usuarioGoogle=function(usr,callback){
+    let modelo = this;
     this.cad.buscarOCrearUsuario(usr,function(obj){
     callback(obj);
+    modelo.insertarLog("inicioGoogle", obj.email);
   });
   };
   this.registrarUsuario=function(obj,callback){
@@ -59,6 +62,7 @@ function Sistema(test){
       modelo.cad.insertarUsuario(obj, function(res) {
           correo.enviarEmail(obj.email, obj.key, "Confirma cuenta");
           callback(res);
+          modelo.insertarLog("registroUsuario", res.email);
       });
     }
     else
@@ -92,6 +96,7 @@ this.loginUsuario = function(obj, callback) {
         bcrypt.compare(obj.password, usr.password, function(err, result) {
             if (result) {
                 callback(usr);
+                modelo.insertarLog("inicioLocal", usr.email);
             } else {
                 callback(undefined);
             }
@@ -103,6 +108,7 @@ this.crearPartida = function(email) {
         let partida = new Partida(codigo, email);
         partida.agregarJugador(email);
         this.partidas[codigo] = partida;
+        this.insertarLog("crearPartida", email);
         return { codigo: codigo, propietario: email };
 };
 this.unirAPartida = function(email, codigo) {
@@ -118,6 +124,7 @@ this.unirAPartida = function(email, codigo) {
             }
             if (partida.estado === "abierta") {
                 partida.agregarJugador(email);
+                this.insertarLog("unirAPartida", email);
                 return { 
                     codigo: codigo, 
                     estado: partida.estado, 
@@ -187,6 +194,25 @@ this.unirAPartida = function(email, codigo) {
             }
         }
         return null; // No está en ninguna partida
+    };
+    this.insertarLog = function(tipo, usuario) {
+        let registro = {
+            "tipo-operacion": tipo,
+            "usuario": usuario,
+            "fecha-hora": new Date().toISOString()
+        };
+        if (this.cad) {
+            this.cad.insertarLog(registro, function(res) {
+                console.log("Log registrado: " + tipo);
+            });
+        }
+    };
+    this.obtenerLogs = function(callback) {
+        if (this.cad) {
+            this.cad.obtenerLogs(callback);
+        } else {
+            callback([]);
+        }
     };
 }
 
