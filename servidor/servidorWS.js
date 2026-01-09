@@ -88,9 +88,70 @@ function WSServer() {
                     srv.enviarGlobal(io, "listaPartidas", lista);
                 }
             });
-            
+            socket.on("iniciarPartida", function(datos) {
+                let nick = datos.nick || socket.email; 
+                let codigo = datos.codigo;
+
+                let res = sistema.iniciarPartida(codigo, nick);
+                if (res && res.mazo) {
+                    io.in(codigo).emit("partidaIniciada", res.mazo);
+                }
+            });
+            socket.on("voltearCarta", function(datos) {
+                let res = sistema.voltearCarta(datos.codigo, datos.nick, datos.idCarta);
+                
+                if (res) {
+                    if (res.tipo === "volteo") {
+                        io.in(datos.codigo).emit("cartaVolteada", res.carta);
+                    }
+                    else if (res.tipo === "pareja") {
+                        io.in(datos.codigo).emit("parejaEncontrada", res);
+                    }
+                    else if (res.tipo === "fallo") {
+                        io.in(datos.codigo).emit("cartaVolteada", { id: datos.idCarta, valor: res.carta2.valor }); // Enviamos la que acaba de tocar
+                        
+                        setTimeout(() => {
+                            io.in(datos.codigo).emit("parejaIncorrecta", res);
+                        }, 1000);
+                    }
+                }
+            });
+
             socket.on("disconnect", function() {
                 console.log("Usuario desconectado: " + socket.email);
+                
+                if (socket.codigo && socket.email) {
+                    
+                    let res = sistema.abandonarPartida(socket.email, socket.codigo);
+                    
+                    // 2. Si la partida existía...
+                    if (res.codigo != -1) {
+                        
+                        // Si tras irse él, la partida se queda vacía (ya se borró sola en el modelo)
+                        if (res.eliminado) {
+                            // Solo actualizamos la lista global para los demás
+                            let lista = sistema.obtenerPartidasDisponibles();
+                            srv.enviarGlobal(io, "listaPartidas", lista);
+                        } 
+                        else {
+                            // Si queda un rival dentro (la partida no se ha borrado aún)
+                            // Como quieres que se "cancele", vamos a forzar su eliminación.
+                            
+                            // Avisamos al rival que queda
+                            io.in(socket.codigo).emit("partidaTerminada", { 
+                                mensaje: "El rival se ha desconectado. La partida ha sido cancelada." 
+                            });
+                            
+                            // Eliminamos la partida definitivamente del sistema
+                            // (Usamos el nick del propietario actual, que ahora es el rival que quedó)
+                            sistema.eliminarPartida(res.propietario, res.codigo);
+                            
+                            // Actualizamos la lista global
+                            let lista = sistema.obtenerPartidasDisponibles();
+                            srv.enviarGlobal(io, "listaPartidas", lista);
+                        }
+                    }
+                }
             });
         });
     }

@@ -177,13 +177,25 @@ this.unirAPartida = function(email, codigo) {
     };
     this.eliminarPartida = function(email, codigo) {
         if (this.partidas[codigo]) {
-            // Solo el propietario puede borrarla manualmente
             if (this.partidas[codigo].propietario === email) {
                 delete this.partidas[codigo];
                 return { codigo: codigo, eliminado: true };
             }
         }
         return { codigo: -1, eliminado: false };
+    };
+
+    this.iniciarPartida = function(codigo, nick) {
+        let partida = this.partidas[codigo];
+        if (partida && partida.propietario == nick) {
+            if (partida.jugadores.length == 2) {
+                let res = partida.iniciarJuego();
+                if (res) {
+                    return { codigo: codigo, mazo: res };
+                }
+            }
+        }
+        return null;
     };
 
     this.buscarPartidaDeUsuario = function(email) {
@@ -193,7 +205,7 @@ this.unirAPartida = function(email, codigo) {
                 return { codigo: codigo, propietario: partida.propietario };
             }
         }
-        return null; // No está en ninguna partida
+        return null; 
     };
     this.insertarLog = function(tipo, usuario) {
         let registro = {
@@ -214,6 +226,20 @@ this.unirAPartida = function(email, codigo) {
             callback([]);
         }
     };
+    this.sumarMonedas = function(email, cantidad) {
+        if (this.cad) {
+            this.cad.sumarMonedas(email, cantidad, function(nuevasMonedas) {
+                console.log("Monedas guardadas para " + email + ": " + nuevasMonedas);
+            });
+        }
+    };
+    this.voltearCarta = function(codigo, nick, idCarta) {
+        let partida = this.partidas[codigo];
+        if (partida && partida.jugadores.includes(nick)) {
+            return partida.voltearCarta(idCarta, nick); // <--- AHORA PASAMOS EL NICK
+        }
+        return null;
+    };
 }
 
 function Usuario(nick){
@@ -226,23 +252,99 @@ function Partida(codigo, propietario) {
     this.jugadores = [];
     this.maxJug = 2;
     this.estado = "abierta"; 
+    this.mazo = [];
+    this.cartasLevantadas = []; 
+    this.turno = undefined; 
+
+    this.fondosDisponibles = [
+        "battle1.jpg",
+        "battle2.jpg",
+        "battle3.jpg",
+        "battle4.jpg"
+    ];
+    this.fondo = this.fondosDisponibles[Math.floor(Math.random() * this.fondosDisponibles.length)];
 
     this.agregarJugador = function(nick) {
-        if (this.jugadores.includes(nick)) {
-            return true; 
-        }
-        
+        if (this.jugadores.includes(nick)) return true;
         if (this.jugadores.length < this.maxJug) {
             this.jugadores.push(nick);
-            if (this.jugadores.length === this.maxJug) {
-                this.estado = "completa";
-            }
+            if (this.jugadores.length === this.maxJug) this.estado = "completa";
             return true;
         }
         return false;
     }
+
+    this.iniciarJuego = function() {
+        if (this.estado != "jugando") {
+            this.estado = "jugando";
+            this.mazo = this.generarMazo(8);
+            this.turno = this.jugadores[Math.floor(Math.random() * this.jugadores.length)];
+            return { 
+                mazo: this.mazo, 
+                turno: this.turno,
+                fondo: this.fondo 
+            };
+        }
+        return null;
+    }
+
+    this.generarMazo = function(numParejas) {
+        let iconos = ["🐉", "⚔️", "🛡️", "🧪", "💍", "🔥", "🔮", "👑"];
+        let cartas = [];
+        for(let i=0; i<numParejas; i++) {
+            let icono = iconos[i % iconos.length];
+            cartas.push({ id: i*2, valor: icono, estado: 'oculta' });
+            cartas.push({ id: i*2+1, valor: icono, estado: 'oculta' });
+        }
+        for (let i = cartas.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cartas[i], cartas[j]] = [cartas[j], cartas[i]];
+        }
+        return cartas;
+    }
+
+    this.voltearCarta = function(idCarta, nick) {
+        // 1. VALIDACIÓN DE TURNO
+        if (this.turno !== nick) {
+            console.log("No es el turno de " + nick);
+            return null; 
+        }
+
+        let carta = this.mazo.find(c => c.id == idCarta);
+        
+        if (carta && carta.estado === 'oculta' && this.cartasLevantadas.length < 2) {
+            carta.estado = 'visible';
+            this.cartasLevantadas.push(carta);
+            
+            if (this.cartasLevantadas.length === 2) {
+                let carta1 = this.cartasLevantadas[0];
+                let carta2 = this.cartasLevantadas[1];
+                
+                if (carta1.valor === carta2.valor) {
+                    carta1.estado = 'encontrada';
+                    carta2.estado = 'encontrada';
+                    this.cartasLevantadas = []; 
+                    // Si acierta, CONSERVA el turno. Devolvemos quien tiene el turno.
+                    return { tipo: "pareja", carta1: carta1, carta2: carta2, turno: this.turno };
+                } else {
+                    carta1.estado = 'oculta';
+                    carta2.estado = 'oculta';
+                    this.cartasLevantadas = [];
+                    this.cambiarTurno();
+                    return { tipo: "fallo", carta1: carta1, carta2: carta2, turno: this.turno };
+                }
+            }
+            return { tipo: "volteo", carta: carta, turno: this.turno };
+        }
+        return null;
+    }
+
+    // --- NUEVO: Función auxiliar para cambiar turno ---
+    this.cambiarTurno = function() {
+        let index = this.jugadores.indexOf(this.turno);
+        // Pasa al siguiente jugador (cíclico)
+        this.turno = this.jugadores[(index + 1) % this.jugadores.length];
+    }
 }
-
-
 
 module.exports.Sistema = Sistema;

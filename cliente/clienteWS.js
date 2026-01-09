@@ -32,21 +32,36 @@ function ClienteWS(){
             cw.actualizarEstadoPartida(datos);
         });
         this.socket.on("partidaTerminada", function(datos) {
-            cw.mostrarAviso(datos.mensaje);
             cw.mostrarHome();
+            cw.mostrarModal(datos.mensaje);
             cli.codigo = undefined;
+        });
+        this.socket.on("partidaIniciada", function(mazo) {
+            console.log("¡El servidor dice que empieza el juego! Mazo recibido:", mazo);
+            cw.pintarTablero(mazo);
+        });
+        this.socket.on("cartaVolteada", function(carta) {
+            cw.girarCartaVisual(carta.id, carta.valor);
+        });
+
+        this.socket.on("parejaEncontrada", function(res) {
+            cw.marcarPareja(res.carta1.id, res.carta2.id);
+        });
+
+        this.socket.on("parejaIncorrecta", function(res) {
+            cw.ocultarCartaVisual(res.carta1.id);
+            cw.ocultarCartaVisual(res.carta2.id);
         });
     }
     this.crearPartida = function() {
         let nick = $.cookie("nick"); 
         
         if (nick) {
-            this.email = nick; // Actualizamos la variable local
+            this.email = nick;
             console.log("Enviando petición crearPartida con:", nick);
             this.socket.emit("crearPartida", { "email": nick });
         } else {
             console.error("No se pudo crear partida: Cookie 'nick' no encontrada.");
-            // Opcional: Redirigir al login si no hay cookie
             window.location.href = "/";
         }
     }
@@ -61,13 +76,40 @@ function ClienteWS(){
     }
 
     this.eliminarPartida = function(codigo) {
-        // Antes enviaba 'this.email' que podía ser undefined.
-        // Ahora forzamos a leer la cookie si la variable está vacía.
+       
         let email = this.email || $.cookie("nick");
         
         console.log("Intentando borrar partida:", codigo, "Usuario:", email); // Log para depurar
         this.socket.emit("eliminarPartida", { "email": email, "codigo": codigo });
     }
+    this.iniciarPartida = function(codigo) {
+        let email = this.email || $.cookie("nick");
+        console.log("Iniciando partida:", codigo, "Usuario:", email);
+        this.socket.emit("iniciarPartida", { 
+            "codigo": codigo, 
+            "nick": email, // El servidor espera 'nick' o 'email' según tu servidorWS.js
+            "email": email 
+        });
+    }
+
+    this.voltearCarta = function(idCarta) {
+        let email = this.email || $.cookie("nick");
+        if (this.codigo && email) {
+            this.socket.emit("voltearCarta", { 
+                "nick": email, 
+                "codigo": this.codigo, 
+                "idCarta": idCarta 
+            });
+        }
+    }
+
+    this.lanzarSocketSrv = function() {
+        // ... existing listeners ...
+        this.socket.on("partidaIniciada", function(mazo) {
+            cw.pintarTablero(mazo);
+        });
+    }
 
     this.ini();
 }
+

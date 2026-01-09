@@ -1,152 +1,154 @@
 function ControlWeb() {
-  this.pintarMenu = function(nick) {
-    const $menu = $("#menu"); // <ul id="menu"> en index.html
-    if (nick) {
-      $menu.html(`
-        <li class="nav-item"><a class="nav-link" href="#home">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="#link2">Link 2</a></li>
-        <li class="nav-item"><a id="lnkSalir" class="nav-link" href="#">Salir</a></li>
-      `);
-    } else {
-      $menu.html(`
-        <li class="nav-item"><a class="nav-link" href="#login">Inicio sesión</a></li>
-        <li class="nav-item"><a class="nav-link" href="#link2">Link 2</a></li>
-        <li class="nav-item disabled"><a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Salir</a></li>
-      `);
-    }
-  };
-  this.mostrarAgregarUsuario = function(){
-    $('#bnv').remove();
-    $('#mAU').remove();
-    let cadena = '<div id="mAU">';
-    cadena = cadena + '<div class="card"><div class="card-body">';
-    cadena = cadena + '<div class="form-group">';
-    cadena = cadena + '<label for="nick">Nick:</label>';
-    cadena = cadena + '<p><input type="text" class="form-control" id="nick" placeholder="introduce un nick"></p>';
-    cadena = cadena + '<button id="btnAU" type="submit" class="btn btn-primary">Submit</button>';
-    // Botón “Acceso con Google” igual que en el guion
-    cadena = cadena + '<div><a href="/auth/google"><img src="/cliente/img/web_light_rd_SI@1x.png" style="height:40px;"></a></div>';
-    cadena = cadena + '</div>';
-    cadena = cadena + '</div></div></div>';
+    this.pintarMenu = function(nick) {
+        const $menu = $("#menu"); 
+        if (nick) {
+            $menu.html(`
+                <li class="nav-item"><a class="nav-link" href="#home">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="#link2">Link 2</a></li>
+                <li class="nav-item"><a id="lnkSalir" class="nav-link" href="#">Salir</a></li>
+            `);
+        } else {
+            $menu.html(`
+                <li class="nav-item"><a class="nav-link" href="#login">Inicio sesión</a></li>
+                <li class="nav-item"><a class="nav-link" href="#link2">Link 2</a></li>
+                <li class="nav-item disabled"><a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Salir</a></li>
+            `);
+        }
+    };
 
-    // Inyectamos en el contenedor
-    $('#au').empty().append(cadena);
+    this.mostrarAgregarUsuario = function(){
+        $('#bnv').remove();
+        $('#mAU').remove();
+        let cadena = '<div id="mAU">';
+        cadena = cadena + '<div class="card"><div class="card-body">';
+        cadena = cadena + '<div class="form-group">';
+        cadena = cadena + '<label for="nick">Nick:</label>';
+        cadena = cadena + '<p><input type="text" class="form-control" id="nick" placeholder="introduce un nick"></p>';
+        cadena = cadena + '<button id="btnAU" type="submit" class="btn btn-primary">Submit</button>';
+        cadena = cadena + '<div><a href="/auth/google"><img src="/cliente/img/web_light_rd_SI@1x.png" style="height:40px;"></a></div>';
+        cadena = cadena + '</div>';
+        cadena = cadena + '</div></div></div>';
 
-    $('#btnAU').on('click', function(){
-      var nick = $('#nick').val().trim();
-      if (!nick){ alert('Escribe un nick'); return; }
-      rest.agregarUsuario(nick);
-  });
-};
-  this.mostrarRegistro=function(){
-  $('body').css('background-image', 'none');
-  $("#fmRegistro").remove();
-  $("#fmLogin").remove();
-  $("#registro").load("./cliente/registro.html",function(){
-    $("#btnRegistro").on("click",function(e){
-      e.preventDefault();
-      let email=$("#email").val();
-      let pwd=$("#pwd").val();
-      if (email && pwd){
-        $(this).prop("disabled", true).text("Registrando...");
-        rest.registrarUsuario(email,pwd);
-        console.log(email+" "+pwd);
-      }
-      });
-    $("#registro").append('<p>¿Ya tienes cuenta? <a href="#" id="linkLogin">Inicia sesión</a></p>');
-      $("#linkLogin").on("click", function(e){
-        e.preventDefault();
-        cw.mostrarLogin();
-      });
-    });
-  };
+        $('#au').empty().append(cadena);
 
-  this.mostrarLogin = function() {
-    $('body').css({
+        $('#btnAU').on('click', function(){
+            var nick = $('#nick').val().trim();
+            if (!nick){ alert('Escribe un nick'); return; }
+            rest.agregarUsuario(nick);
+        });
+    };
+
+    this.mostrarRegistro=function(){
+        $('body').css('background-image', 'none');
+        $("#fmRegistro").remove();
+        $("#fmLogin").remove();
+        $("#registro").load("./cliente/registro.html",function(){
+            $("#btnRegistro").on("click",function(e){
+                e.preventDefault();
+                let email=$("#email").val();
+                let pwd=$("#pwd").val();
+                if (email && pwd){
+                    $(this).prop("disabled", true).text("Registrando...");
+                    rest.registrarUsuario(email,pwd);
+                    console.log(email+" "+pwd);
+                }
+            });
+            $("#registro").append('<p>¿Ya tienes cuenta? <a href="#" id="linkLogin">Inicia sesión</a></p>');
+            $("#linkLogin").on("click", function(e){
+                e.preventDefault();
+                cw.mostrarLogin();
+            });
+        });
+    };
+
+    this.mostrarLogin = function() {
+        $('body').css({
             'background-image': 'url("./cliente/img/dragon.gif")',
             'background-size': 'cover',
             'background-position': 'center',
             'background-attachment': 'fixed'
-    });
-    $("#fmLogin").remove();
-    $("#fmRegistro").remove(); 
-    $('#gameTitle').show();
+        });
+        $("#fmLogin").remove();
+        $("#fmRegistro").remove(); 
+        $('#gameTitle').show();
 
-    $("#registro").load("./cliente/login.html", function() {
-      $("#email, #pwd").css({
-            "background-color": "rgba(0, 0, 0, 0.5)", 
-            "color": "white",                         
-            "border": "1px solid rgba(255, 255, 255, 0.5)", 
-            "backdrop-filter": "blur(5px)",            
-            "border-radius": "5px"
-      });
-      $("#btnLogin").off("click").on("click", function(e) {
-        e.preventDefault();
-        let email = $("#email").val();
-        let pwd = $("#pwd").val();
-        if (email && pwd) {
-          $(this).prop("disabled", true).text("Iniciando sesión...");
-          rest.loginUsuario(email, pwd);
+        $("#registro").load("./cliente/login.html", function() {
+            $("#email, #pwd").css({
+                "background-color": "rgba(0, 0, 0, 0.5)", 
+                "color": "white",                         
+                "border": "1px solid rgba(255, 255, 255, 0.5)", 
+                "backdrop-filter": "blur(5px)",            
+                "border-radius": "5px"
+            });
+            $("#btnLogin").off("click").on("click", function(e) {
+                e.preventDefault();
+                let email = $("#email").val();
+                let pwd = $("#pwd").val();
+                if (email && pwd) {
+                    $(this).prop("disabled", true).text("Iniciando sesión...");
+                    rest.loginUsuario(email, pwd);
+                }
+            });
+            $("#registro").append(
+                '<p style="color: #ffffffff; font-weight: bold;">¿No tienes cuenta? ' + 
+                '<a href="#" id="linkRegistro" style="color: #edf345ff; text-decoration: underline;">Regístrate aquí</a>' +
+                '</p></div>'
+            );      
+            $("#linkRegistro").on("click", function(e){
+                e.preventDefault();
+                cw.mostrarRegistro();
+            });
+        });
+    };
+
+    this.comprobarSesion=function(){
+        const nick = $.cookie('nick');
+        this.pintarMenu(nick);
+        $('#au').empty();
+        if (nick){
+            rest.comprobarPartidaActiva();
+            this.mostrarMensaje("Bienvenido al sistema, " + nick, true);
+            this.mostrarHome();
+        } else {
+            this.mostrarLogin();
         }
-      });
-      $("#registro").append(
-            '<p style="color: #ffffffff; font-weight: bold;">¿No tienes cuenta? ' + 
-            '<a href="#" id="linkRegistro" style="color: #edf345ff; text-decoration: underline;">Regístrate aquí</a>' +
-            '</p></div>'
-        );      
-        $("#linkRegistro").on("click", function(e){
-        e.preventDefault();
-        cw.mostrarRegistro();
-      });
-    });
-  };
+    };
 
-  this.comprobarSesion=function(){
-    const nick = $.cookie('nick');
-    this.pintarMenu(nick);
-    $('#au').empty();
-    if (nick){
-      rest.comprobarPartidaActiva();
-      this.mostrarMensaje("Bienvenido al sistema, " + nick, true);
-      this.mostrarHome();
-    }
-    else{
-      this.mostrarLogin();
-    }
-  };
+    this.mostrarMensaje = function (msg, noOcultar) {
+        $('#msg').empty();
+        const html = `
+            <div class="alert alert-info" role="alert">
+                ${msg}
+            </div>
+        `;
+        $('#msg').html(html);
+        if (!noOcultar) {
+            setTimeout(() => $('#msg').empty(), 3000);
+        }
+    };
 
-   this.mostrarMensaje = function (msg, noOcultar) {
-    $('#msg').empty();
-    const html = `
-      <div class="alert alert-info" role="alert">
-        ${msg}
-      </div>
-    `;
-    $('#msg').html(html);
-    if (!noOcultar) {
-        setTimeout(() => $('#msg').empty(), 3000);
-    }
-  };
+    this.salir = function () {
+        const nick = $.cookie('nick');
+        $.removeCookie("nick");
+        rest.cerrarSesion();
+        cw.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
+        setTimeout(() => location.reload(), 1200);
+    };
 
-  this.salir = function () {
-    const nick = $.cookie('nick');
-    $.removeCookie("nick");
-    rest.cerrarSesion();
-    cw.mostrarMensaje(`¡Hasta luego${nick ? ', ' + nick : ''}!`);
-    setTimeout(() => location.reload(), 1200);
-  };
-  this.limpiar = function() {
-    $('#au').empty(); 
-    $('#registro').empty(); 
-    $('#msg').empty();
-  };
-  this.mostrarModal = function(msg) {
-    $("#mModalMsg").remove(); 
-    let cadena = "<div id='mModalMsg'>" + msg + "</div>";
-    $('#mBody').append(cadena);
-    $('#miModal').modal();
-  };
-  this.mostrarHome = function() {
+    this.limpiar = function() {
+        $('#au').empty(); 
+        $('#registro').empty(); 
+        $('#msg').empty();
+    };
+
+    this.mostrarModal = function(msg) {
+        $("#mModalMsg").remove(); 
+        let cadena = "<div id='mModalMsg'>" + msg + "</div>";
+        $('#mBody').append(cadena);
+        $('#miModal').modal();
+    };
+
+    this.mostrarHome = function() {
         $('body').css({
             'background-image': 'url("./cliente/img/casss.png")',
             'background-size': 'cover',
@@ -165,8 +167,8 @@ function ControlWeb() {
                 
                 <h2 class="mb-4 animate__animated animate__fadeInDown" 
                     style="font-family: 'MedievalSharp', cursive; 
-                           color: #fdf6e3; /* Color crema claro */
-                           text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 15px #8b4513; /* Borde negro fuerte y resplandor marrón */
+                           color: #fdf6e3; 
+                           text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 15px #8b4513; 
                            font-size: 2.5rem;">
                     ¡Saludos, <span style="color: #FFD700;">${nick}</span>!
                 </h2>
@@ -184,8 +186,8 @@ function ControlWeb() {
 
                 <div class="card shadow animate__animated animate__fadeInUp animate__delay-1s mx-auto" 
                      style="max-width: 600px;
-                            background-color: #fdf6e3; /* Pergamino */
-                            border: 4px solid #8b4513; /* Marco de madera */
+                            background-color: #fdf6e3; 
+                            border: 4px solid #8b4513; 
                             border-radius: 15px;
                             box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
                     
@@ -234,6 +236,7 @@ function ControlWeb() {
             cw.actualizarListaPartidas(cw.ultimasPartidas); 
         });
     };
+
     this.mostrarPartida = function(datos) {
         let codigoStr = datos.codigo || datos;
         let propietario = datos.propietario;
@@ -255,15 +258,15 @@ function ControlWeb() {
             top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999;
-            font-family: 'MedievalSharp', cursive; /* FUENTE MEDIEVAL GLOBAL */
+            font-family: 'MedievalSharp', cursive; 
         ">
             <audio id="audioLobby" loop>
                 <source src="./cliente/musica/lobby.mp3" type="audio/mpeg">
             </audio>
 
             <div id="btnAudio" class="btn btn-sm shadow-sm" 
-                     style="position: absolute; top: 80px; right: 15px; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border: 1px solid #FFD700; color: #FFD700; cursor: pointer; background: rgba(0,0,0,0.5);">
-                    🔊
+                 style="position: absolute; top: 80px; right: 15px; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border: 1px solid #FFD700; color: #FFD700; cursor: pointer; background: rgba(0,0,0,0.5);">
+                🔊
             </div>
 
             <h2 class="mb-4 text-white" style="text-shadow: 2px 2px 4px #000; font-weight: bold; z-index: 10;">
@@ -414,6 +417,7 @@ function ControlWeb() {
             });
         }
     };
+
     this.actualizarEstadoPartida = function(datos) {
         if ($('#listaJugadoresSala').length === 0) return;
         let jugadoresValidos = datos.jugadores.filter(jugador => jugador);
@@ -436,13 +440,116 @@ function ControlWeb() {
             $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text("¡Sala llena! Todo listo.");
             $('#btnIrAlJuego').show();
         } else {
-            let mensaje = datos.mensaje || "Esperando rival..."; // Usa el mensaje del servidor
+            let mensaje = datos.mensaje || "Esperando rival..."; 
             $('#tituloEstado').removeClass('alert-success').addClass('alert-info').text(mensaje);
             $('#btnIrAlJuego').hide();
         }
     };
+
     this.mostrarAviso = function(msg) {
       $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);
     };
-    
+
+    // --- FUNCIONES DEL JUEGO ---
+
+    this.mostrarTablero = function(codigo) {
+        $('#au').empty(); 
+        $('#registro').empty(); 
+        $('#msg').empty(); 
+        $('#gameTitle').hide(); 
+        $('body').css('background-image', 'none'); 
+        
+        // AÑADIMOS EL CARTEL DEL TURNO
+        let cadena = `
+        <div id="juego">
+            <div id="info-turno" class="alert alert-primary text-center" style="font-weight: bold; font-size: 1.2rem; margin: 10px auto; max-width: 800px;">
+                Esperando inicio...
+            </div>
+            <div id="panel-info">
+                <div class="info-item">⏳ <span id="tiempo">00:00</span></div>
+                <div class="info-item">💰 <span id="mis-monedas">0</span></div>
+            </div>
+            <div id="tablero" class="grid-cartas"></div>
+        </div>
+        `;
+        $('#au').html(cadena); // Lo inyectamos directamente en AU si no existe el div juego base
+        // O si ya usabas el div oculto del index.html, asegurate de tener el div info-turno
+        
+        ws.iniciarPartida(codigo);
+    };
+
+
+    this.pintarTablero = function(datos) {
+        // datos puede ser el mazo directo (versión vieja) o {mazo: [], turno: "pepe"}
+        let mazo = datos.mazo || datos; 
+        let turno = datos.turno;
+        let fondo = datos.fondo;
+        let nick = $.cookie("nick");
+
+        if (turno) {
+            this.actualizarTurno(turno);
+        }
+        if (fondo) {
+            $('body').css({
+                'background-image': 'url("./cliente/img/fondos/' + fondo + '")',
+                'background-size': 'cover',
+                'background-position': 'center',
+                'background-attachment': 'fixed'
+            });
+        }
+        let tablero = document.getElementById("tablero");
+        tablero.innerHTML = ""; 
+
+        mazo.forEach(carta => {
+            let elemento = document.createElement("div");
+            elemento.className = "carta";
+            elemento.id = "carta-" + carta.id; 
+            
+            elemento.innerHTML = `
+                <div class="cara detras"></div>
+                <div class="cara frente">${carta.valor}</div>
+            `;
+            
+            elemento.onclick = function() {
+                ws.voltearCarta(carta.id);
+            };
+            
+            tablero.appendChild(elemento);
+        });
+    };
+
+    this.actualizarTurno = function(turno) {
+        let nick = $.cookie("nick");
+        let info = document.getElementById("info-turno");
+        
+        if (info) {
+            if (turno === nick) {
+                info.className = "alert alert-success text-center";
+                info.innerHTML = " ¡ES TU TURNO, A PELEAR! જ⁀➴ ";
+            } else {
+                info.className = "alert alert-danger text-center";
+                info.innerHTML = "🔮 Turno de: " + turno;
+            }
+        }
+    };
+
+    this.girarCartaVisual = function(id, valor) {
+        let el = document.getElementById("carta-" + id);
+        if (el) {
+            el.classList.add("girada");
+            el.querySelector(".frente").innerText = valor;
+        }
+    };
+
+    this.ocultarCartaVisual = function(id) {
+        let el = document.getElementById("carta-" + id);
+        if (el) {
+            el.classList.remove("girada");
+        }
+    };
+
+    this.marcarPareja = function(id1, id2) {
+        $("#carta-" + id1 + " .cara").css("border-color", "#2ecc71"); 
+        $("#carta-" + id2 + " .cara").css("border-color", "#2ecc71");
+    };
 }

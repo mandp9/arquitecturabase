@@ -1,18 +1,28 @@
 const mongo = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 
- function buscarOCrear(coleccion,criterio,callback)
-    {
-        coleccion.findOneAndUpdate(criterio, {$set: criterio}, {upsert:
-        true,returnDocument:"after",projection:{email:1}}, function(err,doc) {
-        if (err) { throw err; }
-        else {
+function buscarOCrear(coleccion, criterio, callback) {
+    coleccion.findOneAndUpdate(criterio, { $set: criterio }, {
+        upsert: true,
+        returnDocument: "after"
+    }, function(err, doc) {
+        if (err) {
+            throw err;
+        } else {
             console.log("Elemento actualizado");
-            console.log(doc.value.email);
-            callback({email:doc.value.email});
+            if (doc.value.monedas === undefined) {
+                coleccion.updateOne({ _id: doc.value._id }, { $set: { monedas: 0 } }, function(err2, res) {
+                    console.log("Cuenta nueva: Monedas inicializadas a 0");
+                    callback({ email: doc.value.email, monedas: 0 });
+                });
+            } else {
+                console.log("Usuario recurrente: Monedas " + doc.value.monedas);
+                callback({ email: doc.value.email, monedas: doc.value.monedas });
+            }
         }
-        });
-    }
+    });
+}
+
 function buscar(coleccion,criterio,callback){
     coleccion.find(criterio).toArray(function(error,usuarios){
     if (usuarios.length==0){
@@ -55,6 +65,22 @@ function obtenerLogs(coleccion, callback) {
     });
 }
 
+function sumarMonedas(coleccion, email, cantidad, callback) {
+    coleccion.findOneAndUpdate(
+        { email: email },
+        { $inc: { monedas: cantidad } },
+        { returnDocument: "after" },
+        function(err, doc) {
+            if (err) {
+                console.log("Error al sumar monedas");
+            } else if (doc.value) {
+                console.log("Monedas actualizadas. Total: " + doc.value.monedas);
+                if (callback) callback(doc.value.monedas);
+            }
+        }
+    );
+}
+
 function CAD(){
     this.usuarios;
     this.logs;
@@ -62,12 +88,12 @@ function CAD(){
     this.conectar=async function(callback) {
         let cad=this;
         let client = new mongo(process.env.MONGO_URI); 
-        await client.connect(); // Establece la conexión
-        const database=client.db("sistema"); // Conéctate o crea la base de datos "sistema"
-        cad.usuarios=database.collection("usuarios"); // Asigna la colección "usuarios"
+        await client.connect(); 
+        const database=client.db("sistema"); 
+        cad.usuarios=database.collection("usuarios"); 
         cad.partidas=database.collection("partidas");
         cad.logs = database.collection("logs");
-        callback(database); // Ejecuta el callback
+        callback(database); 
     }
     this.buscarOCrearUsuario=function(usr,callback){
         buscarOCrear(this.usuarios,usr,callback);
@@ -87,8 +113,12 @@ function CAD(){
     this.obtenerLogs = function(callback) {
         obtenerLogs(this.logs, callback);
     }
+    
+    this.sumarMonedas = function(email, cantidad, callback) {
+        sumarMonedas(this.usuarios, email, cantidad, callback);
+    }
+
     function actualizar(coleccion, obj, callback) {
-        // Buscamos por _id y actualizamos el objeto completo
         coleccion.findOneAndUpdate(
             { _id: ObjectId(obj._id) }, 
             { $set: obj }, 
