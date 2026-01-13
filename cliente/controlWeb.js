@@ -3,16 +3,14 @@ function ControlWeb() {
         const $menu = $("#menu"); 
         if (nick) {
             $menu.html(`
-                <li class="nav-item"><a class="nav-link" href="#home">Inicio</a></li>
-                <li class="nav-item"><a class="nav-link" href="#link2">Link 2</a></li>
-                <li class="nav-item"><a id="lnkSalir" class="nav-link" href="#">Salir</a></li>
+                <li class="nav-item">
+                    <a id="lnkSalir" class="nav-link btn-salir-medieval" href="#">
+                        🚪 Salir
+                    </a>
+                </li>
             `);
         } else {
-            $menu.html(`
-                <li class="nav-item"><a class="nav-link" href="#login">Inicio sesión</a></li>
-                <li class="nav-item"><a class="nav-link" href="#link2">Link 2</a></li>
-                <li class="nav-item disabled"><a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Salir</a></li>
-            `);
+            $menu.html(``);
         }
     };
 
@@ -508,7 +506,7 @@ function ControlWeb() {
             elemento.innerHTML = `
                 <div class="cara detras"></div>
                 <div class="cara frente">
-                    <img src="./cliente/img/cartas/${carta.valor}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                    <img src="./cliente/img/cartas/${carta.valor}" alt="monstruo">
                 </div>
             `;
             
@@ -527,10 +525,10 @@ function ControlWeb() {
         if (info) {
             if (turno === nick) {
                 info.className = "alert alert-success text-center";
-                info.innerHTML = " ¡ES TU TURNO, A PELEAR! જ⁀➴ ";
+                info.innerHTML = " ¡ES TU TURNO, A PELEAR! ";
             } else {
                 info.className = "alert alert-danger text-center";
-                info.innerHTML = "🔮 Turno de: " + turno;
+                info.innerHTML = " Turno de: " + turno;
             }
         }
     };
