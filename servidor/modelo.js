@@ -240,6 +240,17 @@ this.unirAPartida = function(email, codigo) {
         }
         return null;
     };
+    this.forzarCambioTurno = function(codigo) {
+        let partida = this.partidas[codigo];
+        if (partida) {
+            // Usamos el método cambiarTurno() que YA TIENE la partida
+            partida.cambiarTurno();
+            
+            console.log("Turno forzado en partida " + codigo + ". Ahora le toca a: " + partida.turno);
+            return { turno: partida.turno };
+        }
+        return null;
+    };
 }
 
 function Usuario(nick){
@@ -352,10 +363,8 @@ function Partida(codigo, propietario) {
         return null;
     }
 
-    // --- NUEVO: Función auxiliar para cambiar turno ---
     this.cambiarTurno = function() {
         let index = this.jugadores.indexOf(this.turno);
-        // Pasa al siguiente jugador (cíclico)
         this.turno = this.jugadores[(index + 1) % this.jugadores.length];
     }
 }

@@ -1,4 +1,7 @@
 function WSServer() {
+
+    this.temporizadores = {};
+
     this.lanzarServidor = function(io, sistema) {
         let srv = this;
         io.on('connection', function(socket) {
@@ -8,19 +11,29 @@ function WSServer() {
             }
             console.log("Capa WS activa. Usuario: " + (socket.email || "Anónimo"));
 
+            const reiniciarTemporizador = (codigo) => {
+                if (srv.temporizadores[codigo]) {
+                        clearTimeout(srv.temporizadores[codigo]);
+                }
+                srv.temporizadores[codigo] = setTimeout(() => {
+                    console.log("¡Tiempo agotado en partida " + codigo + "! Cambiando turno...");
+                    let nuevoEstado = sistema.forzarCambioTurno(codigo); 
+                    
+                    if (nuevoEstado) {
+                        io.in(codigo).emit("cambioTurno", { turno: nuevoEstado.turno });
+                        reiniciarTemporizador(codigo);
+                    }
+                    }, 16000);
+            };
             socket.on("crearPartida", function(datos) {
                 let res = sistema.crearPartida(datos.email);
-                
                 if (res.codigo != -1) {
                     socket.join(res.codigo);
                     socket.codigo = res.codigo;
                     socket.email = datos.email;
-
                     srv.enviarAlRemitente(socket, "partidaCreada", res);
-                    
                     let lista = sistema.obtenerPartidasDisponibles();
                     srv.enviarGlobal(io, "listaPartidas", lista);
-                    
                     io.in(res.codigo).emit("jugadores", { 
                         jugadores: [datos.email],
                         maxJug: 2,
@@ -75,15 +88,16 @@ function WSServer() {
             socket.on("eliminarPartida", function(datos) {
                 let res = sistema.eliminarPartida(datos.email, datos.codigo);
                 if (res.eliminado) {
-                    // 1. Avisar a todos en la sala que se acabó
+                    if (srv.temporizadores[datos.codigo]) {
+                        clearTimeout(srv.temporizadores[datos.codigo]);
+                        delete srv.temporizadores[datos.codigo];
+                    }
                     io.in(datos.codigo).emit("partidaTerminada", { 
                         mensaje: "El creador ha cerrado la sala. Todos fuera." 
                     });
                     
-                    // 2. Desconectar sockets de la sala (opcional, pero limpio)
                     io.in(datos.codigo).socketsLeave(datos.codigo); 
                     
-                    // 3. Actualizar la lista global
                     let lista = sistema.obtenerPartidasDisponibles();
                     srv.enviarGlobal(io, "listaPartidas", lista);
                 }
@@ -91,10 +105,11 @@ function WSServer() {
             socket.on("iniciarPartida", function(datos) {
                 let nick = datos.nick || socket.email; 
                 let codigo = datos.codigo;
-
                 let res = sistema.iniciarPartida(codigo, nick);
+
                 if (res && res.mazo) {
                     io.in(codigo).emit("partidaIniciada", res.mazo);
+                    reiniciarTemporizador(codigo);
                 }
             });
             socket.on("voltearCarta", function(datos) {
@@ -103,15 +118,18 @@ function WSServer() {
                 if (res) {
                     if (res.tipo === "volteo") {
                         io.in(datos.codigo).emit("cartaVolteada", res.carta);
+                        reiniciarTemporizador(datos.codigo);
                     }
                     else if (res.tipo === "pareja") {
                         io.in(datos.codigo).emit("parejaEncontrada", res);
+                        reiniciarTemporizador(datos.codigo);
                     }
                     else if (res.tipo === "fallo") {
                         io.in(datos.codigo).emit("cartaVolteada", { id: datos.idCarta, valor: res.carta2.valor }); // Enviamos la que acaba de tocar
                         
                         setTimeout(() => {
                             io.in(datos.codigo).emit("parejaIncorrecta", res);
+                            reiniciarTemporizador(datos.codigo);
                         }, 1000);
                     }
                 }

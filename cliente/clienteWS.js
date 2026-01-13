@@ -53,6 +53,9 @@ function ClienteWS(){
             cw.ocultarCartaVisual(res.carta2.id);
             cw.actualizarTurno(res.turno);
         });
+        this.socket.on("cambioTurno", function(datos) {
+            cw.actualizarTurno(datos.turno);
+        });
     }
     this.crearPartida = function() {
         let nick = $.cookie("nick"); 

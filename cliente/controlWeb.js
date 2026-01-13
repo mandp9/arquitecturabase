@@ -1,4 +1,7 @@
 function ControlWeb() {
+    this.jugadoresActuales = [];
+    this.intervaloTiempo = null;
+
     this.pintarMenu = function(nick) {
         const $menu = $("#menu"); 
         if (nick) {
@@ -419,6 +422,7 @@ function ControlWeb() {
 
     this.actualizarEstadoPartida = function(datos) {
         if ($('#listaJugadoresSala').length === 0) return;
+        this.jugadoresActuales = datos.jugadores;
         let jugadoresValidos = datos.jugadores.filter(jugador => jugador);
         let numJugadores = datos.jugadores.length;
         let max = datos.maxJug || 2;
@@ -456,7 +460,11 @@ function ControlWeb() {
         $('#gameTitle').hide(); 
         $('body').css('background-image', 'none'); 
         
-        // AÑADIMOS EL CARTEL DEL TURNO
+        // Obtenemos los nombres (o ponemos genéricos si falla algo)
+        let jug1 = this.jugadoresActuales && this.jugadoresActuales[0] ? this.jugadoresActuales[0] : "Jugador 1";
+        let jug2 = this.jugadoresActuales && this.jugadoresActuales[1] ? this.jugadoresActuales[1] : "Jugador 2";
+
+        // NUEVA ESTRUCTURA CON AVATARES A LOS LADOS
         let cadena = `
         <div id="juego">
             <div id="info-turno" class="alert alert-primary text-center" style="font-weight: bold; font-size: 1.2rem; margin: 10px auto; max-width: 800px;">
@@ -466,11 +474,25 @@ function ControlWeb() {
                 <div class="info-item">⏳ <span id="tiempo">00:00</span></div>
                 <div class="info-item">💰 <span id="mis-monedas">0</span></div>
             </div>
-            <div id="tablero" class="grid-cartas"></div>
+            
+            <div class="arena-de-juego">
+                
+                <div id="avatar-izq" class="contenedor-avatar" data-nick="${jug1}">
+                    <img src="./cliente/img/K1.png" alt="${jug1}" class="img-avatar">
+                    <div class="nombre-avatar">${jug1}</div>
+                </div>
+
+                <div id="tablero" class="grid-cartas"></div>
+
+                <div id="avatar-der" class="contenedor-avatar" data-nick="${jug2}">
+                    <img src="./cliente/img/K2.png" alt="${jug2}" class="img-avatar">
+                    <div class="nombre-avatar">${jug2}</div>
+                </div>
+
+            </div>
         </div>
         `;
-        $('#au').html(cadena); // Lo inyectamos directamente en AU si no existe el div juego base
-        // O si ya usabas el div oculto del index.html, asegurate de tener el div info-turno
+        $('#au').html(cadena); 
         
         ws.iniciarPartida(codigo);
     };
@@ -522,6 +544,7 @@ function ControlWeb() {
         let nick = $.cookie("nick");
         let info = document.getElementById("info-turno");
         
+        // 1. Actualizar el cartel de texto (como antes)
         if (info) {
             if (turno === nick) {
                 info.className = "alert alert-success text-center";
@@ -530,7 +553,24 @@ function ControlWeb() {
                 info.className = "alert alert-danger text-center";
                 info.innerHTML = " Turno de: " + turno;
             }
+            
         }
+
+        // 2. Actualizar los AVATARES (Lógica nueva)
+        let avIzq = $('#avatar-izq');
+        let avDer = $('#avatar-der');
+
+        // Comprobamos de quién es el turno mirando el data-nick que guardamos en el HTML
+        if (turno === avIzq.data('nick')) {
+            // Turno del jugador de la IZQUIERDA
+            avIzq.removeClass('avatar-turno-inactivo').addClass('avatar-turno-activo');
+            avDer.removeClass('avatar-turno-activo').addClass('avatar-turno-inactivo');
+        } else if (turno === avDer.data('nick')) {
+            // Turno del jugador de la DERECHA
+            avDer.removeClass('avatar-turno-inactivo').addClass('avatar-turno-activo');
+            avIzq.removeClass('avatar-turno-activo').addClass('avatar-turno-inactivo');
+        }
+        this.iniciarTemporizador();
     };
 
     this.girarCartaVisual = function(id, valor) {
@@ -557,5 +597,36 @@ function ControlWeb() {
         this.girarCartaVisual(carta2.id, carta2.valor);
         $("#carta-" + carta1.id + " .cara").css("border-color", "#2ecc71"); 
         $("#carta-" + carta2.id + " .cara").css("border-color", "#2ecc71");
+    };
+    this.iniciarTemporizador = function() {
+        if (this.intervaloTiempo) {
+            clearInterval(this.intervaloTiempo);
+        }
+        
+        let segundos = 15;
+        let elementoTiempo = document.getElementById("tiempo");
+        let contenedorInfo = document.querySelector(".info-item span#tiempo").parentElement; 
+        
+        if (elementoTiempo) {
+            elementoTiempo.innerText = segundos;
+            contenedorInfo.classList.remove("tiempo-agotandose");
+        }
+
+        let self = this;
+        this.intervaloTiempo = setInterval(function() {
+            segundos--;
+            
+            if (elementoTiempo) {
+                elementoTiempo.innerText = segundos;
+
+                if (segundos <= 5) {
+                    contenedorInfo.classList.add("tiempo-agotandose");
+                }
+            }
+
+            if (segundos <= 0) {
+                clearInterval(self.intervaloTiempo);
+            }
+        }, 1000);
     };
 }
