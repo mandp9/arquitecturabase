@@ -450,8 +450,6 @@ function ControlWeb() {
       $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text(msg);
     };
 
-    // --- FUNCIONES DEL JUEGO ---
-
     this.mostrarTablero = function(codigo) {
         $('#au').empty(); 
         $('#registro').empty(); 
@@ -507,7 +505,9 @@ function ControlWeb() {
             
             elemento.innerHTML = `
                 <div class="cara detras"></div>
-                <div class="cara frente">${carta.valor}</div>
+                <div class="cara frente">
+                    <img src="./cliente/img/cartas/${carta.valor}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                </div>
             `;
             
             elemento.onclick = function() {
@@ -537,7 +537,11 @@ function ControlWeb() {
         let el = document.getElementById("carta-" + id);
         if (el) {
             el.classList.add("girada");
-            el.querySelector(".frente").innerText = valor;
+            // Buscamos la etiqueta img dentro del div y le cambiamos el src
+            let img = el.querySelector(".frente img");
+            if (img) {
+                img.src = "./cliente/img/cartas/" + valor;
+            }
         }
     };
 
@@ -548,8 +552,10 @@ function ControlWeb() {
         }
     };
 
-    this.marcarPareja = function(id1, id2) {
-        $("#carta-" + id1 + " .cara").css("border-color", "#2ecc71"); 
-        $("#carta-" + id2 + " .cara").css("border-color", "#2ecc71");
+    this.marcarPareja = function(carta1, carta2) {
+        this.girarCartaVisual(carta1.id, carta1.valor);
+        this.girarCartaVisual(carta2.id, carta2.valor);
+        $("#carta-" + carta1.id + " .cara").css("border-color", "#2ecc71"); 
+        $("#carta-" + carta2.id + " .cara").css("border-color", "#2ecc71");
     };
 }

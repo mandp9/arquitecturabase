@@ -45,12 +45,13 @@ function ClienteWS(){
         });
 
         this.socket.on("parejaEncontrada", function(res) {
-            cw.marcarPareja(res.carta1.id, res.carta2.id);
+            cw.marcarPareja(res.carta1, res.carta2);
         });
 
         this.socket.on("parejaIncorrecta", function(res) {
             cw.ocultarCartaVisual(res.carta1.id);
             cw.ocultarCartaVisual(res.carta2.id);
+            cw.actualizarTurno(res.turno);
         });
     }
     this.crearPartida = function() {

@@ -289,22 +289,36 @@ function Partida(codigo, propietario) {
     }
 
     this.generarMazo = function(numParejas) {
-        let iconos = ["🐉", "⚔️", "🛡️", "🧪", "💍", "🔥", "🔮", "👑"];
-        let cartas = [];
-        for(let i=0; i<numParejas; i++) {
-            let icono = iconos[i % iconos.length];
-            cartas.push({ id: i*2, valor: icono, estado: 'oculta' });
-            cartas.push({ id: i*2+1, valor: icono, estado: 'oculta' });
+        let totalCartas = [];
+        for(let j=1; j<=25; j++) {
+            totalCartas.push(j);
         }
+
+        for (let i = totalCartas.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [totalCartas[i], totalCartas[j]] = [totalCartas[j], totalCartas[i]];
+        }
+        
+        let seleccionadas = totalCartas.slice(0, numParejas);
+
+        let cartas = [];
+        for(let i=0; i<seleccionadas.length; i++) {
+            let nombreImagen = "enemy" + seleccionadas[i] + ".jpg"; // Ej: "enemy5.jpg"
+            
+            cartas.push({ id: i*2, valor: nombreImagen, estado: 'oculta' });
+            cartas.push({ id: i*2+1, valor: nombreImagen, estado: 'oculta' });
+        }
+        
+        // 4. Barajamos el mazo final para que las parejas no estén juntas
         for (let i = cartas.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [cartas[i], cartas[j]] = [cartas[j], cartas[i]];
         }
+        
         return cartas;
     }
 
     this.voltearCarta = function(idCarta, nick) {
-        // 1. VALIDACIÓN DE TURNO
         if (this.turno !== nick) {
             console.log("No es el turno de " + nick);
             return null; 
@@ -324,7 +338,6 @@ function Partida(codigo, propietario) {
                     carta1.estado = 'encontrada';
                     carta2.estado = 'encontrada';
                     this.cartasLevantadas = []; 
-                    // Si acierta, CONSERVA el turno. Devolvemos quien tiene el turno.
                     return { tipo: "pareja", carta1: carta1, carta2: carta2, turno: this.turno };
                 } else {
                     carta1.estado = 'oculta';
