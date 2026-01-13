@@ -236,14 +236,13 @@ this.unirAPartida = function(email, codigo) {
     this.voltearCarta = function(codigo, nick, idCarta) {
         let partida = this.partidas[codigo];
         if (partida && partida.jugadores.includes(nick)) {
-            return partida.voltearCarta(idCarta, nick); // <--- AHORA PASAMOS EL NICK
+            return partida.voltearCarta(idCarta, nick); 
         }
         return null;
     };
     this.forzarCambioTurno = function(codigo) {
         let partida = this.partidas[codigo];
         if (partida) {
-            // Usamos el método cambiarTurno() que YA TIENE la partida
             partida.cambiarTurno();
             
             console.log("Turno forzado en partida " + codigo + ". Ahora le toca a: " + partida.turno);
@@ -266,6 +265,7 @@ function Partida(codigo, propietario) {
     this.mazo = [];
     this.cartasLevantadas = []; 
     this.turno = undefined; 
+    this.pocimas = {};
 
     this.fondosDisponibles = [
         "battle1.jpg",
@@ -279,12 +279,42 @@ function Partida(codigo, propietario) {
         if (this.jugadores.includes(nick)) return true;
         if (this.jugadores.length < this.maxJug) {
             this.jugadores.push(nick);
+            this.pocimas[nick] = 1
             if (this.jugadores.length === this.maxJug) this.estado = "completa";
             return true;
         }
         return false;
     }
+    this.usarPocima = function(nick) {
+        if (this.pocimas[nick] > 0) {
+            this.pocimas[nick]--; 
 
+            let azar = Math.random();
+
+            if (azar < 0.5) {
+                return { 
+                    efecto: "monedas", 
+                    valor: 10, 
+                    restantes: this.pocimas[nick] 
+                };
+            } else {
+         
+                let ocultas = this.mazo.filter(c => c.estado === 'oculta');
+
+                if (ocultas.length > 0) {
+                    let cartaRevelada = ocultas[Math.floor(Math.random() * ocultas.length)];
+                    return { 
+                        efecto: "revelar", 
+                        carta: cartaRevelada, 
+                        restantes: this.pocimas[nick] 
+                    };
+                } else {
+                    return { efecto: "monedas", valor: 10, restantes: this.pocimas[nick] };
+                }
+            }
+        }
+        return null; // No le quedan pócimas
+    }
     this.iniciarJuego = function() {
         if (this.estado != "jugando") {
             this.estado = "jugando";

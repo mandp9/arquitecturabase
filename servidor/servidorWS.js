@@ -171,6 +171,36 @@ function WSServer() {
                     }
                 }
             });
+            socket.on("usarPocima", function(datos) {
+                // Buscamos la partida
+                let partida = sistema.partidas[datos.codigo];
+                if (partida) {
+                    let resultado = partida.usarPocima(datos.nick);
+                    
+                    if (resultado) {
+                        socket.emit("pocimaUsada", { restantes: resultado.restantes });
+
+                        // 2. Aplicamos el efecto
+                        if (resultado.efecto === "monedas") {
+                            sistema.sumarMonedas(datos.nick, resultado.valor);
+                            
+                            // Avisamos al jugador
+                            socket.emit("efectoPocima", { 
+                                mensaje: "🧪 ¡La pócima contenía oro! Has ganado 10 monedas.",
+                                tipo: "monedas",
+                                valor: 10
+                            });
+                        } 
+                        else if (resultado.efecto === "revelar") {
+                            socket.emit("efectoPocima", { 
+                                mensaje: "👁️ La pócima te revela una carta...",
+                                tipo: "revelar",
+                                carta: resultado.carta
+                            });
+                        }
+                    }
+                }
+            });
         });
     }
     this.enviarAlRemitente = function(socket, mensaje, datos) {

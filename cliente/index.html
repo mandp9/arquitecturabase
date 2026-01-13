@@ -423,6 +423,48 @@
         margin: 10px auto; 
         max-width: 800px;
     }
+    .contenedor-pocima {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        z-index: 9999;
+        cursor: pointer;
+        transition: transform 0.2s;
+        display: block;
+    }
+
+    .img-pocima {
+        width: 120px; 
+        height: 120px;
+        border-radius: 50%;
+        border: 5px solid #FFD700; 
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), inset 0 0 20px #000;
+        background-color: #000;
+        object-fit: cover;
+    }
+
+    .contenedor-pocima:hover {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .badge-cantidad {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background-color: #d60000; 
+        color: white;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        width: 40px; 
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 1.4rem;
+        z-index: 10000;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+    }
   </style>
 </head>
 
@@ -494,6 +536,10 @@
         <img src="./cliente/img/caballero.gif" class="caballero-descanso" alt="Caballero descansando">
     </div>
 </div> 
+<div id="contenedor-pocima" class="contenedor-pocima" style="display: none;">
+      <div class="badge-cantidad" id="lblPocimas">1</div>
+      <img src="./cliente/img/pocima.png" onclick="cw.usarPocima()" class="img-pocima animate__animated animate__pulse animate__infinite">
+</div>
 <div class="modal" id="miModal">
     <div class="modal-dialog">
       <div class="modal-content">

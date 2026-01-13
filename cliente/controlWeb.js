@@ -459,12 +459,12 @@ function ControlWeb() {
         $('#msg').empty(); 
         $('#gameTitle').hide(); 
         $('body').css('background-image', 'none'); 
-        
-        // Obtenemos los nombres (o ponemos genéricos si falla algo)
+        $('#contenedor-pocima').show(); 
+        $('#lblPocimas').text("1");
+
         let jug1 = this.jugadoresActuales && this.jugadoresActuales[0] ? this.jugadoresActuales[0] : "Jugador 1";
         let jug2 = this.jugadoresActuales && this.jugadoresActuales[1] ? this.jugadoresActuales[1] : "Jugador 2";
 
-        // NUEVA ESTRUCTURA CON AVATARES A LOS LADOS
         let cadena = `
         <div id="juego">
             <div id="info-turno" class="alert alert-primary text-center" style="font-weight: bold; font-size: 1.2rem; margin: 10px auto; max-width: 800px;">
@@ -499,7 +499,6 @@ function ControlWeb() {
 
 
     this.pintarTablero = function(datos) {
-        // datos puede ser el mazo directo (versión vieja) o {mazo: [], turno: "pepe"}
         let mazo = datos.mazo || datos; 
         let turno = datos.turno;
         let fondo = datos.fondo;
@@ -629,4 +628,19 @@ function ControlWeb() {
             }
         }, 1000);
     };
+
+    this.usarPocima = function() {
+        let nick = $.cookie("nick");
+        // Solo enviamos si estamos en partida (el codigo lo tenemos en ws.codigo o similar)
+        // Necesitamos el código de partida accesible. Si no lo guardaste global, úsalo desde el socket o cookie.
+        // Asumo que 'ws.codigo' guarda el código actual tras unirse.
+        
+        // Efecto visual de click
+        $('#contenedor-pocima').addClass('animate__rubberBand');
+        setTimeout(() => $('#contenedor-pocima').removeClass('animate__rubberBand'), 1000);
+
+        ws.socket.emit("usarPocima", { nick: nick, codigo: ws.codigo });
+    };
+
+
 }
