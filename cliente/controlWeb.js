@@ -250,7 +250,8 @@ function ControlWeb() {
             'background-size': 'cover',
             'background-position': 'center',
             'background-attachment': 'fixed',
-            'overflow': 'hidden'
+            'overflow': 'hidden',
+            'overflow': 'auto'
         });
         let cadena = `
         <div style="
@@ -492,7 +493,8 @@ function ControlWeb() {
                 'background-image': 'url("./cliente/img/fondos/' + fondo + '")',
                 'background-size': 'cover',
                 'background-position': 'center',
-                'background-attachment': 'fixed'
+                'background-attachment': 'fixed',
+                'overflow': 'auto'
             });
         }
         let tablero = document.getElementById("tablero");
