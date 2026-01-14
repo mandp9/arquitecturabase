@@ -234,10 +234,22 @@ this.unirAPartida = function(email, codigo) {
     };
     this.voltearCarta = function(codigo, nick, idCarta) {
         let partida = this.partidas[codigo];
-        if (partida && partida.jugadores.includes(nick)) {
-            return partida.voltearCarta(idCarta, nick); 
+        
+        if (partida) {
+            // Delegamos la acción a la partida, que es quien tiene el mazo
+            return partida.voltearCarta(idCarta, nick);
+        } else {
+            console.log("No se encuentra la partida con código: " + codigo);
+            return null;
         }
-        return null;
+    };
+
+    this.calcularEfectoCarta = function(valorCarta) {
+
+        return { 
+            monedas: 10, 
+            tipo: "estandar" 
+        };
     };
     this.forzarCambioTurno = function(codigo) {
         let partida = this.partidas[codigo];
@@ -319,7 +331,7 @@ function Partida(codigo, propietario) {
         }
         return null; // No le quedan pócimas
     }
-    
+
     this.iniciarJuego = function() {
         if (this.estado == "jugando") {
         return { 
@@ -362,7 +374,6 @@ function Partida(codigo, propietario) {
             cartas.push({ id: i*2+1, valor: nombreImagen, estado: 'oculta' });
         }
         
-        // 4. Barajamos el mazo final para que las parejas no estén juntas
         for (let i = cartas.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [cartas[i], cartas[j]] = [cartas[j], cartas[i]];
@@ -370,10 +381,13 @@ function Partida(codigo, propietario) {
         
         return cartas;
     }
+    this.calcularEfectoCarta = function(valorCarta) {
+        return { monedas: 10, tipo: "estandar" };
+    };
 
     this.voltearCarta = function(idCarta, nick) {
         if (this.turno !== nick) {
-            console.log("No es el turno de " + nick);
+            console.log("No es el turno de " + nick + ". Turno actual: " + this.turno);
             return null; 
         }
 
@@ -391,7 +405,16 @@ function Partida(codigo, propietario) {
                     carta1.estado = 'encontrada';
                     carta2.estado = 'encontrada';
                     this.cartasLevantadas = []; 
-                    return { tipo: "pareja", carta1: carta1, carta2: carta2, turno: this.turno };
+                    
+                    let efecto = this.calcularEfectoCarta(carta1.valor); // <--- Lógica de monedas
+
+                    return { 
+                        tipo: "pareja", 
+                        carta1: carta1, 
+                        carta2: carta2, 
+                        turno: this.turno,
+                        monedas: efecto.monedas 
+                    };
                 } else {
                     carta1.estado = 'oculta';
                     carta2.estado = 'oculta';
@@ -403,8 +426,7 @@ function Partida(codigo, propietario) {
             return { tipo: "volteo", carta: carta, turno: this.turno };
         }
         return null;
-    }
-
+    };
     this.cambiarTurno = function() {
         let index = this.jugadores.indexOf(this.turno);
         this.turno = this.jugadores[(index + 1) % this.jugadores.length];

@@ -50,6 +50,16 @@ this.agregarUsuario2 = function (nick) {
       console.log('Error obtenerUsuarios:', s, e);
     });
   };
+    this.obtenerUsuario = function(nick, callback) {
+      // Pide al servidor los datos de un usuario concreto (incluyendo sus monedas)
+      $.getJSON("/obtenerUsuario/" + nick, function(data) {
+          callback(data);
+      }).fail(function() {
+          console.log("Error al obtener datos del usuario");
+          // Si falla, devolvemos null o un objeto vacío para que no rompa la web
+          callback({ monedas: 0 });
+      });
+  };
 
   this.usuarioActivo = function (nick) {
     return $.ajax({

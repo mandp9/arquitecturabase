@@ -122,10 +122,20 @@ function WSServer() {
                     }
                     else if (res.tipo === "pareja") {
                         io.in(datos.codigo).emit("parejaEncontrada", res);
+                        
+                        // Si hay monedas, las sumamos y avisamos
+                        if (res.monedas && res.monedas > 0) {
+                            sistema.sumarMonedas(res.turno, res.monedas);
+                            io.in(datos.codigo).emit("actualizarMonedas", { 
+                                nick: res.turno, 
+                                cantidad: res.monedas 
+                            });
+                        }
+
                         reiniciarTemporizador(datos.codigo);
                     }
                     else if (res.tipo === "fallo") {
-                        io.in(datos.codigo).emit("cartaVolteada", { id: datos.idCarta, valor: res.carta2.valor }); // Enviamos la que acaba de tocar
+                        io.in(datos.codigo).emit("cartaVolteada", { id: datos.idCarta, valor: res.carta2.valor });
                         
                         setTimeout(() => {
                             io.in(datos.codigo).emit("parejaIncorrecta", res);

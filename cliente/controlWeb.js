@@ -167,60 +167,69 @@ function ControlWeb() {
         
         this.ultimasPartidas = [];
 
+        rest.obtenerUsuario(nick, function(datosUsuario) {
+        let monedasTotales = datosUsuario.monedas || 0; 
+
         let cadena = `
-        <div class="row justify-content-center" style="min-height: 80vh; align-items: flex-start; padding-top: 50px;">
-            <div class="col-12 col-md-8 col-lg-7 text-center">
-                
-                <h2 class="mb-4 animate__animated animate__fadeInDown" 
-                    style="font-family: 'MedievalSharp', cursive; 
-                           color: #fdf6e3; 
-                           text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 15px #8b4513; 
-                           font-size: 2.5rem;">
-                    ¡Saludos, <span style="color: #FFD700;">${nick}</span>!
-                </h2>
-
-                <div class="mb-5 animate__animated animate__fadeInUp d-flex justify-content-center gap-3">
-                    <button id="btnCrearPartida" class="btn btn-lg px-4 py-3 shadow-lg mr-3" 
-                            style="font-family: 'MedievalSharp', cursive; background-color: #8b4513; color: #fdf6e3; border: 3px solid #5d4037; border-radius: 10px;">
-                        ⚔️ Crear Nueva Misión
-                    </button>
-                    <button id="btnSalir" class="btn btn-lg px-4 py-3 shadow-lg" 
-                            style="font-family: 'MedievalSharp', cursive; background-color: #5d4037; color: #fdf6e3; border: 3px solid #3e2723; border-radius: 10px;">
-                        🚪 Cerrar Sesión
-                    </button>
-                </div>
-
-                <div class="card shadow animate__animated animate__fadeInUp animate__delay-1s mx-auto" 
-                     style="max-width: 600px;
-                            background-color: #fdf6e3; 
-                            border: 4px solid #8b4513; 
-                            border-radius: 15px;
-                            box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+            <div class="row justify-content-center" style="min-height: 80vh; align-items: flex-start; padding-top: 50px;">
+                <div class="col-12 col-md-8 col-lg-7 text-center">
                     
-                    <div class="card-body p-4">
-                        <h4 class="text-center mb-3" style="font-family: 'MedievalSharp', cursive; color: #3e2723; border-bottom: 2px dashed #8b4513; padding-bottom: 10px;">
-                            📜 Tablón de Partidas
-                        </h4>
-                        
-                        <div class="input-group mb-3 shadow-sm">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="background-color: #8b4513; color: #fdf6e3; border: 1px solid #5d4037;">🔎</span>
-                            </div>
-                            <input type="text" id="buscador" class="form-control" placeholder="Buscar código de misión..." 
-                                   style="background: rgba(255,255,255,0.7); border: 1px solid #8b4513; color: #3e2723; font-family: 'MedievalSharp', cursive;">
-                        </div>
+                    <h2 class="mb-4 animate__animated animate__fadeInDown" 
+                        style="font-family: 'MedievalSharp', cursive; 
+                               color: #fdf6e3; 
+                               text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 15px #8b4513; 
+                               font-size: 2.5rem;">
+                        ¡Saludos, <span style="color: #FFD700;">${nick}</span>!
+                    </h2>
 
-                        <div id="listaPartidas" class="list-group text-left" style="max-height: 300px; overflow-y: auto;">
-                            <li class="list-group-item text-center text-muted" style="background-color: transparent; border-bottom: 1px dashed #8b4513; font-family: 'MedievalSharp', cursive;">
-                                Buscando misiones activas...
-                            </li>
+                    <div class="mb-4 animate__animated animate__fadeInDown" 
+                         style="display: inline-block; background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 20px; border: 2px solid #FFD700;">
+                        <span style="font-size: 1.5rem; color: #fdf6e3;">🏆 Tesoro Acumulado: </span>
+                        <span style="font-size: 1.8rem; color: #FFD700; font-weight: bold;">${monedasTotales} 💰</span>
+                    </div>
+
+                    <div class="mb-5 animate__animated animate__fadeInUp d-flex justify-content-center gap-3">
+                        <button id="btnCrearPartida" class="btn btn-lg px-4 py-3 shadow-lg mr-3" 
+                                style="font-family: 'MedievalSharp', cursive; background-color: #8b4513; color: #fdf6e3; border: 3px solid #5d4037; border-radius: 10px;">
+                            ⚔️ Crear Nueva Misión
+                        </button>
+                        <button id="btnSalir" class="btn btn-lg px-4 py-3 shadow-lg" 
+                                style="font-family: 'MedievalSharp', cursive; background-color: #5d4037; color: #fdf6e3; border: 3px solid #3e2723; border-radius: 10px;">
+                            🚪 Cerrar Sesión
+                        </button>
+                    </div>
+
+                    <div class="card shadow animate__animated animate__fadeInUp animate__delay-1s mx-auto" 
+                         style="max-width: 600px;
+                                background-color: #fdf6e3; 
+                                border: 4px solid #8b4513; 
+                                border-radius: 15px;
+                                box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                        
+                        <div class="card-body p-4">
+                            <h4 class="text-center mb-3" style="font-family: 'MedievalSharp', cursive; color: #3e2723; border-bottom: 2px dashed #8b4513; padding-bottom: 10px;">
+                                📜 Tablón de Partidas
+                            </h4>
+                            
+                            <div class="input-group mb-3 shadow-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background-color: #8b4513; color: #fdf6e3; border: 1px solid #5d4037;">🔎</span>
+                                </div>
+                                <input type="text" id="buscador" class="form-control" placeholder="Buscar código de misión..." 
+                                       style="background: rgba(255,255,255,0.7); border: 1px solid #8b4513; color: #3e2723; font-family: 'MedievalSharp', cursive;">
+                            </div>
+
+                            <div id="listaPartidas" class="list-group text-left" style="max-height: 300px; overflow-y: auto;">
+                                <li class="list-group-item text-center text-muted" style="background-color: transparent; border-bottom: 1px dashed #8b4513; font-family: 'MedievalSharp', cursive;">
+                                    Buscando misiones activas...
+                                </li>
+                            </div>
                         </div>
                     </div>
-                </div>
 
+                </div>
             </div>
-        </div>
-        `;
+            `;
         
         $('#au').append(cadena);
         rest.obtenerPartidasDisponibles();
@@ -240,6 +249,7 @@ function ControlWeb() {
 
         $('#btnBuscar').on('click', function() {
             cw.actualizarListaPartidas(cw.ultimasPartidas); 
+        });
         });
     };
 
@@ -636,6 +646,7 @@ function ControlWeb() {
         
         if (nickAcierto === miNick) {
             colorBorde = "#2ecc71"; 
+            this.mostrarAvisoMonedas(10);
         } else {
             colorBorde = "#e74c3c"; 
         }
