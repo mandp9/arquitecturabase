@@ -605,11 +605,28 @@ function ControlWeb() {
         }
     };
 
-    this.marcarPareja = function(carta1, carta2) {
+    this.marcarPareja = function(carta1, carta2,nickAcierto) {
+        let miNick = $.cookie("nick");
         this.girarCartaVisual(carta1.id, carta1.valor);
         this.girarCartaVisual(carta2.id, carta2.valor);
-        $("#carta-" + carta1.id + " .cara").css("border-color", "#2ecc71"); 
-        $("#carta-" + carta2.id + " .cara").css("border-color", "#2ecc71");
+        
+        let colorBorde;
+        
+        if (nickAcierto === miNick) {
+            colorBorde = "#2ecc71"; 
+        } else {
+            colorBorde = "#e74c3c"; 
+        }
+
+        $("#carta-" + carta1.id + " .cara").css({
+            "border-color": colorBorde,
+            "box-shadow": "0 0 15px " + colorBorde 
+        });
+        
+        $("#carta-" + carta2.id + " .cara").css({
+            "border-color": colorBorde,
+            "box-shadow": "0 0 15px " + colorBorde
+        });
     };
     this.iniciarTemporizador = function() {
         if (this.intervaloTiempo) {

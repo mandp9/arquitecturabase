@@ -47,7 +47,7 @@ function ClienteWS(){
         });
 
         this.socket.on("parejaEncontrada", function(res) {
-            cw.marcarPareja(res.carta1, res.carta2);
+            cw.marcarPareja(res.carta1, res.carta2, res.turno);
             cw.iniciarTemporizador();
         });
 
