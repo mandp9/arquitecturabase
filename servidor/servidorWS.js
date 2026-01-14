@@ -117,15 +117,19 @@ function WSServer() {
                 
                 if (res) {
                     if (res.tipo === "volteo") {
-                        // ... (igual que antes)
                         io.in(datos.codigo).emit("cartaVolteada", res.carta);
+                        reiniciarTemporizador(datos.codigo);
                     }
                     else if (res.tipo === "pareja") {
-                        // ... (igual que antes)
                         io.in(datos.codigo).emit("parejaEncontrada", res);
+                        
+                        // OJO: Quitamos sistema.sumarMonedas de aquí.
+                        // Solo actualizamos lo visual:
                         if (res.monedas > 0) {
-                            sistema.sumarMonedas(res.turno, res.monedas);
-                            io.in(datos.codigo).emit("actualizarMonedas", { nick: res.turno, cantidad: res.monedas });
+                            io.in(datos.codigo).emit("actualizarMonedas", { 
+                                nick: res.turno, 
+                                cantidad: res.monedas 
+                            });
                         }
                         reiniciarTemporizador(datos.codigo);
                     }
@@ -133,7 +137,18 @@ function WSServer() {
                         io.in(datos.codigo).emit("parejaEncontrada", res);
                         
                         if (res.monedas > 0) {
-                            sistema.sumarMonedas(res.turno, res.monedas);
+                            io.in(datos.codigo).emit("actualizarMonedas", { 
+                                nick: res.turno, 
+                                cantidad: res.monedas 
+                            });
+                        }
+
+                        console.log("Partida finalizada. Guardando monedas en BBDD...");
+                        for (let jugador in res.puntos) {
+                            let monedasGanadas = res.puntos[jugador];
+                            if (monedasGanadas > 0) {
+                                sistema.sumarMonedas(jugador, monedasGanadas);
+                            }
                         }
 
                         if (srv.temporizadores[datos.codigo]) {
@@ -145,14 +160,13 @@ function WSServer() {
                                 ganador: res.ganador,
                                 puntos: res.puntos
                             });
-                        }, 1000); // Pequeña espera para ver la última carta
+                        }, 1000);
                     }
-                    // --------------------------------------
                     else if (res.tipo === "fallo") {
                         io.in(datos.codigo).emit("cartaVolteada", { id: datos.idCarta, valor: res.carta2.valor });
                         setTimeout(() => {
                             io.in(datos.codigo).emit("parejaIncorrecta", res);
-                            reiniciarTemporizador(datos.codigo); // <--- Ojo, asegúrate de reiniciar aquí también
+                            reiniciarTemporizador(datos.codigo);
                         }, 1000);
                     }
                 }
@@ -199,7 +213,6 @@ function WSServer() {
                         socket.emit("pocimaUsada", { restantes: resultado.restantes });
 
                         if (resultado.efecto === "monedas") {
-                            sistema.sumarMonedas(datos.nick, resultado.valor);
                             socket.emit("efectoPocima", { 
                                 mensaje: "🧪 ¡La pócima contenía oro! Has ganado 10 monedas.",
                                 tipo: "monedas",

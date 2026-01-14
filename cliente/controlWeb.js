@@ -208,7 +208,7 @@ function ControlWeb() {
                         
                         <div class="card-body p-4">
                             <h4 class="text-center mb-3" style="font-family: 'MedievalSharp', cursive; color: #3e2723; border-bottom: 2px dashed #8b4513; padding-bottom: 10px;">
-                                📜 Tablón de Partidas
+                                📜 Tablón de Misiones
                             </h4>
                             
                             <div class="input-group mb-3 shadow-sm">
@@ -411,7 +411,7 @@ function ControlWeb() {
 
         if (listaFiltrada.length === 0) {
             if (lista.length === 0) {
-                $('#listaPartidas').append('<li class="list-group-item">No hay partidas disponibles</li>');
+                $('#listaPartidas').append('<li class="list-group-item">No hay misiones disponibles</li>');
             } else {
                 $('#listaPartidas').append('<li class="list-group-item">No hay coincidencias con ese código</li>');
             }

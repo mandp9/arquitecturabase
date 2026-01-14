@@ -321,25 +321,23 @@ function Partida(codigo, propietario) {
         return false;
     }
     this.usarPocima = function(nick) {
-        if (this.turno !== nick) {
-            console.log("El jugador " + nick + " intentó usar pócima fuera de turno.");
-            return null; 
-        }
+        if (this.turno !== nick) return null;
+        
         if (this.pocimas[nick] > 0) {
             this.pocimas[nick]--; 
-
             let azar = Math.random();
 
             if (azar < 0.5) {
+                if (!this.puntos[nick]) this.puntos[nick] = 0;
+                this.puntos[nick] += 10; 
+
                 return { 
                     efecto: "monedas", 
                     valor: 10, 
                     restantes: this.pocimas[nick] 
                 };
             } else {
-         
                 let ocultas = this.mazo.filter(c => c.estado === 'oculta');
-
                 if (ocultas.length > 0) {
                     let cartaRevelada = ocultas[Math.floor(Math.random() * ocultas.length)];
                     return { 
@@ -348,11 +346,13 @@ function Partida(codigo, propietario) {
                         restantes: this.pocimas[nick] 
                     };
                 } else {
+                    if (!this.puntos[nick]) this.puntos[nick] = 0;
+                    this.puntos[nick] += 10;
                     return { efecto: "monedas", valor: 10, restantes: this.pocimas[nick] };
                 }
             }
         }
-        return null;
+        return null; 
     }
 
     this.iniciarJuego = function() {
