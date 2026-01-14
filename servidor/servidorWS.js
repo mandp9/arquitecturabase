@@ -160,31 +160,29 @@ function WSServer() {
                                 mensaje: "El rival se ha desconectado. La partida ha sido cancelada." 
                             });
                             
-                            // Eliminamos la partida definitivamente del sistema
-                            // (Usamos el nick del propietario actual, que ahora es el rival que quedó)
                             sistema.eliminarPartida(res.propietario, res.codigo);
                             
-                            // Actualizamos la lista global
                             let lista = sistema.obtenerPartidasDisponibles();
                             srv.enviarGlobal(io, "listaPartidas", lista);
                         }
                     }
                 }
             });
-            socket.on("usarPocima", function(datos) {
-                // Buscamos la partida
+            socket.on("usarPocima", function(datos) { 
+                
+                console.log("Petición de pócima recibida de: " + datos.nick + " en partida: " + datos.codigo);
+                
                 let partida = sistema.partidas[datos.codigo];
                 if (partida) {
                     let resultado = partida.usarPocima(datos.nick);
                     
                     if (resultado) {
+                        console.log("Pócima usada con éxito. Efecto: " + resultado.efecto);
+
                         socket.emit("pocimaUsada", { restantes: resultado.restantes });
 
-                        // 2. Aplicamos el efecto
                         if (resultado.efecto === "monedas") {
                             sistema.sumarMonedas(datos.nick, resultado.valor);
-                            
-                            // Avisamos al jugador
                             socket.emit("efectoPocima", { 
                                 mensaje: "🧪 ¡La pócima contenía oro! Has ganado 10 monedas.",
                                 tipo: "monedas",
@@ -198,10 +196,15 @@ function WSServer() {
                                 carta: resultado.carta
                             });
                         }
+                    } else {
+                        console.log("❌ Fallo al usar pócima (No es turno o no quedan)");
                     }
+                } else {
+                    console.log("⚠️ Partida no encontrada: " + datos.codigo);
                 }
-            });
-        });
+            }); 
+            
+        }); 
     }
     this.enviarAlRemitente = function(socket, mensaje, datos) {
         socket.emit(mensaje, datos);

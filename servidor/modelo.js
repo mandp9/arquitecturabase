@@ -271,7 +271,8 @@ function Partida(codigo, propietario) {
         "battle1.jpg",
         "battle2.jpg",
         "battle3.jpg",
-        "battle4.jpg"
+        "battle4.jpg",
+        "battle5.jpg",
     ];
     this.fondo = this.fondosDisponibles[Math.floor(Math.random() * this.fondosDisponibles.length)];
 
@@ -286,6 +287,10 @@ function Partida(codigo, propietario) {
         return false;
     }
     this.usarPocima = function(nick) {
+        if (this.turno !== nick) {
+            console.log("El jugador " + nick + " intentó usar pócima fuera de turno.");
+            return null; 
+        }
         if (this.pocimas[nick] > 0) {
             this.pocimas[nick]--; 
 

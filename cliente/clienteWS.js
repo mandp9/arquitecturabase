@@ -8,17 +8,20 @@ function ClienteWS(){
 
         this.socket = io.connect(undefined, { query: { email: nick } });
         this.lanzarServidorWS();
+        this.codigo = undefined;
     }
     this.lanzarServidorWS = function() {
         let cli = this;
 
         this.socket.on("partidaCreada", function(datos) {
+            ws.codigo = datos.codigo;
             console.log("Partida creada con código:", datos.codigo);
             cli.codigo = datos.codigo;
             cw.mostrarPartida(datos);
         });
 
         this.socket.on("unidoAPartida", function(datos) {
+            ws.codigo = datos.codigo;
             console.log("Te has unido a la partida:", datos.codigo);
             cli.codigo = datos.codigo;
             cw.mostrarPartida(datos);
@@ -36,9 +39,8 @@ function ClienteWS(){
             cw.mostrarModal(datos.mensaje);
             cli.codigo = undefined;
         });
-        this.socket.on("partidaIniciada", function(mazo) {
-            console.log("¡El servidor dice que empieza el juego! Mazo recibido:", mazo);
-            cw.pintarTablero(mazo);
+        this.socket.on("partidaIniciada", function(datos) {
+            cw.pintarTablero(datos);
         });
         this.socket.on("cartaVolteada", function(carta) {
             cw.girarCartaVisual(carta.id, carta.valor);
@@ -58,11 +60,9 @@ function ClienteWS(){
             cw.actualizarTurno(datos.turno);
         });
         this.socket.on("pocimaUsada", function(datos) {
-        // Actualizamos el contador visual
         $('#lblPocimas').text(datos.restantes);
         
         if (datos.restantes == 0) {
-            // Si se gastaron, quitamos el brillo o lo ponemos en gris
             $('.img-pocima').css('filter', 'grayscale(100%)');
             $('.img-pocima').removeClass('animate__infinite');
             $('#contenedor-pocima').css('cursor', 'default');
@@ -72,27 +72,16 @@ function ClienteWS(){
         this.socket.on("efectoPocima", function(datos) {
             
             if (datos.tipo === "monedas") {
-                // Animación de monedas o Alert
-                // Sumamos visualmente al contador de monedas
                 let actuales = parseInt($('#mis-monedas').text());
                 $('#mis-monedas').text(actuales + 10);
-                
-                // Modal rápido o Toast
-                alert(datos.mensaje); // Puedes usar tu modal bonito aquí
+            
+                alert(datos.mensaje); 
             } 
             else if (datos.tipo === "revelar") {
-                // Aquí viene la magia: Revelamos la carta SOLO PARA TI durante unos segundos
-                let carta = datos.carta; // { id: 4, valor: "enemy2.jpg" ... }
-                
-                // Buscamos la carta en el tablero por su ID (necesitas que tus cartas tengan id="carta-X")
-                // En tu pintarTablero asegúrate de que el div de la carta tenga un identificador.
-                // Si no, la lógica visual es compleja.
-                
-                // Asumiendo que puedes identificar el div de la carta:
+                let carta = datos.carta; 
+               
                 alert(datos.mensaje + "\nEs un: " + carta.valor);
-                
-                // O mejor, busca el elemento y gíralo temporalmente con CSS
-                // Esto depende de cómo generaste el HTML de las cartas.
+ 
             }
         });
     }

@@ -254,14 +254,29 @@
     }
 
     .carta {
-        aspect-ratio: 2 / 3; 
-        cursor: pointer;
+        aspect-ratio: 2 / 3;
+        cursor: default; 
         transform-style: preserve-3d;
-        transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1), box-shadow 0.3s;
+    }
+    .turno-propio .carta:not(.girada) {
+        cursor: pointer; 
+    }
+
+    .turno-propio .carta:not(.girada):hover {
+        transform: translateY(-10px) scale(1.05); 
+        box-shadow: 0 15px 30px rgba(0,0,0,0.6); 
+        z-index: 10; 
     }
 
     .carta.girada {
-        transform: rotateY(180deg);
+        transform: rotateY(180deg) !important;
+        cursor: default !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important;
+    }
+    .carta.girada:hover {
+        transform: rotateY(180deg) !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important;
     }
 
     .cara {
@@ -367,7 +382,7 @@
     }
 
     .img-avatar {
-        width: 260px;
+        width: 320px;
         filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8));
         transition: all 0.5s ease;
     }
@@ -376,13 +391,15 @@
         font-family: 'MedievalSharp', cursive;
         color: #FFD700;
         text-shadow: 2px 2px 0 #000;
-        margin-top: 10px;
+        margin-top: -30px; 
         font-size: 1.4rem;
         text-align: center;
         background: rgba(0,0,0,0.6); 
-        padding: 5px 15px;
+        padding: 2px 10px; 
         border-radius: 10px;
         border: 1px solid #c5a05a;
+        position: relative; 
+        z-index: 20;
     }
 
     .avatar-turno-activo { transform: translateY(-50%) scale(1.15); }
@@ -449,8 +466,8 @@
 
     .badge-cantidad {
         position: absolute;
-        top: 0px;
-        right: 0px;
+        top: 5px;
+        right: 5px;
         background-color: #d60000; 
         color: white;
         border: 3px solid #fff;
@@ -464,6 +481,13 @@
         font-size: 1.4rem;
         z-index: 10000;
         box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+    }
+    .pocima-off {
+        filter: grayscale(100%) brightness(0.7); 
+        cursor: not-allowed;      
+        pointer-events: none;    
+        border-color: #555 !important; 
+        box-shadow: none !important;
     }
   </style>
 </head>

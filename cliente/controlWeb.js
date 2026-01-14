@@ -157,6 +157,7 @@ function ControlWeb() {
             'background-attachment': 'fixed'
         });
         this.limpiar();
+        $('#contenedor-pocima').hide();
         let nick = $.cookie("nick");
         $('#gameTitle').show();
         
@@ -542,32 +543,47 @@ function ControlWeb() {
     this.actualizarTurno = function(turno) {
         let nick = $.cookie("nick");
         let info = document.getElementById("info-turno");
-        
-        // 1. Actualizar el cartel de texto (como antes)
+        let tablero = $('#tablero');
+
         if (info) {
             if (turno === nick) {
                 info.className = "alert alert-success text-center";
                 info.innerHTML = " ¡ES TU TURNO, A PELEAR! ";
+                tablero.addClass('turno-propio');
             } else {
                 info.className = "alert alert-danger text-center";
                 info.innerHTML = " Turno de: " + turno;
+                tablero.removeClass('turno-propio');
             }
             
         }
 
-        // 2. Actualizar los AVATARES (Lógica nueva)
         let avIzq = $('#avatar-izq');
         let avDer = $('#avatar-der');
 
         // Comprobamos de quién es el turno mirando el data-nick que guardamos en el HTML
         if (turno === avIzq.data('nick')) {
-            // Turno del jugador de la IZQUIERDA
             avIzq.removeClass('avatar-turno-inactivo').addClass('avatar-turno-activo');
             avDer.removeClass('avatar-turno-activo').addClass('avatar-turno-inactivo');
         } else if (turno === avDer.data('nick')) {
-            // Turno del jugador de la DERECHA
             avDer.removeClass('avatar-turno-inactivo').addClass('avatar-turno-activo');
             avIzq.removeClass('avatar-turno-activo').addClass('avatar-turno-inactivo');
+        }
+        let imgPocima = $('.img-pocima');
+        let cantidad = parseInt($('#lblPocimas').text());
+
+        if (turno === nick && cantidad > 0) {
+            imgPocima.removeClass('pocima-off');
+            imgPocima.addClass('animate__infinite'); 
+        } else {
+            imgPocima.addClass('pocima-off');
+            imgPocima.removeClass('animate__infinite');
+        }
+
+        if (turno === nick) {
+            tablero.addClass('turno-propio');
+        } else {
+            tablero.removeClass('turno-propio');
         }
         this.iniciarTemporizador();
     };
@@ -631,11 +647,14 @@ function ControlWeb() {
 
     this.usarPocima = function() {
         let nick = $.cookie("nick");
-        // Solo enviamos si estamos en partida (el codigo lo tenemos en ws.codigo o similar)
-        // Necesitamos el código de partida accesible. Si no lo guardaste global, úsalo desde el socket o cookie.
-        // Asumo que 'ws.codigo' guarda el código actual tras unirse.
         
-        // Efecto visual de click
+        console.log("Click en pócima. Nick:", nick, "Código:", ws.codigo);
+
+        if (!ws.codigo) {
+            alert("Error: No se encuentra el código de la partida. Recarga la página.");
+            return;
+        }
+
         $('#contenedor-pocima').addClass('animate__rubberBand');
         setTimeout(() => $('#contenedor-pocima').removeClass('animate__rubberBand'), 1000);
 
