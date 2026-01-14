@@ -192,7 +192,13 @@ app.get("/obtenerLogs", function(request, response) {
     response.send(logs);
   });
 });
-
+app.get("/obtenerUsuario/:nick", function(request, response) {
+  let nick = request.params.nick;
+  
+  sistema.obtenerUsuario(nick, function(usuario) {
+    response.send(usuario);
+  });
+});
 httpServer.listen(PORT, () => {
     console.log(`App está escuchando en el puerto ${PORT}`);
     console.log('Ctrl+C para salir');
