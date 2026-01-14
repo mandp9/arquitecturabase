@@ -34,6 +34,9 @@ function ClienteWS(){
         this.socket.on("jugadores", function(datos) {
             cw.actualizarEstadoPartida(datos);
         });
+        this.socket.on("finalPartida", function(datos) {
+            cw.mostrarVictoria(datos);
+        });
         this.socket.on("partidaTerminada", function(datos) {
             cw.mostrarHome();
             cw.mostrarModal(datos.mensaje);

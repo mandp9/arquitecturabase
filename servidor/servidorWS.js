@@ -117,29 +117,42 @@ function WSServer() {
                 
                 if (res) {
                     if (res.tipo === "volteo") {
+                        // ... (igual que antes)
                         io.in(datos.codigo).emit("cartaVolteada", res.carta);
-                        reiniciarTemporizador(datos.codigo);
                     }
                     else if (res.tipo === "pareja") {
+                        // ... (igual que antes)
                         io.in(datos.codigo).emit("parejaEncontrada", res);
-                        
-                        // Si hay monedas, las sumamos y avisamos
-                        if (res.monedas && res.monedas > 0) {
+                        if (res.monedas > 0) {
                             sistema.sumarMonedas(res.turno, res.monedas);
-                            io.in(datos.codigo).emit("actualizarMonedas", { 
-                                nick: res.turno, 
-                                cantidad: res.monedas 
-                            });
+                            io.in(datos.codigo).emit("actualizarMonedas", { nick: res.turno, cantidad: res.monedas });
                         }
-
                         reiniciarTemporizador(datos.codigo);
                     }
+                    else if (res.tipo === "final") {
+                        io.in(datos.codigo).emit("parejaEncontrada", res);
+                        
+                        if (res.monedas > 0) {
+                            sistema.sumarMonedas(res.turno, res.monedas);
+                        }
+
+                        if (srv.temporizadores[datos.codigo]) {
+                            clearTimeout(srv.temporizadores[datos.codigo]);
+                        }
+
+                        setTimeout(() => {
+                            io.in(datos.codigo).emit("finalPartida", {
+                                ganador: res.ganador,
+                                puntos: res.puntos
+                            });
+                        }, 1000); // Pequeña espera para ver la última carta
+                    }
+                    // --------------------------------------
                     else if (res.tipo === "fallo") {
                         io.in(datos.codigo).emit("cartaVolteada", { id: datos.idCarta, valor: res.carta2.valor });
-                        
                         setTimeout(() => {
                             io.in(datos.codigo).emit("parejaIncorrecta", res);
-                            reiniciarTemporizador(datos.codigo);
+                            reiniciarTemporizador(datos.codigo); // <--- Ojo, asegúrate de reiniciar aquí también
                         }, 1000);
                     }
                 }

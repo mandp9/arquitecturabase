@@ -802,6 +802,74 @@ function ControlWeb() {
             cardDiv.css('box-shadow', '');
         }, 3000); 
     };
+    this.mostrarVictoria = function(datos) {
+        let miNick = $.cookie("nick");
+        let ganador = datos.ganador;
+        let mensajeTitulo = "";
+        let colorTitulo = "";
+
+        // Lógica para determinar si gané yo, el rival o hubo empate
+        if (ganador === miNick) {
+            mensajeTitulo = "🏆 ¡VICTORIA! 🏆";
+            colorTitulo = "#FFD700"; // Dorado
+        } else if (ganador === "empate") {
+            mensajeTitulo = "🤝 EMPATE 🤝";
+            colorTitulo = "#FFFFFF"; // Blanco
+        } else {
+            mensajeTitulo = "💀 DERROTA 💀";
+            colorTitulo = "#ff4444"; // Rojo
+        }
+
+        // Construimos la lista de puntuaciones
+        let listaPuntos = "";
+        for (let jugador in datos.puntos) {
+            listaPuntos += `
+                <li class="list-group-item d-flex justify-content-between align-items-center" 
+                    style="background: transparent; color: #fdf6e3; font-size: 1.2rem; border-bottom: 1px solid #5d4037;">
+                    ${jugador}
+                    <span class="badge badge-warning badge-pill" style="font-size: 1rem;">${datos.puntos[jugador]} 💰</span>
+                </li>
+            `;
+        }
+
+        let html = `
+        <div id="pantalla-fin" class="animate__animated animate__fadeIn"
+             style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                    background: rgba(0,0,0,0.95); z-index: 99999; 
+                    display: flex; flex-direction: column; justify-content: center; align-items: center;
+                    font-family: 'MedievalSharp', cursive;">
+            
+            <h1 class="animate__animated animate__zoomInDown" 
+                style="font-size: 4rem; color: ${colorTitulo}; text-shadow: 0 0 20px ${colorTitulo}, 3px 3px 0 #000; margin-bottom: 30px; text-align: center;">
+                ${mensajeTitulo}
+            </h1>
+
+            <div class="card p-4 shadow-lg" style="background: #2b1d0e; border: 4px double #c5a05a; color: #fdf6e3; min-width: 320px; max-width: 500px;">
+                <h3 class="text-center" style="color: #FFD700; border-bottom: 2px dashed #c5a05a; padding-bottom: 15px; margin-bottom: 15px;">
+                    📜 Resultados de la Misión
+                </h3>
+                <ul class="list-group list-group-flush" style="background: transparent;">
+                    ${listaPuntos}
+                </ul>
+            </div>
+
+            <button id="btnVolverHome" class="btn btn-lg mt-5 shadow-lg animate__animated animate__pulse animate__infinite"
+                    style="background-color: #8b4513; color: white; border: 3px solid #FFD700; padding: 15px 40px; font-size: 1.5rem; border-radius: 50px;">
+                🏰 Volver al Reino
+            </button>
+        </div>
+        `;
+
+        $('body').append(html);
+
+        // Listener para el botón de volver
+        $('#btnVolverHome').off('click').on('click', function() {
+            $('#pantalla-fin').fadeOut(500, function() {
+                $(this).remove(); // Importante: eliminar del DOM para que no se acumulen
+                cw.mostrarHome();
+            });
+        });
+    };
 
     this.mostrarAvisoMonedas = function(cantidad, mensaje) {
         let actuales = parseInt($('#mis-monedas').text());

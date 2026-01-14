@@ -278,6 +278,8 @@ function Partida(codigo, propietario) {
     this.turno = undefined; 
     this.pocimas = {};
 
+    this.puntos = {};
+
     this.fondosDisponibles = [
         "battle1.jpg",
         "battle2.jpg",
@@ -292,6 +294,7 @@ function Partida(codigo, propietario) {
         if (this.jugadores.length < this.maxJug) {
             this.jugadores.push(nick);
             this.pocimas[nick] = 1
+            this.puntos[nick] = 0;
             if (this.jugadores.length === this.maxJug) this.estado = "completa";
             return true;
         }
@@ -329,7 +332,7 @@ function Partida(codigo, propietario) {
                 }
             }
         }
-        return null; // No le quedan pócimas
+        return null;
     }
 
     this.iniciarJuego = function() {
@@ -407,6 +410,23 @@ function Partida(codigo, propietario) {
                     this.cartasLevantadas = []; 
                     
                     let efecto = this.calcularEfectoCarta(carta1.valor); // <--- Lógica de monedas
+                    if (!this.puntos[nick]) this.puntos[nick] = 0;
+                    this.puntos[nick] += efecto.monedas;
+                    let quedanOcultas = this.mazo.some(c => c.estado === 'oculta' || c.estado === 'visible');
+                    
+                    if (!quedanOcultas) {
+                        this.estado = "finalizada";
+                        let ganador = this.calcularGanador();
+                        return { 
+                            tipo: "final", 
+                            carta1: carta1, 
+                            carta2: carta2, 
+                            turno: this.turno, 
+                            monedas: efecto.monedas,
+                            ganador: ganador,
+                            puntos: this.puntos
+                        };
+                    }
 
                     return { 
                         tipo: "pareja", 
@@ -427,6 +447,14 @@ function Partida(codigo, propietario) {
         }
         return null;
     };
+    this.calcularGanador = function() {
+        let jug1 = this.jugadores[0];
+        let jug2 = this.jugadores[1];
+        
+        if (this.puntos[jug1] > this.puntos[jug2]) return jug1;
+        if (this.puntos[jug2] > this.puntos[jug1]) return jug2;
+        return "empate";
+    }
     this.cambiarTurno = function() {
         let index = this.jugadores.indexOf(this.turno);
         this.turno = this.jugadores[(index + 1) % this.jugadores.length];
