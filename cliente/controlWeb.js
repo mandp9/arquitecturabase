@@ -808,19 +808,17 @@ function ControlWeb() {
         let mensajeTitulo = "";
         let colorTitulo = "";
 
-        // Lógica para determinar si gané yo, el rival o hubo empate
         if (ganador === miNick) {
-            mensajeTitulo = "🏆 ¡VICTORIA! 🏆";
-            colorTitulo = "#FFD700"; // Dorado
+            mensajeTitulo = "⚜️°• ¡VICTORIA! •°⚜️";
+            colorTitulo = "#FFD700"; 
         } else if (ganador === "empate") {
-            mensajeTitulo = "🤝 EMPATE 🤝";
-            colorTitulo = "#FFFFFF"; // Blanco
+            mensajeTitulo = "⚖️ EMPATE ⚖️";
+            colorTitulo = "#FFFFFF";
         } else {
-            mensajeTitulo = "💀 DERROTA 💀";
-            colorTitulo = "#ff4444"; // Rojo
+            mensajeTitulo = "🧌 DERROTA 🧌";
+            colorTitulo = "#ff4444"; 
         }
 
-        // Construimos la lista de puntuaciones
         let listaPuntos = "";
         for (let jugador in datos.puntos) {
             listaPuntos += `
@@ -862,10 +860,9 @@ function ControlWeb() {
 
         $('body').append(html);
 
-        // Listener para el botón de volver
         $('#btnVolverHome').off('click').on('click', function() {
             $('#pantalla-fin').fadeOut(500, function() {
-                $(this).remove(); // Importante: eliminar del DOM para que no se acumulen
+                $(this).remove(); 
                 cw.mostrarHome();
             });
         });
