@@ -182,6 +182,10 @@ function WSServer() {
                                 tipo: "monedas",
                                 valor: 10
                             });
+                            io.in(datos.codigo).emit("actualizarMonedas", { 
+                                nick: datos.nick, 
+                                cantidad: 10 
+                            });
                         } 
                         else if (resultado.efecto === "revelar") {
                             socket.emit("efectoPocima", { 

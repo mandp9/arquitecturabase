@@ -50,7 +50,7 @@ function ClienteWS(){
             cw.marcarPareja(res.carta1, res.carta2, res.turno);
             cw.iniciarTemporizador();
         });
-
+        
         this.socket.on("parejaIncorrecta", function(res) {
             cw.ocultarCartaVisual(res.carta1.id);
             cw.ocultarCartaVisual(res.carta2.id);
@@ -58,6 +58,9 @@ function ClienteWS(){
         });
         this.socket.on("cambioTurno", function(datos) {
             cw.actualizarTurno(datos.turno);
+        });
+        this.socket.on("actualizarMonedas", function(datos) {
+            cw.actualizarMonedasRival(datos);
         });
         this.socket.on("pocimaUsada", function(datos) {
         $('#lblPocimas').text(datos.restantes);

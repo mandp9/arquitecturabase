@@ -2,6 +2,10 @@ function ControlWeb() {
     this.jugadoresActuales = [];
     this.intervaloTiempo = null;
 
+    this.limpiarId = function(nick) {
+        return nick.replace(/[^a-zA-Z0-9]/g, '_'); 
+    };
+
     this.pintarMenu = function(nick) {
         const $menu = $("#menu"); 
         if (nick) {
@@ -455,17 +459,34 @@ function ControlWeb() {
     };
 
     this.mostrarTablero = function(codigo) {
+        let nick = $.cookie("nick");
+        let miNick = nick;
+
         $('#au').empty(); 
         $('#registro').empty(); 
         $('#msg').empty(); 
         $('#gameTitle').hide(); 
         $('body').css('background-image', 'none'); 
+        
         $('#contenedor-pocima').show(); 
         $('#lblPocimas').text("1");
+        
+        // --- CORRECCIÓN PÓCIMA GRIS ---
+        // Quitamos el filtro gris y reseteamos el cursor para la nueva partida
+        $('.img-pocima').css('filter', ''); 
+        $('#contenedor-pocima').css('cursor', '');
+        $('.img-pocima').removeClass('pocima-off'); 
+        // ------------------------------
 
         let jug1 = this.jugadoresActuales && this.jugadoresActuales[0] ? this.jugadoresActuales[0] : "Jugador 1";
         let jug2 = this.jugadoresActuales && this.jugadoresActuales[1] ? this.jugadoresActuales[1] : "Jugador 2";
 
+        let idBadge1 = "badge-" + this.limpiarId(jug1);
+        let idBadge2 = "badge-" + this.limpiarId(jug2);
+
+        let htmlBadge1 = (jug1 !== miNick) ? `<div class="badge-rival" id="${idBadge1}" style="opacity: 1">💰 <span class="val">0</span></div>` : '';
+        let htmlBadge2 = (jug2 !== miNick) ? `<div class="badge-rival" id="${idBadge2}" style="opacity: 1">💰 <span class="val">0</span></div>` : '';
+        
         let cadena = `
         <div id="juego">
             <div id="info-turno" class="alert alert-primary text-center" style="font-weight: bold; font-size: 1.2rem; margin: 10px auto; max-width: 800px;">
@@ -479,6 +500,7 @@ function ControlWeb() {
             <div class="arena-de-juego">
                 
                 <div id="avatar-izq" class="contenedor-avatar" data-nick="${jug1}">
+                    ${htmlBadge1}
                     <img src="./cliente/img/K1.png" alt="${jug1}" class="img-avatar">
                     <div class="nombre-avatar">${jug1}</div>
                 </div>
@@ -486,6 +508,7 @@ function ControlWeb() {
                 <div id="tablero" class="grid-cartas"></div>
 
                 <div id="avatar-der" class="contenedor-avatar" data-nick="${jug2}">
+                    ${htmlBadge2}
                     <img src="./cliente/img/K2.png" alt="${jug2}" class="img-avatar">
                     <div class="nombre-avatar">${jug2}</div>
                 </div>
@@ -497,7 +520,6 @@ function ControlWeb() {
         
         ws.iniciarPartida(codigo);
     };
-
 
     this.pintarTablero = function(datos) {
         let mazo = datos.mazo || datos; 
@@ -627,6 +649,37 @@ function ControlWeb() {
             "border-color": colorBorde,
             "box-shadow": "0 0 15px " + colorBorde
         });
+    };
+    this.actualizarMonedasRival = function(data) {
+        let miNick = $.cookie("nick");
+        
+        if (data.nick !== miNick) {
+            
+            let idLimpio = this.limpiarId(data.nick); 
+            let selector = "#badge-" + idLimpio; 
+            
+            let badge = $(selector); 
+            
+            if (badge.length > 0) {
+                let span = badge.find('.val');
+                
+                // Aseguramos que sea visible por si acaso
+                badge.css('opacity', '1'); 
+                
+                // Calculamos el nuevo valor
+                let actual = parseInt(span.text()) || 0; 
+                let nuevo = actual + data.cantidad;
+                span.text(nuevo);
+                
+                // Animación de brillo
+                badge.addClass('brillo-moneda');
+                setTimeout(() => badge.removeClass('brillo-moneda'), 600);
+                
+                console.log("Monedas actualizadas al rival: " + idLimpio + " Cantidad: " + nuevo);
+            } else {
+                console.warn("No se encontró el badge del rival. ID buscado: " + selector);
+            }
+        }
     };
     this.iniciarTemporizador = function() {
         if (this.intervaloTiempo) {
