@@ -108,7 +108,7 @@ function WSServer() {
                 let res = sistema.iniciarPartida(codigo, nick);
 
                 if (res && res.mazo) {
-                    io.in(codigo).emit("partidaIniciada", res.mazo);
+                    io.in(codigo).emit("partidaIniciada", res); 
                     reiniciarTemporizador(codigo);
                 }
             });

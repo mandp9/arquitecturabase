@@ -27,6 +27,20 @@ function Sistema(test){
   this.obtenerUsuarios = function(){   
     return this.usuarios;
   };
+  this.obtenerUsuario = function(email, callback) {
+    if (this.cad) {
+      this.cad.buscarUsuario({ "email": email }, function(usr) {
+        if (usr) {
+          callback(usr);
+        } else {
+          callback({ email: email, monedas: 0 });
+        }
+      });
+    } else {
+      // Si estamos en modo test sin BBDD
+      callback({ email: email, monedas: 0 });
+    }
+  };
   this.usuarioActivo = function(nick){
     return this.usuarios.hasOwnProperty(nick);
   };
@@ -186,11 +200,17 @@ this.unirAPartida = function(email, codigo) {
 
     this.iniciarPartida = function(codigo, nick) {
         let partida = this.partidas[codigo];
-        if (partida && partida.propietario == nick) {
-            if (partida.jugadores.length == 2) {
-                let res = partida.iniciarJuego();
-                if (res) {
-                    return { codigo: codigo, mazo: res };
+        
+        if (partida) {
+            if (partida.estado === "jugando") {
+                if (partida.jugadores.includes(nick)) {
+                    return partida.iniciarJuego();
+                }
+            }
+            
+            else if (partida.jugadores.length === 2) {
+                if (partida.jugadores.includes(nick)) {
+                    return partida.iniciarJuego();
                 }
             }
         }
