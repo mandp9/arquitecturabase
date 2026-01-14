@@ -561,7 +561,6 @@ function ControlWeb() {
         let avIzq = $('#avatar-izq');
         let avDer = $('#avatar-der');
 
-        // Comprobamos de quién es el turno mirando el data-nick que guardamos en el HTML
         if (turno === avIzq.data('nick')) {
             avIzq.removeClass('avatar-turno-inactivo').addClass('avatar-turno-activo');
             avDer.removeClass('avatar-turno-activo').addClass('avatar-turno-inactivo');
@@ -592,7 +591,6 @@ function ControlWeb() {
         let el = document.getElementById("carta-" + id);
         if (el) {
             el.classList.add("girada");
-            // Buscamos la etiqueta img dentro del div y le cambiamos el src
             let img = el.querySelector(".frente img");
             if (img) {
                 img.src = "./cliente/img/cartas/" + valor;
@@ -617,7 +615,6 @@ function ControlWeb() {
         if (this.intervaloTiempo) {
             clearInterval(this.intervaloTiempo);
         }
-        
         let segundos = 15;
         let elementoTiempo = document.getElementById("tiempo");
         let contenedorInfo = document.querySelector(".info-item span#tiempo").parentElement; 
@@ -626,7 +623,6 @@ function ControlWeb() {
             elementoTiempo.innerText = segundos;
             contenedorInfo.classList.remove("tiempo-agotandose");
         }
-
         let self = this;
         this.intervaloTiempo = setInterval(function() {
             segundos--;
@@ -654,12 +650,69 @@ function ControlWeb() {
             alert("Error: No se encuentra el código de la partida. Recarga la página.");
             return;
         }
-
         $('#contenedor-pocima').addClass('animate__rubberBand');
         setTimeout(() => $('#contenedor-pocima').removeClass('animate__rubberBand'), 1000);
 
         ws.socket.emit("usarPocima", { nick: nick, codigo: ws.codigo });
     };
+    this.mostrarRevelacion = function(carta) {
+        let msg = $(`<div class="mensaje-magico">
+                        <img src="./cliente/img/magic.gif" class="icono-mensaje"><br>
+                        🔮 ¡El Ojo Arcano revela un secreto!<br>
+                        <span style="font-size:1.2rem; color:#d633ff;">¡Es un ${carta.valor}!</span>
+                     </div>`);
+        $('body').append(msg);
 
+        this.girarCartaVisual(carta.id, carta.valor);
 
+        let cardDiv = $('#carta-' + carta.id + ' .cara');
+        cardDiv.css('border', '3px solid #d633ff'); 
+        cardDiv.css('box-shadow', '0 0 20px #d633ff');
+
+        let self = this;
+        setTimeout(function() {
+            self.ocultarCartaVisual(carta.id);
+            msg.fadeOut(500, function() { $(this).remove(); });
+            cardDiv.css('border', '');
+            cardDiv.css('box-shadow', '');
+        }, 3000); 
+    };
+    this.mostrarRevelacion = function(carta) {
+        let msg = $(`<div class="mensaje-magico">
+                        <img src="./cliente/img/magic.gif" class="icono-mensaje"><br>
+                        🔮 ¡El Ojo Arcano revela un secreto!<br>
+                        <span style="font-size:1.2rem; color:#d633ff;">¡Es un ${carta.valor}!</span>
+                     </div>`);
+        $('body').append(msg);
+
+        this.girarCartaVisual(carta.id, carta.valor);
+
+        let cardDiv = $('#carta-' + carta.id + ' .cara');
+        cardDiv.css('border', '3px solid #d633ff'); 
+        cardDiv.css('box-shadow', '0 0 20px #d633ff');
+
+        let self = this;
+        setTimeout(function() {
+            self.ocultarCartaVisual(carta.id);
+            msg.fadeOut(500, function() { $(this).remove(); });
+            cardDiv.css('border', '');
+            cardDiv.css('box-shadow', '');
+        }, 3000); 
+    };
+
+    this.mostrarAvisoMonedas = function(cantidad) {
+        let actuales = parseInt($('#mis-monedas').text());
+        $('#mis-monedas').text(actuales + cantidad);
+
+        let msg = $(`<div class="mensaje-moneda">
+                        <img src="./cliente/img/moneda.gif" class="icono-mensaje"><br>
+                        ¡Gracias a la pócima, has encontrado un tesoro!<br>
+                        <span style="font-size:1.2rem; color:#FFD700;">+${cantidad} Monedas de Oro</span>
+                     </div>`);
+        $('body').append(msg);
+
+        setTimeout(function() {
+            msg.fadeOut(500, function() { $(this).remove(); });
+        }, 3000);
+    };
 }

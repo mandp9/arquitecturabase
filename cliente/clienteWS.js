@@ -72,16 +72,13 @@ function ClienteWS(){
         this.socket.on("efectoPocima", function(datos) {
             
             if (datos.tipo === "monedas") {
-                let actuales = parseInt($('#mis-monedas').text());
-                $('#mis-monedas').text(actuales + 10);
-            
-                alert(datos.mensaje); 
+                cw.mostrarAvisoMonedas(datos.valor);
             } 
             else if (datos.tipo === "revelar") {
-                let carta = datos.carta; 
-               
-                alert(datos.mensaje + "\nEs un: " + carta.valor);
- 
+                cw.mostrarRevelacion(datos.carta);
+            }
+            else if (datos.tipo === "error") {
+                alert(datos.mensaje); 
             }
         });
     }

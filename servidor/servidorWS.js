@@ -142,20 +142,14 @@ function WSServer() {
                     
                     let res = sistema.abandonarPartida(socket.email, socket.codigo);
                     
-                    // 2. Si la partida existía...
                     if (res.codigo != -1) {
                         
-                        // Si tras irse él, la partida se queda vacía (ya se borró sola en el modelo)
                         if (res.eliminado) {
-                            // Solo actualizamos la lista global para los demás
                             let lista = sistema.obtenerPartidasDisponibles();
                             srv.enviarGlobal(io, "listaPartidas", lista);
                         } 
                         else {
-                            // Si queda un rival dentro (la partida no se ha borrado aún)
-                            // Como quieres que se "cancele", vamos a forzar su eliminación.
                             
-                            // Avisamos al rival que queda
                             io.in(socket.codigo).emit("partidaTerminada", { 
                                 mensaje: "El rival se ha desconectado. La partida ha sido cancelada." 
                             });
@@ -197,10 +191,10 @@ function WSServer() {
                             });
                         }
                     } else {
-                        console.log("❌ Fallo al usar pócima (No es turno o no quedan)");
+                        console.log("Fallo al usar pócima (No es turno o no quedan)");
                     }
                 } else {
-                    console.log("⚠️ Partida no encontrada: " + datos.codigo);
+                    console.log("Partida no encontrada: " + datos.codigo);
                 }
             }); 
             

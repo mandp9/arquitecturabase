@@ -489,6 +489,51 @@
         border-color: #555 !important; 
         box-shadow: none !important;
     }
+    .icono-mensaje {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+    }
+    .mensaje-magico {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(20, 0, 20, 0.95);
+        border: 3px double #d633ff;
+        color: #fdf6e3;
+        padding: 20px 40px;
+        border-radius: 15px;
+        font-family: 'MedievalSharp', cursive;
+        font-size: 1.8rem;
+        text-align: center;
+        z-index: 10000;
+        box-shadow: 0 0 30px rgba(214, 51, 255, 0.6);
+        animation: aparecerMagia 0.5s ease-out;
+    }
+    .mensaje-moneda {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(30, 20, 0, 0.95); /* Fondo marrón oscuro */
+        border: 3px double #FFD700;       /* Borde dorado */
+        color: #fdf6e3;
+        padding: 20px 40px;
+        border-radius: 15px;
+        font-family: 'MedievalSharp', cursive;
+        font-size: 1.8rem;
+        text-align: center;
+        z-index: 10000;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); /* Brillo dorado */
+        animation: aparecerMagia 0.5s ease-out;
+    }
+    @keyframes aparecerMagia {
+        from { opacity: 0; transform: translate(-50%, -20px) scale(0.8); }
+        to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    }
+    
   </style>
 </head>
 
