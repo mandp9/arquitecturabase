@@ -75,7 +75,7 @@ function ClienteWS(){
         this.socket.on("efectoPocima", function(datos) {
             
             if (datos.tipo === "monedas") {
-                cw.mostrarAvisoMonedas(datos.valor);
+                cw.mostrarAvisoMonedas(datos.valor, " ⋆˚꩜｡ Gracias a la pócima");
             } 
             else if (datos.tipo === "revelar") {
                 cw.mostrarRevelacion(datos.carta);
@@ -111,7 +111,7 @@ function ClienteWS(){
        
         let email = this.email || $.cookie("nick");
         
-        console.log("Intentando borrar partida:", codigo, "Usuario:", email); // Log para depurar
+        console.log("Intentando borrar partida:", codigo, "Usuario:", email); 
         this.socket.emit("eliminarPartida", { "email": email, "codigo": codigo });
     }
     this.iniciarPartida = function(codigo) {
@@ -119,7 +119,7 @@ function ClienteWS(){
         console.log("Iniciando partida:", codigo, "Usuario:", email);
         this.socket.emit("iniciarPartida", { 
             "codigo": codigo, 
-            "nick": email, // El servidor espera 'nick' o 'email' según tu servidorWS.js
+            "nick": email, 
             "email": email 
         });
     }

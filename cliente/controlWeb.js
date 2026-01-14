@@ -636,8 +636,38 @@ function ControlWeb() {
             el.classList.remove("girada");
         }
     };
+    this.obtenerNombreMonstruo = function(nombreArchivo) {
+        const nombres = {
+            "enemy1.jpg": "la Jauría de Lobos",
+            "enemy2.jpg": "un Enano Feroz",
+            "enemy3.jpg": "un Ermitaño Salvaje",
+            "enemy4.jpg": "la Gorgona Venenosa",
+            "enemy5.jpg": "un Gourmet Caníbal",
+            "enemy6.jpg": "un Ciervo Zombie",
+            "enemy7.jpg": "un Asesino a sueldo",
+            "enemy8.jpg": "una Momia Antigua",
+            "enemy9.jpg": "un Hechicero Oscuro",
+            "enemy10.jpg": "un Demonio Castigador",
+            "enemy11.jpg": "un Zombie errante",
+            "enemy12.jpg": "un Zombie gigante",
+            "enemy13.jpg": "un Murciélago rabioso",
+            "enemy14.jpg": "una Quimera",
+            "enemy15.jpg": "una Esfinge",
+            "enemy16.jpg": "Cerberus",
+            "enemy17.jpg": "un Súcubo",
+            "enemy18.jpg": "un unicornio adorable",
+            "enemy19.jpg": "un Gatito (¡Cuidado!)",
+            "enemy20.jpg": "un Ojo flotante",
+            "enemy21.jpg": "un Cofre tramposo",
+            "enemy22.jpg": "un Gallo parlanchín",
+            "enemy23.jpg": "un Guerrero de la muerte",
+            "enemy24.jpg": "una Rata gigante",
+            "enemy25.jpg": "un Troll agresivo",
+        };
+        return nombres[nombreArchivo] || nombreArchivo.replace(".jpg", "");
+    };
 
-    this.marcarPareja = function(carta1, carta2,nickAcierto) {
+    this.marcarPareja = function(carta1, carta2, nickAcierto) {
         let miNick = $.cookie("nick");
         this.girarCartaVisual(carta1.id, carta1.valor);
         this.girarCartaVisual(carta2.id, carta2.valor);
@@ -646,7 +676,13 @@ function ControlWeb() {
         
         if (nickAcierto === miNick) {
             colorBorde = "#2ecc71"; 
-            this.mostrarAvisoMonedas(10);
+            
+            let nombreBicho = this.obtenerNombreMonstruo(carta1.valor);
+            
+            let mensajeVictoria = `💀 ¡Has derrotado a <br><span style="color: #ff4444;">${nombreBicho}</span>!`;
+            
+            this.mostrarAvisoMonedas(10, mensajeVictoria);
+
         } else {
             colorBorde = "#e74c3c"; 
         }
@@ -661,6 +697,7 @@ function ControlWeb() {
             "box-shadow": "0 0 15px " + colorBorde
         });
     };
+
     this.actualizarMonedasRival = function(data) {
         let miNick = $.cookie("nick");
         
@@ -674,15 +711,12 @@ function ControlWeb() {
             if (badge.length > 0) {
                 let span = badge.find('.val');
                 
-                // Aseguramos que sea visible por si acaso
                 badge.css('opacity', '1'); 
                 
-                // Calculamos el nuevo valor
                 let actual = parseInt(span.text()) || 0; 
                 let nuevo = actual + data.cantidad;
                 span.text(nuevo);
                 
-                // Animación de brillo
                 badge.addClass('brillo-moneda');
                 setTimeout(() => badge.removeClass('brillo-moneda'), 600);
                 
@@ -738,42 +772,13 @@ function ControlWeb() {
     };
 
     this.mostrarRevelacion = function(carta) {
-        
-        const nombres = {
-            "enemy1.jpg": "Jauría de Lobos",
-            "enemy2.jpg": "Enano Feroz",
-            "enemy3.jpg": "Ermitaño Salvaje",
-            "enemy4.jpg": "Gorgona Venenosa",
-            "enemy5.jpg": "Gourmet Caníbal",
-            "enemy6.jpg": "Ciervo Zombie",
-            "enemy7.jpg": "Asesino a sueldo",
-            "enemy8.jpg": "Troll de las Cavernas",
-            "enemy9.jpg": "Momia",
-            "enemy10.jpg": "Hechicero Oscuro",
-            "enemy11.jpg": "Demonio Castigador",
-            "enemy12.jpg": "Zombie errante",
-            "enemy13.jpg": "Zombie gigante",
-            "enemy14.jpg": "Murciélago",
-            "enemy15.jpg": "Quimera",
-            "enemy16.jpg": "Esfinge",
-            "enemy17.jpg": "Cerberus",
-            "enemy18.jpg": "Súcubo",
-            "enemy19.jpg": "Gatito",
-            "enemy20.jpg": "Ojo flotante",
-            "enemy21.jpg": "Cofre tramposo",
-            "enemy22.jpg": "Gallo",
-            "enemy23.jpg": "Guerrero de la muerte",
-            "enemy24.jpg": "Rata",
-            "enemy25.jpg": "Troll agresivo",
-        };
-
-        let nombreMostrar = nombres[carta.valor] || carta.valor.replace(".jpg", "");
+        let nombreMostrar = this.obtenerNombreMonstruo(carta.valor);
 
         let msg = $(`<div class="mensaje-magico">
                         <img src="./cliente/img/magic.gif" class="icono-mensaje"><br>
                         🔮 ¡El Ojo Arcano revela un secreto!<br>
-                        <span style="font-size:1.2rem; color:#d633ff;">¡Es un ${nombreMostrar}!</span>
-                     </div>`);
+                        <span style="font-size:1.2rem; color:#d633ff;">¡Es ${nombreMostrar}!</span>
+                      </div>`);
         $('body').append(msg);
 
         this.girarCartaVisual(carta.id, carta.valor);
@@ -798,20 +803,21 @@ function ControlWeb() {
         }, 3000); 
     };
 
-    this.mostrarAvisoMonedas = function(cantidad) {
+    this.mostrarAvisoMonedas = function(cantidad, mensaje) {
         let actuales = parseInt($('#mis-monedas').text());
         $('#mis-monedas').text(actuales + cantidad);
 
+        let textoMostrar = mensaje || "¡Has encontrado un tesoro!";
+
         let msg = $(`<div class="mensaje-moneda">
                         <img src="./cliente/img/moneda.gif" class="icono-mensaje"><br>
-                        ¡Gracias a la pócima, has encontrado un tesoro!<br>
+                        ${textoMostrar}<br>
                         <span style="font-size:1.2rem; color:#FFD700;">+${cantidad} Monedas de Oro</span>
-                     </div>`);
+                      </div>`);
         $('body').append(msg);
 
         setTimeout(function() {
             msg.fadeOut(500, function() { $(this).remove(); });
         }, 3000);
     };
-
 } 
