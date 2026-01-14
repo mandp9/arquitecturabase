@@ -655,33 +655,43 @@ function ControlWeb() {
 
         ws.socket.emit("usarPocima", { nick: nick, codigo: ws.codigo });
     };
+
     this.mostrarRevelacion = function(carta) {
-        let msg = $(`<div class="mensaje-magico">
-                        <img src="./cliente/img/magic.gif" class="icono-mensaje"><br>
-                        ¡El Ojo Arcano revela un secreto!<br>
-                        <span style="font-size:1.2rem; color:#d633ff;">¡Es un ${carta.valor}!</span>
-                     </div>`);
-        $('body').append(msg);
+        
+        const nombres = {
+            "enemy1.jpg": "Jauría de Lobos",
+            "enemy2.jpg": "Enano Feroz",
+            "enemy3.jpg": "Ermitaño Salvaje",
+            "enemy4.jpg": "Gorgona Venenosa",
+            "enemy5.jpg": "Gourmet Caníbal",
+            "enemy6.jpg": "Ciervo Zombie",
+            "enemy7.jpg": "Asesino a sueldo",
+            "enemy8.jpg": "Troll de las Cavernas",
+            "enemy9.jpg": "Momia",
+            "enemy10.jpg": "Hechicero Oscuro",
+            "enemy11.jpg": "Demonio Castigador",
+            "enemy12.jpg": "Zombie errante",
+            "enemy13.jpg": "Zombie gigante",
+            "enemy14.jpg": "Murciélago",
+            "enemy15.jpg": "Quimera",
+            "enemy16.jpg": "Esfinge",
+            "enemy17.jpg": "Cerberus",
+            "enemy18.jpg": "Súcubo",
+            "enemy19.jpg": "Gatito",
+            "enemy20.jpg": "Ojo flotante",
+            "enemy21.jpg": "Cofre tramposo",
+            "enemy22.jpg": "Gallo",
+            "enemy23.jpg": "Guerrero de la muerte",
+            "enemy24.jpg": "Rata",
+            "enemy25.jpg": "Troll agresivo",
+        };
 
-        this.girarCartaVisual(carta.id, carta.valor);
+        let nombreMostrar = nombres[carta.valor] || carta.valor.replace(".jpg", "");
 
-        let cardDiv = $('#carta-' + carta.id + ' .cara');
-        cardDiv.css('border', '3px solid #d633ff'); 
-        cardDiv.css('box-shadow', '0 0 20px #d633ff');
-
-        let self = this;
-        setTimeout(function() {
-            self.ocultarCartaVisual(carta.id);
-            msg.fadeOut(500, function() { $(this).remove(); });
-            cardDiv.css('border', '');
-            cardDiv.css('box-shadow', '');
-        }, 3000); 
-    };
-    this.mostrarRevelacion = function(carta) {
         let msg = $(`<div class="mensaje-magico">
                         <img src="./cliente/img/magic.gif" class="icono-mensaje"><br>
                         🔮 ¡El Ojo Arcano revela un secreto!<br>
-                        <span style="font-size:1.2rem; color:#d633ff;">¡Es un ${carta.valor}!</span>
+                        <span style="font-size:1.2rem; color:#d633ff;">¡Es un ${nombreMostrar}!</span>
                      </div>`);
         $('body').append(msg);
 
@@ -690,6 +700,13 @@ function ControlWeb() {
         let cardDiv = $('#carta-' + carta.id + ' .cara');
         cardDiv.css('border', '3px solid #d633ff'); 
         cardDiv.css('box-shadow', '0 0 20px #d633ff');
+
+        let tarjeta = $('#carta-' + carta.id);
+        if (tarjeta.length > 0) {
+            $('html, body').animate({
+                scrollTop: tarjeta.offset().top - 200 
+            }, 800); 
+        }
 
         let self = this;
         setTimeout(function() {
@@ -715,4 +732,5 @@ function ControlWeb() {
             msg.fadeOut(500, function() { $(this).remove(); });
         }, 3000);
     };
-}
+
+} 

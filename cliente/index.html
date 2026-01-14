@@ -495,45 +495,47 @@
         margin-bottom: 10px;
         filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     }
-    .mensaje-magico {
+    .mensaje-magico, .mensaje-moneda {
         position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 120px;       /* Debajo de la barra de navegación */
+        right: 20px;      /* Pegado a la derecha */
+        left: auto !important; /* Anulamos el centrado anterior */
+        transform: none !important; /* Anulamos el transform anterior */
+        
+        width: 300px;     /* Ancho fijo para que no sea enorme */
+        
+        border-radius: 15px;
+        font-family: 'MedievalSharp', cursive;
+        font-size: 1.2rem; /* Un pelín más pequeño para que no moleste */
+        text-align: center;
+        z-index: 10000;
+        
+        animation: deslizarDerecha 0.5s ease-out;
+    }
+
+    .mensaje-magico {
         background: rgba(20, 0, 20, 0.95);
         border: 3px double #d633ff;
         color: #fdf6e3;
-        padding: 20px 40px;
-        border-radius: 15px;
-        font-family: 'MedievalSharp', cursive;
-        font-size: 1.8rem;
-        text-align: center;
-        z-index: 10000;
-        box-shadow: 0 0 30px rgba(214, 51, 255, 0.6);
-        animation: aparecerMagia 0.5s ease-out;
+        box-shadow: 0 0 20px rgba(214, 51, 255, 0.6);
     }
+
     .mensaje-moneda {
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(30, 20, 0, 0.95); /* Fondo marrón oscuro */
-        border: 3px double #FFD700;       /* Borde dorado */
+        background: rgba(30, 20, 0, 0.95);
+        border: 3px double #FFD700;
         color: #fdf6e3;
-        padding: 20px 40px;
-        border-radius: 15px;
-        font-family: 'MedievalSharp', cursive;
-        font-size: 1.8rem;
-        text-align: center;
-        z-index: 10000;
-        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); /* Brillo dorado */
-        animation: aparecerMagia 0.5s ease-out;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+
+    @keyframes deslizarDerecha {
+        from { opacity: 0; transform: translateX(50px); }
+        to { opacity: 1; transform: translateX(0); }
     }
     @keyframes aparecerMagia {
         from { opacity: 0; transform: translate(-50%, -20px) scale(0.8); }
         to { opacity: 1; transform: translate(-50%, 0) scale(1); }
     }
-    
+
   </style>
 </head>
 
