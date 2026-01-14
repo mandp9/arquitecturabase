@@ -319,7 +319,15 @@ function Partida(codigo, propietario) {
         }
         return null; // No le quedan pócimas
     }
+    
     this.iniciarJuego = function() {
+        if (this.estado == "jugando") {
+        return { 
+            mazo: this.mazo, 
+            turno: this.turno,
+            fondo: this.fondo 
+        };
+    }
         if (this.estado != "jugando") {
             this.estado = "jugando";
             this.mazo = this.generarMazo(8);

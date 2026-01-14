@@ -461,7 +461,7 @@ function ControlWeb() {
     this.mostrarTablero = function(codigo) {
         let nick = $.cookie("nick");
         let miNick = nick;
-
+        ws.codigo = codigo;
         $('#au').empty(); 
         $('#registro').empty(); 
         $('#msg').empty(); 
