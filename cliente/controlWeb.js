@@ -658,7 +658,7 @@ function ControlWeb() {
     this.mostrarRevelacion = function(carta) {
         let msg = $(`<div class="mensaje-magico">
                         <img src="./cliente/img/magic.gif" class="icono-mensaje"><br>
-                        🔮 ¡El Ojo Arcano revela un secreto!<br>
+                        ¡El Ojo Arcano revela un secreto!<br>
                         <span style="font-size:1.2rem; color:#d633ff;">¡Es un ${carta.valor}!</span>
                      </div>`);
         $('body').append(msg);
