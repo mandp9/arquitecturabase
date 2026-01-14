@@ -268,7 +268,7 @@ function ControlWeb() {
             </audio>
 
             <div id="btnAudio" class="btn btn-sm shadow-sm" 
-                 style="position: absolute; top: 80px; right: 15px; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border: 1px solid #FFD700; color: #FFD700; cursor: pointer; background: rgba(0,0,0,0.5);">
+                 style="position: absolute; top: 120px; right: 15px; border-radius: 50%; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; border: 1px solid #FFD700; color: #FFD700; cursor: pointer; background: rgba(0,0,0,0.5);">
                 🔊
             </div>
 

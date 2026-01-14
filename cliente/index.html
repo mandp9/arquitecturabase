@@ -127,15 +127,15 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     }
     .btn-historia-flotante:hover {
-        transform: scale(1.1) rotate(-2deg); /* Efecto al pasar el ratón */
+        transform: scale(1.1) rotate(-2deg); 
         background-color: #a0522d;
-        box-shadow: 0 0 20px #FFD700; /* Resplandor dorado */
+        box-shadow: 0 0 20px #FFD700; 
     }
 
     .modal-overlay-historia {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.85); /* Fondo negro semitransparente */
+        background-color: rgba(0, 0, 0, 0.85); 
         z-index: 10000; 
         display: flex;
         justify-content: center;
@@ -143,7 +143,6 @@
         padding: 20px;
     }
 
-    /* --- ESTILOS DEL CONTENEDOR DEL PERGAMINO (La imagen de fondo) --- */
     .pergamino-container {
         position: relative;
         width: 100%;
@@ -497,16 +496,16 @@
     }
     .mensaje-magico, .mensaje-moneda {
         position: fixed;
-        top: 120px;       /* Debajo de la barra de navegación */
-        right: 20px;      /* Pegado a la derecha */
-        left: auto !important; /* Anulamos el centrado anterior */
-        transform: none !important; /* Anulamos el transform anterior */
+        top: 120px;       
+        right: 20px;      
+        left: auto !important; 
+        transform: none !important; 
         
-        width: 300px;     /* Ancho fijo para que no sea enorme */
+        width: 300px;    
         
         border-radius: 15px;
         font-family: 'MedievalSharp', cursive;
-        font-size: 1.2rem; /* Un pelín más pequeño para que no moleste */
+        font-size: 1.2rem; 
         text-align: center;
         z-index: 10000;
         
@@ -652,9 +651,8 @@
         e.preventDefault();
         cw.salir(); 
     });
-    // Lógica del botón de Historia
     $("#btnAbrirHistoria").on("click", function() {
-        $("#modalHistoria").fadeIn(); // Muestra el pergamino suavemente
+        $("#modalHistoria").fadeIn(); 
     });
 
     $("#btnCerrarHistoria").on("click", function() {

@@ -133,7 +133,6 @@ this.unirAPartida = function(email, codigo) {
             }
         }
         
-        // Si la partida no existe o está llena
         return { codigo: -1 };
     };
   this.obtenerPartidasDisponibles = function() {
