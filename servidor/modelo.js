@@ -428,9 +428,7 @@ function Partida(codigo, propietario) {
     };
 
     this.voltearCarta = function(idCarta, nick) {
-        if (this.turno !== nick) {
-            return null;
-        }
+        if (this.turno !== nick) return null;
 
         let carta = this.mazo.find(c => c.id == idCarta);
 
@@ -438,14 +436,13 @@ function Partida(codigo, propietario) {
             carta.estado = 'visible';
             this.cartasLevantadas.push(carta);
 
-            // Comprobar si hemos alcanzado el límite (2 o 3)
             if (this.cartasLevantadas.length === this.limiteVolteo) {
-                
                 let carta1 = null; 
                 let carta2 = null;
                 let encontrada = false;
+                let cartaSobrante = null; 
 
-                // Bucle robusto para encontrar pareja en array de 2 o 3 elementos
+                // Buscamos la pareja entre las 2 o 3 cartas
                 for(let i=0; i<this.cartasLevantadas.length; i++) {
                     for(let j=i+1; j<this.cartasLevantadas.length; j++) {
                         if (this.cartasLevantadas[i].valor === this.cartasLevantadas[j].valor) {
@@ -462,55 +459,46 @@ function Partida(codigo, propietario) {
                     carta1.estado = 'encontrada';
                     carta2.estado = 'encontrada';
                     
-                    // Si había una tercera carta, la marcamos como oculta
+                    // Identificamos la carta sobrante y la ocultamos en servidor
                     this.cartasLevantadas.forEach(c => {
                         if (c.id !== carta1.id && c.id !== carta2.id) {
                             c.estado = 'oculta';
+                            cartaSobrante = c; 
                         }
                     });
                     
                     this.cartasLevantadas = [];
-
                     let efecto = this.calcularEfectoCarta(carta1.valor, nick, carta1.id);
-
                     if (!this.puntos[nick]) this.puntos[nick] = 0;
                     this.puntos[nick] += efecto.monedas;
 
                     let quedanOcultas = this.mazo.some(c => c.estado === 'oculta' || c.estado === 'visible');
-
                     if (!quedanOcultas) {
                         this.estado = "finalizada";
-                        let ganador = this.calcularGanador();
-                        return {
-                            tipo: "final",
-                            carta1: carta1,
-                            carta2: carta2,
-                            turno: this.turno,
-                            monedas: efecto.monedas,
-                            ganador: ganador,
-                            puntos: this.puntos
-                        };
+                        return { tipo: "final", carta1: carta1, carta2: carta2, turno: this.turno, monedas: efecto.monedas, ganador: this.calcularGanador(), puntos: this.puntos };
                     }
 
-                    // IMPORTANTE: Devolvemos 'pareja' para que el cliente lo procese
-                    return {
-                        tipo: "pareja",
-                        carta1: carta1,
-                        carta2: carta2,
-                        turno: this.turno,
-                        monedas: efecto.monedas
+                    // ENVIAMOS 'cartaOcultar' AL CLIENTE
+                    return { 
+                        tipo: "pareja", 
+                        carta1: carta1, 
+                        carta2: carta2, 
+                        cartaOcultar: cartaSobrante, // ESTO ES LA CLAVE
+                        turno: this.turno, 
+                        monedas: efecto.monedas 
                     };
+
                 } else {
-                    // FALLO: Ocultamos todas
+                    // FALLO
                     let cartasFallo = [...this.cartasLevantadas];
                     this.cartasLevantadas.forEach(c => c.estado = 'oculta');
                     this.cartasLevantadas = [];
-                    
                     this.cambiarTurno();
                     
-                    // Devolvemos las cartas del fallo (aunque sean 3)
+                    // Enviamos TODAS las cartas levantadas para que el cliente las tape
                     return { 
                         tipo: "fallo", 
+                        cartas: cartasFallo, // Array completo
                         carta1: cartasFallo[0], 
                         carta2: cartasFallo[1], 
                         turno: this.turno 
