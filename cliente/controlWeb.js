@@ -2,12 +2,15 @@ function ControlWeb() {
     this.jugadoresActuales = [];
     this.intervaloTiempo = null;
 
-    this.reproducirSonidoBoton = function() {
-        let audio = document.getElementById("audioHoverBtn");
+    this.reproducirAudio = function(idElemento) {
+        let audio = document.getElementById(idElemento);
         if (audio) {
             audio.currentTime = 0;
-            audio.play().catch(e => {});
+            audio.play().catch(e => {}); 
         }
+    };
+    this.reproducirSonidoBoton = function() {
+        this.reproducirAudio("audioHoverBtn");
     };
 
     this.limpiarId = function(nick) {
@@ -409,6 +412,8 @@ function ControlWeb() {
         });
 
         $('#btnIrAlJuego').on('click', function() {
+            cw.reproducirSonidoBoton();
+            $('.navbar').css('z-index', '');
             cw.mostrarTablero(codigoStr);
         });
     };
@@ -738,7 +743,7 @@ function ControlWeb() {
         } else {
             colorBorde = "#e74c3c"; 
         }
-
+        this.reproducirAudio("audioPareja");
         $("#carta-" + carta1.id + " .cara").css({
             "border-color": colorBorde,
             "box-shadow": "0 0 15px " + colorBorde 
@@ -817,6 +822,7 @@ function ControlWeb() {
             alert("Error: No se encuentra el código de la partida. Recarga la página.");
             return;
         }
+        this.reproducirAudio("audioMagic");
         $('#contenedor-pocima').addClass('animate__rubberBand');
         setTimeout(() => $('#contenedor-pocima').removeClass('animate__rubberBand'), 1000);
 
@@ -855,6 +861,12 @@ function ControlWeb() {
         }, 3000); 
     };
     this.mostrarVictoria = function(datos) {
+        let audioJuego = document.getElementById("audioJuego");
+        if (audioJuego) {
+            audioJuego.pause();
+            audioJuego.currentTime = 0;
+        }
+        this.reproducirAudio("audioFin");
         let miNick = $.cookie("nick");
         let ganador = datos.ganador;
         let mensajeTitulo = "";
