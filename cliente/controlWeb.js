@@ -163,6 +163,8 @@ function ControlWeb() {
     };
 
     this.mostrarHome = function() {
+        let audioJuego = document.getElementById("audioJuego");
+        if (audioJuego) { audioJuego.pause(); audioJuego.currentTime = 0;}
         $('body').css({
             'background-image': 'url("./cliente/img/casss.png")',
             'background-size': 'cover',
@@ -491,6 +493,9 @@ function ControlWeb() {
         let nick = $.cookie("nick");
         let miNick = nick;
         ws.codigo = codigo;
+        let audioLobby = document.getElementById("audioLobby");
+        if (audioLobby) { audioLobby.pause(); audioLobby.currentTime = 0; }
+        this.limpiar();
         $('#au').empty(); 
         $('#registro').empty(); 
         $('#msg').empty(); 
@@ -500,12 +505,10 @@ function ControlWeb() {
         $('#contenedor-pocima').show(); 
         $('#lblPocimas').text("1");
         
-        // --- CORRECCIÓN PÓCIMA GRIS ---
-        // Quitamos el filtro gris y reseteamos el cursor para la nueva partida
         $('.img-pocima').css('filter', ''); 
         $('#contenedor-pocima').css('cursor', '');
         $('.img-pocima').removeClass('pocima-off'); 
-        // ------------------------------
+
 
         let jug1 = this.jugadoresActuales && this.jugadoresActuales[0] ? this.jugadoresActuales[0] : "Jugador 1";
         let jug2 = this.jugadoresActuales && this.jugadoresActuales[1] ? this.jugadoresActuales[1] : "Jugador 2";
@@ -517,7 +520,17 @@ function ControlWeb() {
         let htmlBadge2 = (jug2 !== miNick) ? `<div class="badge-rival" id="${idBadge2}" style="opacity: 1">💰 <span class="val">0</span></div>` : '';
         
         let cadena = `
-        <div id="juego">
+        <div id="juego" style="position: relative;">
+            <div id="btnAudioJuego" class="btn btn-sm shadow-sm" 
+                 style="position: absolute; top: 40px; right: -450px; 
+                        border-radius: 50%; width: 45px; height: 45px; 
+                        display: flex; justify-content: center; align-items: center; 
+                        border: 2px solid #FFD700; color: #FFD700; 
+                        cursor: pointer; background: rgba(0,0,0,0.6); 
+                        z-index: 999; box-shadow: 0 0 10px #FFD700;">
+                🔊
+            </div>
+
             <div id="info-turno" class="alert alert-primary text-center" style="font-weight: bold; font-size: 1.2rem; margin: 10px auto; max-width: 800px;">
                 Esperando inicio...
             </div>
@@ -527,7 +540,6 @@ function ControlWeb() {
             </div>
             
             <div class="arena-de-juego">
-                
                 <div id="avatar-izq" class="contenedor-avatar" data-nick="${jug1}">
                     ${htmlBadge1}
                     <img src="./cliente/img/K1.png" alt="${jug1}" class="img-avatar">
@@ -541,12 +553,28 @@ function ControlWeb() {
                     <img src="./cliente/img/K2.png" alt="${jug2}" class="img-avatar">
                     <div class="nombre-avatar">${jug2}</div>
                 </div>
-
             </div>
         </div>
         `;
         $('#au').html(cadena); 
-        
+        let audioJuego = document.getElementById("audioJuego");
+        if (audioJuego) {
+            audioJuego.volume = 0.4; 
+            audioJuego.play().catch(e => {
+                $('#btnAudioJuego').text("🔇"); 
+            });
+        }
+        $('#btnAudioJuego').on('click', function() {
+            if (audioJuego.paused) {
+                audioJuego.play();
+                $(this).text("🔊"); 
+                $(this).css("background", "rgba(0,0,0,0.5)");
+            } else {
+                audioJuego.pause();
+                $(this).text("🔇"); 
+                $(this).css("background", "rgba(255,0,0,0.5)");
+            }
+        });
         ws.iniciarPartida(codigo);
     };
 
@@ -641,6 +669,11 @@ function ControlWeb() {
     this.girarCartaVisual = function(id, valor) {
         let el = document.getElementById("carta-" + id);
         if (el) {
+            let audio = document.getElementById("audioCarta");
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => {});
+            }
             el.classList.add("girada");
             let img = el.querySelector(".frente img");
             if (img) {

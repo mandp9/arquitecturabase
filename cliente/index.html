@@ -722,5 +722,36 @@
     <audio id="audioPergamino" preload="auto">
         <source src="./cliente/musica/pergamino.mp3" type="audio/mpeg">
     </audio>
+    <audio id="audioCarta" preload="auto">
+        <source src="./cliente/musica/carta.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="audioJuego" loop preload="auto">
+        <source src="./cliente/musica/juego.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+    $(document).one('click', function() {
+        let audioBtn = document.getElementById("audioHoverBtn");
+        let audioPerg = document.getElementById("audioPergamino");
+        
+        if(audioBtn) { 
+            audioBtn.volume = 0; 
+            audioBtn.play().then(() => {
+                audioBtn.pause();
+                audioBtn.currentTime = 0;
+                audioBtn.volume = 1; 
+            }).catch(e => {});
+        }
+        
+        if(audioPerg) {
+            audioPerg.volume = 0;
+            audioPerg.play().then(() => {
+                audioPerg.pause();
+                audioPerg.currentTime = 0;
+                audioPerg.volume = 1;
+            }).catch(e => {});
+        }
+    });
+</script>
 </body>
 </html>
