@@ -429,7 +429,6 @@ function Partida(codigo, propietario) {
 
     this.voltearCarta = function(idCarta, nick) {
         if (this.turno !== nick) {
-            console.log("No es el turno de " + nick);
             return null;
         }
 
@@ -439,12 +438,14 @@ function Partida(codigo, propietario) {
             carta.estado = 'visible';
             this.cartasLevantadas.push(carta);
 
+            // Comprobar si hemos alcanzado el límite (2 o 3)
             if (this.cartasLevantadas.length === this.limiteVolteo) {
                 
                 let carta1 = null; 
                 let carta2 = null;
                 let encontrada = false;
 
+                // Bucle robusto para encontrar pareja en array de 2 o 3 elementos
                 for(let i=0; i<this.cartasLevantadas.length; i++) {
                     for(let j=i+1; j<this.cartasLevantadas.length; j++) {
                         if (this.cartasLevantadas[i].valor === this.cartasLevantadas[j].valor) {
@@ -461,6 +462,7 @@ function Partida(codigo, propietario) {
                     carta1.estado = 'encontrada';
                     carta2.estado = 'encontrada';
                     
+                    // Si había una tercera carta, la marcamos como oculta
                     this.cartasLevantadas.forEach(c => {
                         if (c.id !== carta1.id && c.id !== carta2.id) {
                             c.estado = 'oculta';
@@ -490,6 +492,7 @@ function Partida(codigo, propietario) {
                         };
                     }
 
+                    // IMPORTANTE: Devolvemos 'pareja' para que el cliente lo procese
                     return {
                         tipo: "pareja",
                         carta1: carta1,
@@ -505,7 +508,7 @@ function Partida(codigo, propietario) {
                     
                     this.cambiarTurno();
                     
-                    // Devolvemos las 2 primeras para mantener compatibilidad visual básica
+                    // Devolvemos las cartas del fallo (aunque sean 3)
                     return { 
                         tipo: "fallo", 
                         carta1: cartasFallo[0], 
