@@ -420,9 +420,8 @@ function Partida(codigo, propietario) {
             return { monedas: 0, tipo: "hechicero" };
         } 
         else if (valorCarta === "enemy21.jpg") {
-            // CORRECCIÓN: Si es par, +20 monedas. Si es impar, -10.
             let esBueno = (idCarta % 2 === 0);
-            if (esBueno) return { monedas: 20, tipo: "cofre_bueno" };
+            if (esBueno) return { monedas: 20, tipo: "cofre_bueno" }; // +20
             else return { monedas: -10, tipo: "mimic" };
         }
         return { monedas: 10, tipo: "estandar" };

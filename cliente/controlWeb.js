@@ -783,7 +783,7 @@ function ControlWeb() {
 
             else if (carta1.valor === "enemy21.jpg") {
                 
-                let esBueno = Math.random() > 0.5;
+                let esBueno = (carta1.id % 2 === 0);
 
                 if (esBueno) {
                     let actuales = parseInt($('#mis-monedas').text());
@@ -803,7 +803,7 @@ function ControlWeb() {
                         let actuales = parseInt($('#mis-monedas').text());
                         $('#mis-monedas').text(actuales - 10);
 
-                            self.mostrarAvisoEspecial("¡Del cofre sale un gato que te muerde!:"," -10 Monedas", "gato.gif", "#ff0000");
+                        self.mostrarAvisoEspecial("¡ES UN MIMIC!", "El cofre te muerde: -10 Monedas", "gato.gif", "#ff0000");
                         self.reproducirAudio("audioCat"); 
                     }, 800); 
                     
