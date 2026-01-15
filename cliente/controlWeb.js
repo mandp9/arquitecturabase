@@ -329,8 +329,7 @@ function ControlWeb() {
                 <h4 class="text-center mb-3 font-weight-bold" style="color: #ffffffff; text-shadow: 2px 2px 0 #000;">
                     Jugadores
                 </h4>                
-                <div id="listaJugadoresSala" class="list-group mb-3 font-weight-bold shadow-sm">
-                    <li class="list-group-item" style="background-color: rgba(255,255,255,0.7);">Esperando...</li>
+                <div id="listaJugadoresSala" class="list-group mb-3 font-weight-bold shadow-sm" style="min-height: 50px;">
                 </div>
                 
                 <div id="tituloEstado" class="alert alert-info text-center font-weight-bold shadow-sm" style="background-color: rgba(23, 162, 184, 0.8); color: white; border: none;">
@@ -437,7 +436,7 @@ function ControlWeb() {
 
         if (listaFiltrada.length === 0) {
             if (lista.length === 0) {
-                $('#listaPartidas').append('<li class="list-group-item">No hay misiones disponibles</li>');
+                $('#listaPartidas').append('<li class="list-group-item">No hay partidas disponibles</li>');
             } else {
                 $('#listaPartidas').append('<li class="list-group-item">No hay coincidencias con ese código</li>');
             }
@@ -477,9 +476,6 @@ function ControlWeb() {
                 </li>
             `);
         });
-        for (let i = jugadoresValidos.length; i < max; i++) {
-          $('#listaJugadoresSala').append(`<li class="list-group-item text-muted">Esperando jugador...</li>`);
-        }
         if (numJugadores === max) {
             $('#tituloEstado').removeClass('alert-info').addClass('alert-success').text("¡Sala llena! Todo listo.");
             $('#btnIrAlJuego').show();
