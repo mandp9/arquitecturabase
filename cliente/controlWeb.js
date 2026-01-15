@@ -398,7 +398,8 @@ function ControlWeb() {
 
         $('#zonaBotones').append(botones);
         $('#btnEliminarPartida, #btnSalirPartida').on('mouseenter', () => cw.reproducirSonidoBoton());
-        
+        $('#btnIrAlJuego').on('mouseenter', () => cw.reproducirSonidoBoton());
+
         $('#btnSalirPartida').on('click', function() {
             $('.navbar').css('z-index', '');
             ws.abandonarPartida(codigoStr);
@@ -411,7 +412,7 @@ function ControlWeb() {
         });
 
         $('#btnIrAlJuego').on('click', function() {
-            cw.reproducirSonidoBoton();
+            cw.reproducirAudio("audioBarajar");
             $('.navbar').css('z-index', '');
             cw.mostrarTablero(codigoStr);
         });
