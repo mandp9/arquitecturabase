@@ -709,7 +709,7 @@ function ControlWeb() {
             "enemy15.jpg": "una Esfinge, tan magestuosa como letal",
             "enemy16.jpg": "Cerberus, el guardián del inframundo",
             "enemy17.jpg": "un súcubo",
-            "enemy18.jpg": "un unicornio adorable, ¿Por qué?",
+            "enemy18.jpg": "un unicornio adorable, ¿por qué?",
             "enemy19.jpg": "un gatito (¡Cuidado!)",
             "enemy20.jpg": "un ojo flotante, qué turbio",
             "enemy21.jpg": "un cofre tramposo",
