@@ -534,6 +534,19 @@
         from { opacity: 0; transform: translate(-50%, -20px) scale(0.8); }
         to { opacity: 1; transform: translate(-50%, 0) scale(1); }
     }
+
+    @keyframes pulsoBoton {
+        0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 215, 0, 0); }
+        50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+        100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 215, 0, 0); }
+    }
+
+    /* Clase para aplicar la animación al hacer hover */
+    .btn-medieval-hover:hover {
+        animation: pulsoBoton 0.8s infinite;
+        filter: brightness(1.2); /* Los hace un poco más brillantes */
+        cursor: url('./cliente/img/cursor-mano.png'), pointer; /* Opcional: cursor temático */
+    }
     .badge-rival {
         position: absolute;
         top: -60px;
@@ -684,6 +697,11 @@
         cw.salir(); 
     });
     $("#btnAbrirHistoria").on("click", function() {
+        let audio = document.getElementById("audioPergamino");
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log(e));
+        }
         $("#modalHistoria").fadeIn(); 
     });
 
@@ -698,5 +716,11 @@
     });
     cw.comprobarSesion();
   </script>
+    <audio id="audioHoverBtn" preload="auto">
+        <source src="./cliente/musica/sonidoBotones.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioPergamino" preload="auto">
+        <source src="./cliente/musica/pergamino.mp3" type="audio/mpeg">
+    </audio>
 </body>
 </html>

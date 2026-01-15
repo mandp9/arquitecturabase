@@ -16,6 +16,13 @@ function ControlWeb() {
                     </a>
                 </li>
             `);
+            $('#lnkSalir').on('mouseenter', function() {
+                let audio = document.getElementById("audioHoverBtn");
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play().catch(e => {}); 
+                }
+            });
         } else {
             $menu.html(``);
         }
@@ -184,8 +191,8 @@ function ControlWeb() {
 
                     <div class="mb-4 animate__animated animate__fadeInDown" 
                          style="display: inline-block; background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 20px; border: 2px solid #FFD700;">
-                        <span style="font-size: 1.5rem; color: #fdf6e3;">🏆 Tesoro Acumulado: </span>
-                        <span style="font-size: 1.8rem; color: #FFD700; font-weight: bold;">${monedasTotales} 💰</span>
+                        <span style="font-size: 1.5rem; color: #fdf6e3;">✧˖° Tesoro Acumulado: </span>
+                        <span style="font-size: 1.8rem; color: #FFD700; font-weight: bold;">${monedasTotales} ⚜️</span>
                     </div>
 
                     <div class="mb-5 animate__animated animate__fadeInUp d-flex justify-content-center gap-3">
@@ -233,6 +240,18 @@ function ControlWeb() {
         
         $('#au').append(cadena);
         rest.obtenerPartidasDisponibles();
+
+        const sonidoBtn = document.getElementById("audioHoverBtn");
+
+        function playSound() {
+                if(sonidoBtn) {
+                    sonidoBtn.currentTime = 0;
+                    sonidoBtn.play().catch(e => console.log("Interacción requerida primero"));
+                }
+        }
+        $('#btnCrearPartida, #btnSalir').on('mouseenter', function() {
+                playSound();
+        });
 
         $('#btnCrearPartida').on('click', function() {
             $(this).prop('disabled', true);
