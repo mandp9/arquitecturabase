@@ -547,7 +547,7 @@ function ControlWeb() {
             <div class="arena-de-juego">
                 <div id="avatar-izq" class="contenedor-avatar" data-nick="${jug1}">
                     ${htmlBadge1}
-                    <img src="./cliente/img/K1.png" alt="${jug1}" class="img-avatar">
+                    <img src="./cliente/img/k1.png" alt="${jug1}" class="img-avatar">
                     <div class="nombre-avatar">${jug1}</div>
                 </div>
 
@@ -555,7 +555,7 @@ function ControlWeb() {
 
                 <div id="avatar-der" class="contenedor-avatar" data-nick="${jug2}">
                     ${htmlBadge2}
-                    <img src="./cliente/img/K2.png" alt="${jug2}" class="img-avatar">
+                    <img src="./cliente/img/k2.png" alt="${jug2}" class="img-avatar">
                     <div class="nombre-avatar">${jug2}</div>
                 </div>
             </div>
