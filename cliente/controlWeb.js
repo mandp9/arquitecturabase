@@ -803,7 +803,7 @@ function ControlWeb() {
                         let actuales = parseInt($('#mis-monedas').text());
                         $('#mis-monedas').text(actuales - 10);
 
-                        self.mostrarAvisoEspecial("En el cofre había un gatito", " que te muerde: -10 Monedas", "gato.gif", "#ff0000");
+                        self.mostrarAvisoEspecial("En el cofre había un gatito", " te muerde: -10 Monedas", "gato.gif", "#ff0000");
                         self.reproducirAudio("audioCat"); 
                     }, 800); 
                     
