@@ -2,6 +2,14 @@ function ControlWeb() {
     this.jugadoresActuales = [];
     this.intervaloTiempo = null;
 
+    this.reproducirSonidoBoton = function() {
+        let audio = document.getElementById("audioHoverBtn");
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(e => {});
+        }
+    };
+
     this.limpiarId = function(nick) {
         return nick.replace(/[^a-zA-Z0-9]/g, '_'); 
     };
@@ -16,13 +24,7 @@ function ControlWeb() {
                     </a>
                 </li>
             `);
-            $('#lnkSalir').on('mouseenter', function() {
-                let audio = document.getElementById("audioHoverBtn");
-                if (audio) {
-                    audio.currentTime = 0;
-                    audio.play().catch(e => {}); 
-                }
-            });
+            $('#lnkSalir').on('mouseenter', () => this.reproducirSonidoBoton());
         } else {
             $menu.html(``);
         }
@@ -241,14 +243,8 @@ function ControlWeb() {
         $('#au').append(cadena);
         rest.obtenerPartidasDisponibles();
 
-        const sonidoBtn = document.getElementById("audioHoverBtn");
+        $('#btnCrearPartida, #btnSalir').on('mouseenter', () => cw.reproducirSonidoBoton());
 
-        function playSound() {
-                if(sonidoBtn) {
-                    sonidoBtn.currentTime = 0;
-                    sonidoBtn.play().catch(e => console.log("Interacción requerida primero"));
-                }
-        }
         $('#btnCrearPartida, #btnSalir').on('mouseenter', function() {
                 playSound();
         });
@@ -280,6 +276,8 @@ function ControlWeb() {
         this.limpiar();
         $('#gameTitle').hide();
         
+        $('.navbar').css('z-index', '10000');
+
         $('body').css({
           'background-image': 'url("./cliente/img/gifCarga.gif")',
             'background-size': 'cover',
@@ -395,8 +393,10 @@ function ControlWeb() {
         }
 
         $('#zonaBotones').append(botones);
+        $('#btnEliminarPartida, #btnSalirPartida').on('mouseenter', () => cw.reproducirSonidoBoton());
         
         $('#btnSalirPartida').on('click', function() {
+            $('.navbar').css('z-index', '');
             ws.abandonarPartida(codigoStr);
             cw.mostrarHome();
         });
