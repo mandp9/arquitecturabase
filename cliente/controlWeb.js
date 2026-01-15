@@ -273,6 +273,19 @@ function ControlWeb() {
         });
     };
 
+    this.mostrarAvisoEspecial = function(texto, subtexto, gif, colorBorde) {
+        let msg = $(`<div class="mensaje-especial" style="border-color: ${colorBorde}; box-shadow: 0 0 20px ${colorBorde};">
+                        <img src="./cliente/img/${gif}" class="img-mensaje-especial"><br>
+                        <strong style="font-size: 1.3rem;">${texto}</strong><br>
+                        <span style="font-size:1.1rem; color:${colorBorde};">${subtexto}</span>
+                      </div>`);
+        $('body').append(msg);
+        
+        setTimeout(function() {
+            msg.fadeOut(500, function() { $(this).remove(); });
+        }, 3500);
+    };
+
     this.mostrarPartida = function(datos) {
         let codigoStr = datos.codigo || datos;
         let propietario = datos.propietario;
@@ -723,33 +736,89 @@ function ControlWeb() {
 
     this.marcarPareja = function(carta1, carta2, nickAcierto) {
         let miNick = $.cookie("nick");
+        let self = this;
+
         this.girarCartaVisual(carta1.id, carta1.valor);
         this.girarCartaVisual(carta2.id, carta2.valor);
-        
-        let colorBorde;
-        
-        if (nickAcierto === miNick) {
-            colorBorde = "#2ecc71"; 
-            
-            let nombreBicho = this.obtenerNombreMonstruo(carta1.valor);
-            
-            let mensajeVictoria = `💀 ¡Has derrotado a <br><span style="color: #ff4444;">${nombreBicho}</span>!`;
-            
-            this.mostrarAvisoMonedas(10, mensajeVictoria);
 
-        } else {
-            colorBorde = "#e74c3c"; 
-        }
-        this.reproducirAudio("audioPareja");
-        $("#carta-" + carta1.id + " .cara").css({
-            "border-color": colorBorde,
-            "box-shadow": "0 0 15px " + colorBorde 
-        });
+        let colorBorde = (nickAcierto === miNick) ? "#2ecc71" : "#e74c3c";
         
-        $("#carta-" + carta2.id + " .cara").css({
+        $(`#carta-${carta1.id} .cara, #carta-${carta2.id} .cara`).css({
             "border-color": colorBorde,
             "box-shadow": "0 0 15px " + colorBorde
         });
+        let sonidoEspecialReproducido = false;
+
+        if (nickAcierto === miNick) {
+            
+            if (carta1.valor === "enemy19.jpg") {
+               let actuales = parseInt($('#mis-monedas').text());
+                $('#mis-monedas').text(actuales - 10);
+                this.mostrarAvisoEspecial("¡No al abuso animal!", "El gato te araña: -10 Monedas", "gato.gif", "#ff3333");
+                this.reproducirAudio("audioCat");
+                sonidoEspecialReproducido = true;
+            } 
+            
+            else if (carta1.valor === "enemy18.jpg") {
+                let actualesPoc = parseInt($('#lblPocimas').text());
+                $('#lblPocimas').text(actualesPoc + 1);
+                
+                $('.img-pocima').removeClass('pocima-off').css('filter', 'none');
+                $('.img-pocima').addClass('animate__infinite'); 
+                $('#contenedor-pocima').css('cursor', 'pointer');
+
+                $('#contenedor-pocima').addClass('animate__tada'); 
+                setTimeout(() => $('#contenedor-pocima').removeClass('animate__tada'), 1000);
+                
+                this.mostrarAvisoEspecial("¡Bendición Mística!", "¡Obtienes +1 Poción!", "unicornio.gif", "#00ffea");                
+                this.reproducirAudio("audioUnicornio");
+                sonidoEspecialReproducido = true;
+            } 
+            
+            else if (carta1.valor === "enemy9.jpg") {
+                this.mostrarAvisoEspecial("¡Visión Ampliada!", "¡Podrás voltear 3 cartas!", "hechicero.gif", "#d633ff");
+                this.reproducirAudio("audioMago");
+                sonidoEspecialReproducido = true;
+            }
+
+            else if (carta1.valor === "enemy21.jpg") {
+                
+                let esBueno = Math.random() > 0.5;
+
+                if (esBueno) {
+                    let actuales = parseInt($('#mis-monedas').text());
+                    $('#mis-monedas').text(actuales + 20);
+
+                    this.mostrarAvisoEspecial("¡Tesoro Antiguo!", "¡El cofre estaba lleno! +20 Oro", "cofre.gif", "#FFD700");
+                    this.reproducirAudio("audioCofre");
+                    sonidoEspecialReproducido = true;
+                } else {
+                    setTimeout(function() {
+                        let rutaGato = "./cliente/img/cartas/enemy19.jpg"; 
+                        $(`#carta-${carta1.id} .frente img`).attr('src', rutaGato);
+                        $(`#carta-${carta2.id} .frente img`).attr('src', rutaGato);
+                        
+                        $(`#carta-${carta1.id} .cara, #carta-${carta2.id} .cara`).addClass('efecto-mimic');
+                        
+                        let actuales = parseInt($('#mis-monedas').text());
+                        $('#mis-monedas').text(actuales - 10);
+
+                            self.mostrarAvisoEspecial("¡Del cofre sale un gato que te muerde!:"," -10 Monedas", "gato.gif", "#ff0000");
+                        self.reproducirAudio("audioCat"); 
+                    }, 800); 
+                    
+                    sonidoEspecialReproducido = true; 
+                }
+            }
+            
+            else {
+                let nombreBicho = this.obtenerNombreMonstruo(carta1.valor);
+                this.mostrarAvisoMonedas(10, `💀 Has derrotado a <br><span style="color: #ff4444;">${nombreBicho}</span>!`);
+            }
+        }
+        if (!sonidoEspecialReproducido) {
+            this.reproducirAudio("audioPareja");
+        }
     };
 
     this.actualizarMonedasRival = function(data) {
@@ -811,52 +880,61 @@ function ControlWeb() {
     };
 
     this.usarPocima = function() {
-        let nick = $.cookie("nick");
-        
-        console.log("Click en pócima. Nick:", nick, "Código:", ws.codigo);
+        if (this.usandoPocima) return;
 
-        if (!ws.codigo) {
-            alert("Error: No se encuentra el código de la partida. Recarga la página.");
-            return;
-        }
+        let nick = $.cookie("nick");
+        let cantidad = parseInt($('#lblPocimas').text());
+
+        if (cantidad <= 0) return; 
+        if (!ws.codigo) return;
+
+        this.usandoPocima = true; 
+        
         this.reproducirAudio("audioMagic");
         $('#contenedor-pocima').addClass('animate__rubberBand');
         setTimeout(() => $('#contenedor-pocima').removeClass('animate__rubberBand'), 1000);
 
+        $('#lblPocimas').text(cantidad - 1);
+        if (cantidad - 1 <= 0) {
+             $('.img-pocima').addClass('pocima-off').removeClass('animate__infinite');
+        }
+
         ws.socket.emit("usarPocima", { nick: nick, codigo: ws.codigo });
+
+        let self = this;
+        setTimeout(() => { self.usandoPocima = false; }, 1000);
     };
 
     this.mostrarRevelacion = function(carta) {
         let nombreMostrar = this.obtenerNombreMonstruo(carta.valor);
-
         let msg = $(`<div class="mensaje-magico">
                         <img src="./cliente/img/magic.gif" class="icono-mensaje"><br>
                         🔮 ¡El Ojo Arcano revela un secreto!<br>
                         <span style="font-size:1.2rem; color:#d633ff;">¡Es ${nombreMostrar}!</span>
                       </div>`);
         $('body').append(msg);
-
         this.girarCartaVisual(carta.id, carta.valor);
-
+        
         let cardDiv = $('#carta-' + carta.id + ' .cara');
-        cardDiv.css('border', '3px solid #d633ff'); 
-        cardDiv.css('box-shadow', '0 0 20px #d633ff');
-
+        cardDiv.css({'border': '3px solid #d633ff', 'box-shadow': '0 0 20px #d633ff'});
+        
+        let contenedor = $('.grid-cartas'); 
         let tarjeta = $('#carta-' + carta.id);
-        if (tarjeta.length > 0) {
-            $('html, body').animate({
-                scrollTop: tarjeta.offset().top - 200 
-            }, 800); 
+        if (tarjeta.length > 0 && contenedor.length > 0) {
+            let scrollDestino = contenedor.scrollTop() + tarjeta.position().top - (contenedor.height() / 2) + (tarjeta.height() / 2);
+            contenedor.animate({ scrollTop: scrollDestino }, 800);
+        } else if (tarjeta.length > 0) {
+            $('html, body').animate({ scrollTop: tarjeta.offset().top - 200 }, 800); 
         }
 
         let self = this;
         setTimeout(function() {
             self.ocultarCartaVisual(carta.id);
             msg.fadeOut(500, function() { $(this).remove(); });
-            cardDiv.css('border', '');
-            cardDiv.css('box-shadow', '');
+            cardDiv.css({'border': '', 'box-shadow': ''});
         }, 3000); 
     };
+
     this.mostrarVictoria = function(datos) {
         let audioJuego = document.getElementById("audioJuego");
         if (audioJuego) {
@@ -933,12 +1011,15 @@ function ControlWeb() {
         let actuales = parseInt($('#mis-monedas').text());
         $('#mis-monedas').text(actuales + cantidad);
 
-        let textoMostrar = mensaje || "¡Has encontrado un tesoro!";
+        let colorCant = cantidad >= 0 ? "#FFD700" : "#ff3333";
+        let textoCantidad = cantidad >= 0 ? "+" + cantidad : cantidad;
 
         let msg = $(`<div class="mensaje-moneda">
                         <img src="./cliente/img/moneda.gif" class="icono-mensaje"><br>
-                        ${textoMostrar}<br>
-                        <span style="font-size:1.2rem; color:#FFD700;">+${cantidad} Monedas de Oro</span>
+                        ${mensaje}<br>
+                        <span style="font-size:1.2rem; color:${colorCant}; font-weight: bold;">
+                            ${textoCantidad} Monedas
+                        </span>
                       </div>`);
         $('body').append(msg);
 

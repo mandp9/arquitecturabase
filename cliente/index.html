@@ -269,9 +269,24 @@
     .grid-cartas {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
+        gap: 10px; 
         perspective: 1000px;
         padding: 10px;
+        max-height: 600px; 
+        overflow-y: auto; 
+        scrollbar-width: thin;
+        scrollbar-color: #8b4513 #2c1810;
+    }
+    @keyframes glitchear {
+        0% { filter: hue-rotate(0deg); transform: scale(1); }
+        25% { filter: hue-rotate(90deg) invert(1); transform: translate(2px, -2px); }
+        50% { filter: hue-rotate(180deg); transform: scale(1.1); }
+        75% { filter: hue-rotate(270deg) invert(1); transform: translate(-2px, 2px); }
+        100% { filter: hue-rotate(0deg); transform: scale(1); }
+    }
+    .efecto-mimic {
+        animation: glitchear 0.8s ease-in-out;
+        border: 3px solid #ff0000 !important; 
     }
 
     .carta {
@@ -574,7 +589,6 @@
         100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 215, 0, 0); }
     }
 
-    /* Clase para aplicar la animación al hacer hover */
     .btn-medieval-hover:hover {
         animation: pulsoBoton 0.8s infinite;
         filter: brightness(1.2); /* Los hace un poco más brillantes */
@@ -628,7 +642,34 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         pointer-events: auto;
     }
+    .mensaje-especial {
+        position: fixed;
+        top: 120px;       
+        right: 20px;      
+        width: 320px;    
+        
+        background: rgba(15, 10, 5, 0.95); /* Fondo oscuro semitransparente */
+        border: 4px double #fff; /* Borde por defecto (se cambiará con JS) */
+        border-radius: 15px;
+        
+        font-family: 'MedievalSharp', cursive;
+        font-size: 1.2rem; 
+        text-align: center;
+        padding: 15px;
+        color: #fdf6e3;
+        
+        z-index: 20000 !important;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+        animation: deslizarDerecha 0.5s ease-out;
+    }
 
+    .img-mensaje-especial {
+        width: 100px; /* Tamaño un poco más grande para que se luzca el GIF */
+        height: 100px;
+        object-fit: contain;
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    }
   </style>
 </head>
 
@@ -789,6 +830,18 @@
     </audio>
     <audio id="audioBarajar" preload="auto">
         <source src="./cliente/musica/barajar.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioCat" preload="auto">
+        <source src="./cliente/musica/cat.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioCofre" preload="auto">
+        <source src="./cliente/musica/cofre.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioUnicornio" preload="auto">
+        <source src="./cliente/musica/unicornio.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioMago" preload="auto">
+        <source src="./cliente/musica/mago.mp3" type="audio/mpeg">
     </audio>
     <script>
     $(document).one('click', function() {

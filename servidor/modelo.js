@@ -299,6 +299,7 @@ function Partida(codigo, propietario) {
     this.pocimas = {};
 
     this.puntos = {};
+    this.limiteVolteo = 2;
 
     this.fondosDisponibles = [
         "battle1.jpg",
@@ -404,69 +405,121 @@ function Partida(codigo, propietario) {
         
         return cartas;
     }
-    this.calcularEfectoCarta = function(valorCarta) {
+    this.calcularEfectoCarta = function(valorCarta, nick, idCarta) {
+        if (valorCarta === "enemy19.jpg") {
+            return { monedas: -10, tipo: "trampa" };
+        } 
+        else if (valorCarta === "enemy18.jpg") {
+            if (!this.pocimas[nick]) this.pocimas[nick] = 0;
+            this.pocimas[nick]++; 
+            return { monedas: 10, tipo: "pocima" };
+        } 
+        else if (valorCarta === "enemy9.jpg") {
+            this.limiteVolteo = 3; 
+            console.log("Poder del Hechicero activado: Límite de volteo sube a 3");
+            return { monedas: 0, tipo: "hechicero" };
+        } 
+        else if (valorCarta === "enemy21.jpg") {
+            // CORRECCIÓN: Si es par, +20 monedas. Si es impar, -10.
+            let esBueno = (idCarta % 2 === 0);
+            if (esBueno) return { monedas: 20, tipo: "cofre_bueno" };
+            else return { monedas: -10, tipo: "mimic" };
+        }
         return { monedas: 10, tipo: "estandar" };
     };
 
     this.voltearCarta = function(idCarta, nick) {
         if (this.turno !== nick) {
-            console.log("No es el turno de " + nick + ". Turno actual: " + this.turno);
-            return null; 
+            console.log("No es el turno de " + nick);
+            return null;
         }
 
         let carta = this.mazo.find(c => c.id == idCarta);
-        
-        if (carta && carta.estado === 'oculta' && this.cartasLevantadas.length < 2) {
+
+        if (carta && carta.estado === 'oculta' && this.cartasLevantadas.length < this.limiteVolteo) {
             carta.estado = 'visible';
             this.cartasLevantadas.push(carta);
-            
-            if (this.cartasLevantadas.length === 2) {
-                let carta1 = this.cartasLevantadas[0];
-                let carta2 = this.cartasLevantadas[1];
+
+            if (this.cartasLevantadas.length === this.limiteVolteo) {
                 
-                if (carta1.valor === carta2.valor) {
+                let carta1 = null; 
+                let carta2 = null;
+                let encontrada = false;
+
+                for(let i=0; i<this.cartasLevantadas.length; i++) {
+                    for(let j=i+1; j<this.cartasLevantadas.length; j++) {
+                        if (this.cartasLevantadas[i].valor === this.cartasLevantadas[j].valor) {
+                            carta1 = this.cartasLevantadas[i];
+                            carta2 = this.cartasLevantadas[j];
+                            encontrada = true;
+                            break;
+                        }
+                    }
+                    if(encontrada) break;
+                }
+
+                if (encontrada) {
                     carta1.estado = 'encontrada';
                     carta2.estado = 'encontrada';
-                    this.cartasLevantadas = []; 
                     
-                    let efecto = this.calcularEfectoCarta(carta1.valor); // <--- Lógica de monedas
+                    this.cartasLevantadas.forEach(c => {
+                        if (c.id !== carta1.id && c.id !== carta2.id) {
+                            c.estado = 'oculta';
+                        }
+                    });
+                    
+                    this.cartasLevantadas = [];
+
+                    let efecto = this.calcularEfectoCarta(carta1.valor, nick, carta1.id);
+
                     if (!this.puntos[nick]) this.puntos[nick] = 0;
                     this.puntos[nick] += efecto.monedas;
+
                     let quedanOcultas = this.mazo.some(c => c.estado === 'oculta' || c.estado === 'visible');
-                    
+
                     if (!quedanOcultas) {
                         this.estado = "finalizada";
                         let ganador = this.calcularGanador();
-                        return { 
-                            tipo: "final", 
-                            carta1: carta1, 
-                            carta2: carta2, 
-                            turno: this.turno, 
+                        return {
+                            tipo: "final",
+                            carta1: carta1,
+                            carta2: carta2,
+                            turno: this.turno,
                             monedas: efecto.monedas,
                             ganador: ganador,
                             puntos: this.puntos
                         };
                     }
 
-                    return { 
-                        tipo: "pareja", 
-                        carta1: carta1, 
-                        carta2: carta2, 
+                    return {
+                        tipo: "pareja",
+                        carta1: carta1,
+                        carta2: carta2,
                         turno: this.turno,
-                        monedas: efecto.monedas 
+                        monedas: efecto.monedas
                     };
                 } else {
-                    carta1.estado = 'oculta';
-                    carta2.estado = 'oculta';
+                    // FALLO: Ocultamos todas
+                    let cartasFallo = [...this.cartasLevantadas];
+                    this.cartasLevantadas.forEach(c => c.estado = 'oculta');
                     this.cartasLevantadas = [];
+                    
                     this.cambiarTurno();
-                    return { tipo: "fallo", carta1: carta1, carta2: carta2, turno: this.turno };
+                    
+                    // Devolvemos las 2 primeras para mantener compatibilidad visual básica
+                    return { 
+                        tipo: "fallo", 
+                        carta1: cartasFallo[0], 
+                        carta2: cartasFallo[1], 
+                        turno: this.turno 
+                    };
                 }
             }
             return { tipo: "volteo", carta: carta, turno: this.turno };
         }
         return null;
     };
+
     this.calcularGanador = function() {
         let jug1 = this.jugadores[0];
         let jug2 = this.jugadores[1];
@@ -478,6 +531,7 @@ function Partida(codigo, propietario) {
     this.cambiarTurno = function() {
         let index = this.jugadores.indexOf(this.turno);
         this.turno = this.jugadores[(index + 1) % this.jugadores.length];
+        this.limiteVolteo = 2;
     }
 }
 
