@@ -66,19 +66,15 @@ function ClienteWS(){
                 cw.girarCartaVisual(res.carta2.id, res.carta2.valor);
             }
 
-            // 2. OCULTAMOS INMEDIATAMENTE (Sin espera)
             if (res.cartas) {
-                // Caso Hechicero (3 cartas)
                 res.cartas.forEach(function(c) {
                     cw.ocultarCartaVisual(c.id);
                 });
             } else {
-                // Caso Normal (2 cartas)
                 cw.ocultarCartaVisual(res.carta1.id);
                 cw.ocultarCartaVisual(res.carta2.id);
             }
             
-            // Actualizamos turno inmediatamente
             cw.actualizarTurno(res.turno);
         });
         this.socket.on("cambioTurno", function(datos) {
@@ -161,7 +157,6 @@ function ClienteWS(){
     }
 
     this.lanzarSocketSrv = function() {
-        // ... existing listeners ...
         this.socket.on("partidaIniciada", function(mazo) {
             cw.pintarTablero(mazo);
         });

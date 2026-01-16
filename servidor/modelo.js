@@ -378,33 +378,45 @@ function Partida(codigo, propietario) {
     }
 
     this.generarMazo = function(numParejas) {
-        let totalCartas = [];
-        for(let j=1; j<=25; j++) {
-            totalCartas.push(j);
+        let especiales = [9, 18, 19, 21];
+        let normales = [];
+
+        for(let i=1; i<=25; i++) {
+            if (!especiales.includes(i)) {
+                normales.push(i);
+            }
         }
 
-        for (let i = totalCartas.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [totalCartas[i], totalCartas[j]] = [totalCartas[j], totalCartas[i]];
+        const barajar = (array) => {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        };
+
+        especiales = barajar(especiales);
+        normales = barajar(normales);
+
+        let seleccionados = [];
+
+        seleccionados.push(especiales[0]);
+        seleccionados.push(especiales[1]);
+
+        let necesarios = numParejas - 2; 
+        for(let i=0; i<necesarios; i++) {
+            seleccionados.push(normales[i]);
         }
-        
-        let seleccionadas = totalCartas.slice(0, numParejas);
 
         let cartas = [];
-        for(let i=0; i<seleccionadas.length; i++) {
-            let nombreImagen = "enemy" + seleccionadas[i] + ".jpg"; // Ej: "enemy5.jpg"
-            
-            cartas.push({ id: i*2, valor: nombreImagen, estado: 'oculta' });
-            cartas.push({ id: i*2+1, valor: nombreImagen, estado: 'oculta' });
+        for(let i=0; i<seleccionados.length; i++) {
+            let nombreImagen = "enemy" + seleccionados[i] + ".jpg";
+            cartas.push({ id: i * 2, valor: nombreImagen, estado: 'oculta' });
+            cartas.push({ id: i * 2 + 1, valor: nombreImagen, estado: 'oculta' });
         }
-        
-        for (let i = cartas.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [cartas[i], cartas[j]] = [cartas[j], cartas[i]];
-        }
-        
-        return cartas;
-    }
+
+        return barajar(cartas);
+    };
     this.calcularEfectoCarta = function(valorCarta, nick, idCarta) {
         if (valorCarta === "enemy19.jpg") {
             return { monedas: -10, tipo: "trampa" };
@@ -442,7 +454,6 @@ function Partida(codigo, propietario) {
                 let encontrada = false;
                 let cartaSobrante = null; 
 
-                // Buscamos la pareja entre las 2 o 3 cartas
                 for(let i=0; i<this.cartasLevantadas.length; i++) {
                     for(let j=i+1; j<this.cartasLevantadas.length; j++) {
                         if (this.cartasLevantadas[i].valor === this.cartasLevantadas[j].valor) {
@@ -459,7 +470,6 @@ function Partida(codigo, propietario) {
                     carta1.estado = 'encontrada';
                     carta2.estado = 'encontrada';
                     
-                    // Identificamos la carta sobrante y la ocultamos en servidor
                     this.cartasLevantadas.forEach(c => {
                         if (c.id !== carta1.id && c.id !== carta2.id) {
                             c.estado = 'oculta';
@@ -478,7 +488,6 @@ function Partida(codigo, propietario) {
                         return { tipo: "final", carta1: carta1, carta2: carta2, turno: this.turno, monedas: efecto.monedas, ganador: this.calcularGanador(), puntos: this.puntos };
                     }
 
-                    // ENVIAMOS 'cartaOcultar' AL CLIENTE (Esto es vital)
                     return { 
                         tipo: "pareja", 
                         carta1: carta1, 
@@ -489,13 +498,12 @@ function Partida(codigo, propietario) {
                     };
 
                 } else {
-                    // FALLO
+        
                     let cartasFallo = [...this.cartasLevantadas];
                     this.cartasLevantadas.forEach(c => c.estado = 'oculta');
                     this.cartasLevantadas = [];
                     this.cambiarTurno();
                     
-                    // Enviamos TODAS las cartas levantadas para que el cliente las tape
                     return { 
                         tipo: "fallo", 
                         cartas: cartasFallo, 
