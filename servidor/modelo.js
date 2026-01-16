@@ -478,12 +478,12 @@ function Partida(codigo, propietario) {
                         return { tipo: "final", carta1: carta1, carta2: carta2, turno: this.turno, monedas: efecto.monedas, ganador: this.calcularGanador(), puntos: this.puntos };
                     }
 
-                    // ENVIAMOS 'cartaOcultar' AL CLIENTE
+                    // ENVIAMOS 'cartaOcultar' AL CLIENTE (Esto es vital)
                     return { 
                         tipo: "pareja", 
                         carta1: carta1, 
                         carta2: carta2, 
-                        cartaOcultar: cartaSobrante, // ESTO ES LA CLAVE
+                        cartaOcultar: cartaSobrante, 
                         turno: this.turno, 
                         monedas: efecto.monedas 
                     };
@@ -498,7 +498,7 @@ function Partida(codigo, propietario) {
                     // Enviamos TODAS las cartas levantadas para que el cliente las tape
                     return { 
                         tipo: "fallo", 
-                        cartas: cartasFallo, // Array completo
+                        cartas: cartasFallo, 
                         carta1: cartasFallo[0], 
                         carta2: cartasFallo[1], 
                         turno: this.turno 

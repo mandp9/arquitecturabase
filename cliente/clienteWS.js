@@ -35,7 +35,9 @@ function ClienteWS(){
             cw.actualizarEstadoPartida(datos);
         });
         this.socket.on("finalPartida", function(datos) {
-            cw.mostrarVictoria(datos);
+            setTimeout(function() {
+                cw.mostrarVictoria(datos);
+            }, 1500);
         });
         this.socket.on("partidaTerminada", function(datos) {
             cw.mostrarHome();
@@ -50,13 +52,33 @@ function ClienteWS(){
         });
 
         this.socket.on("parejaEncontrada", function(res) {
-            cw.marcarPareja(res.carta1, res.carta2, res.turno);
+            cw.marcarPareja(res.carta1, res.carta2, res.turno, res.cartaOcultar);
             cw.iniciarTemporizador();
         });
         
         this.socket.on("parejaIncorrecta", function(res) {
-            cw.ocultarCartaVisual(res.carta1.id);
-            cw.ocultarCartaVisual(res.carta2.id);
+            console.log("Fallo:", res);
+            
+            if (res.cartas) {
+                res.cartas.forEach(c => cw.girarCartaVisual(c.id, c.valor));
+            } else {
+                cw.girarCartaVisual(res.carta1.id, res.carta1.valor);
+                cw.girarCartaVisual(res.carta2.id, res.carta2.valor);
+            }
+
+            // 2. OCULTAMOS INMEDIATAMENTE (Sin espera)
+            if (res.cartas) {
+                // Caso Hechicero (3 cartas)
+                res.cartas.forEach(function(c) {
+                    cw.ocultarCartaVisual(c.id);
+                });
+            } else {
+                // Caso Normal (2 cartas)
+                cw.ocultarCartaVisual(res.carta1.id);
+                cw.ocultarCartaVisual(res.carta2.id);
+            }
+            
+            // Actualizamos turno inmediatamente
             cw.actualizarTurno(res.turno);
         });
         this.socket.on("cambioTurno", function(datos) {

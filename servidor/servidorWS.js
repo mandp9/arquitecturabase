@@ -123,8 +123,6 @@ function WSServer() {
                     else if (res.tipo === "pareja") {
                         io.in(datos.codigo).emit("parejaEncontrada", res);
                         
-                        // OJO: Quitamos sistema.sumarMonedas de aquí.
-                        // Solo actualizamos lo visual:
                         if (res.monedas > 0) {
                             io.in(datos.codigo).emit("actualizarMonedas", { 
                                 nick: res.turno, 
@@ -163,7 +161,22 @@ function WSServer() {
                         }, 1000);
                     }
                     else if (res.tipo === "fallo") {
-                        io.in(datos.codigo).emit("cartaVolteada", { id: datos.idCarta, valor: res.carta2.valor });
+                        // --- CORRECCIÓN CRÍTICA ---
+                        // Buscamos la carta exacta que se acaba de voltear dentro del array 'res.cartas'
+                        // (res.cartas contiene las 2 o 3 cartas que están levantadas)
+                        let cartaActual = null;
+                        
+                        if (res.cartas) {
+                            cartaActual = res.cartas.find(c => c.id == datos.idCarta);
+                        }
+                        
+                        let cartaEnviar = cartaActual || res.carta2;
+
+                        io.in(datos.codigo).emit("cartaVolteada", { 
+                            id: datos.idCarta, 
+                            valor: cartaEnviar.valor 
+                        });
+
                         setTimeout(() => {
                             io.in(datos.codigo).emit("parejaIncorrecta", res);
                             reiniciarTemporizador(datos.codigo);
