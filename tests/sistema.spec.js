@@ -9,7 +9,7 @@ test.describe('Flujo Multijugador con Login Real', () => {
     
     await page1.goto('/'); 
     await expect(page1.locator('#email')).toBeVisible();
-    await page1.locator('#email').fill('ppseconte@gmail.com');  // Tu email real 1
+    await page1.locator('#email').fill('ppseconte@gmail.com');  
     await page1.locator('#pwd').fill('1234');
     await page1.locator('#btnLogin').click();
 
@@ -41,7 +41,6 @@ test.describe('Flujo Multijugador con Login Real', () => {
     await expect(botonUnirse).toBeVisible();
     await botonUnirse.click();
 
-    // 1. PEPE LE DA A "COMENZAR"
     const btnStartP1 = page1.locator('#btnIrAlJuego');
     await expect(btnStartP1).toBeVisible({ timeout: 10000 });
     await btnStartP1.click();
