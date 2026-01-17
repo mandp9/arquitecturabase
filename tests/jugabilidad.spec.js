@@ -42,17 +42,20 @@ test.describe('Mecánicas de Juego y Sincronización', () => {
     await expect(page1.locator('#info-turno')).toBeVisible();
     await expect(page2.locator('#info-turno')).toBeVisible();
 
-    //sincronización de cartas
     console.log("Probando sincronización de movimientos...");
     await page1.waitForTimeout(2000);
 
-    // 2. AVERIGUAR DE QUIÉN ES EL TURNO
     const textoTurnoPepe = await page1.locator('#info-turno').textContent();
-    const esTurnoDePepe = textoTurnoPepe.includes('TU TURNO');
-    console.log(`El servidor ha decidido que empieza: ${esTurnoDePepe ? 'PEPE' : 'JUAN'}`);
+    
+    const esTurnoDePpseconte = textoTurnoPepe.includes('TU TURNO');
+    
+    const nickJugador1 = 'ppseconte@gmail.com';
+    const nickJugador2 = 'pirma.ba@gmail.com';
 
-    const paginaJugador = esTurnoDePepe ? page1 : page2;
-    const paginaEspectador = esTurnoDePepe ? page2 : page1;
+    console.log(`🎲 El servidor ha decidido que empieza: ${esTurnoDePpseconte ? nickJugador1 : nickJugador2}`);
+
+    const paginaJugador = esTurnoDePpseconte ? page1 : page2;
+    const paginaEspectador = esTurnoDePpseconte ? page2 : page1;
 
     const cartaJugador = paginaJugador.locator('#au .carta').first();
 
