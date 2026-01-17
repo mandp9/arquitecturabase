@@ -26,10 +26,9 @@ passport.use(new GoogleStrategy({
 passport.use(
    new GoogleOneTapStrategy(
    {
-      client_id: options.clientID, //prod-oneTap
-      //clientSecret: "xxxx", //local
+      client_id: options.clientID, 
       clientSecret: options.clientSecret, 
-      verifyCsrfToken: false, // whether to validate the csrf token or
+      verifyCsrfToken: false, 
    },
    function (profile, done) {
       return done(null, profile);

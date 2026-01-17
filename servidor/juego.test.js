@@ -134,6 +134,24 @@ describe('Mecánicas del Juego', function() {
             expect(partida.turno).toBe(JUGADOR_B); 
             expect(partida.limiteVolteo).toBe(2); 
         });
+        it('UNICORNIO: Permite usar 2 pócimas seguidas tras encontrarlo', () => {
+            expect(partida.pocimas[JUGADOR_A]).toBe(1);
+
+            partida.mazo[0] = { id: 0, valor: "enemy18.jpg", estado: 'oculta' };
+            partida.mazo[1] = { id: 1, valor: "enemy18.jpg", estado: 'oculta' };
+            sistema.voltearCarta(codigo, JUGADOR_A, 0);
+            sistema.voltearCarta(codigo, JUGADOR_A, 1);
+
+            expect(partida.pocimas[JUGADOR_A]).toBe(2);
+
+            const uso1 = partida.usarPocima(JUGADOR_A);
+            expect(uso1).not.toBeNull();
+            expect(partida.pocimas[JUGADOR_A]).toBe(1);
+
+            const uso2 = partida.usarPocima(JUGADOR_A);
+            expect(uso2).not.toBeNull();
+            expect(partida.pocimas[JUGADOR_A]).toBe(0);
+        });
     });
 
     describe('Uso de Pócimas', () => {

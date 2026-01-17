@@ -161,9 +161,7 @@ function WSServer() {
                         }, 1000);
                     }
                     else if (res.tipo === "fallo") {
-                        // --- CORRECCIÓN CRÍTICA ---
-                        // Buscamos la carta exacta que se acaba de voltear dentro del array 'res.cartas'
-                        // (res.cartas contiene las 2 o 3 cartas que están levantadas)
+                        
                         let cartaActual = null;
                         
                         if (res.cartas) {

@@ -10,7 +10,6 @@ function Sistema(test){
   if(!test.test){
     this.cad.conectar(function(db){
       console.log("Conectado a Mango Atlas");});
-      //Aqui puedes realizar operaciones con la base de datos
   }
 
   this.agregarUsuario = function(nick){
@@ -37,7 +36,6 @@ function Sistema(test){
         }
       });
     } else {
-      // Si estamos en modo test sin BBDD
       callback({ email: email, monedas: 0 });
     }
   };
@@ -256,7 +254,6 @@ this.unirAPartida = function(email, codigo) {
         let partida = this.partidas[codigo];
         
         if (partida) {
-            // Delegamos la acción a la partida, que es quien tiene el mazo
             return partida.voltearCarta(idCarta, nick);
         } else {
             console.log("No se encuentra la partida con código: " + codigo);
@@ -433,8 +430,7 @@ function Partida(codigo, propietario) {
         } 
         else if (valorCarta === "enemy21.jpg") {
             let esBueno = (idCarta % 2 === 0);
-            if (esBueno) return { monedas: 20, tipo: "cofre_bueno" }; // +20
-            else return { monedas: -10, tipo: "mimic" };
+            if (esBueno) return { monedas: 20, tipo: "cofre_bueno" }; 
         }
         return { monedas: 10, tipo: "estandar" };
     };

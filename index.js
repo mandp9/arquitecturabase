@@ -6,7 +6,6 @@ const cookieSession = require("cookie-session");
 const LocalStrategy = require('passport-local').Strategy;
 const bodyParser = require("body-parser");
 
-// 1. Importar HTTP y Socket.IO
 const httpServer = require('http').Server(app);
 const { Server } = require("socket.io");
 const moduloWS = require("./servidor/servidorWS.js");
@@ -18,16 +17,13 @@ const PORT = process.env.PORT || 3000;
 
 let sistema = new modelo.Sistema({test:false});
 
-// 2. Crear instancias de WS
 let ws = new moduloWS.WSServer();
 let io = new Server(httpServer, {
     cors: {
-        origin: "*", // Permite conexiones desde cualquier URL (localhost:5173, etc.)
+        origin: "*", 
         methods: ["GET", "POST"]
     }
 });
-
-// --- MIDDLEWARE DE EXPRESS (Configuración) ---
 
 app.use(cookieSession({
   name: 'Sistema',
@@ -42,7 +38,6 @@ app.use(passport.session());
 
 app.use(express.static(__dirname + "/"));
 
-// --- ESTRATEGIA LOCAL ---
 passport.use(new LocalStrategy({
     usernameField: "email",
     passwordField: "password"
@@ -58,7 +53,6 @@ passport.use(new LocalStrategy({
   }
 ));
 
-// --- FUNCIONES AUXILIARES ---
 const haIniciado = function(request, response, next){
   if (request.user){
     next();
@@ -68,7 +62,6 @@ const haIniciado = function(request, response, next){
   }
 }
 
-// --- RUTAS (Endpoints) ---
 
 app.get("/auth/google", passport.authenticate('google', { scope: ['profile','email'] }));
 
@@ -98,7 +91,6 @@ app.get('/', (request, response) => {
   response.send(contenido);
 });
 
-// ... (Resto de tus rutas API: agregarUsuario, obtenerUsuarios, etc.) ...
 app.get("/agregarUsuario/:nick",function(request,response){
     let nick=request.params.nick;
     let res=sistema.agregarUsuario(nick);
@@ -185,7 +177,7 @@ app.get("/obtenerPartidas", haIniciado, function(request, response) {
 app.get("/partidaActiva/:email", haIniciado, function(request, response) {
     let email = request.params.email;
     let res = sistema.buscarPartidaDeUsuario(email);
-    response.send(res); // Devuelve {codigo: "...", ...} o "" (vacío)
+    response.send(res);
 });
 app.get("/obtenerLogs", function(request, response) {
   sistema.obtenerLogs(function(logs) {
