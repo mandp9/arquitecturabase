@@ -56,7 +56,6 @@ test.describe('Flujo Multijugador con Login Real', () => {
     } catch (e) {
         console.log("Juan entró directo al juego o el botón ya no está.");
     }
-
     
     await expect(page1.locator('#info-turno')).toBeVisible({ timeout: 15000 });
     await expect(page2.locator('#info-turno')).toBeVisible({ timeout: 15000 });
